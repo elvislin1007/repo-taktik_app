@@ -99,7 +99,7 @@
     // 選項
     if (card.options.length || edit) {
       if (card.options.length) {
-        root.append(el('div', { class: 'gray' }, 'ABILITIES'));
+        root.append(el('div', { class: 'gray' }, 'OPTIONS'));
         root.append(optionList(card, edit));
       }
     }
@@ -148,7 +148,7 @@
         onEnter: () => { arr.splice(i + 1, 0, { text: '', score: '' }); rerender(); focusAt('.ed-abil', i + 1); },
         onEmptyBackspace: () => { if (arr.length > 1) { arr.splice(i, 1); rerender(); focusAt('.ed-abil', Math.max(0, i - 1)); } },
       }));
-      const inp = el('input', { type: 'number', step: '5', placeholder: '分數', 'aria-label': '這條能力的分數', value: a.score });
+      const inp = el('input', { type: 'number', step: '5', placeholder: '分數', title: '填「獨立模型」的分數；部隊會自動每個模型算 1/5', 'aria-label': '這條能力的分數（獨立模型的值，部隊自動算 1/5）', value: a.score });
       inp.addEventListener('input', () => { a.score = inp.value; saveDraft(); });
       li.append(el('span', { class: 'ctrl' }, inp,
         el('button', { type: 'button', title: '刪除這一行', 'aria-label': '刪除這一行', onclick: () => { arr.splice(i, 1); if (!arr.length) arr.push({ text: '', score: '' }); rerender(); } }, '×')));

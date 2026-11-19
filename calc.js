@@ -363,9 +363,19 @@
       if (!clean(w.name) && !w.STR && !w.RNG) return;
       wSum += scoreWeapon(w, b, out);
     });
-    const model = b.body + b.extra + wSum;
+    // 能力：輸入的是獨立模型的分數；部隊每個模型算 1/5（同額外加成 30X／6X），算進每個模型
+    let abil = 0;
+    const abilK = b.independent ? 1 : 0.2;
+    (card.abilities || []).forEach((a) => {
+      const v = parseFloat(a.score);
+      if (isNaN(v) || !v) return;
+      abil += v * abilK;
+      out.steps.push({ label: `能力：${clean(a.text).split('：')[0].slice(0, 24)}`, calc: b.independent ? `手動輸入 ${v}（獨立）` : `手動輸入 ${v} × 1/5（部隊，每個模型）`, value: r2(v * abilK) });
+    });
+
+    const model = b.body + b.extra + abil + wSum;
     const modelR = round5(model);
-    out.steps.push({ label: '每個模型', calc: `本體 ${r2(b.body)} + 額外 ${r2(b.extra)} + 武器 ${wSum}`, value: `${r2(model)} → ${modelR}` });
+    out.steps.push({ label: '每個模型', calc: `本體 ${r2(b.body)} + 額外 ${r2(b.extra)}${abil ? ' + 能力 ' + r2(abil) : ''} + 武器 ${wSum}`, value: `${r2(model)} → ${modelR}` });
 
     const count = modelCount(card.composition);
     let unit = round5(modelR * count);
@@ -382,11 +392,8 @@
       }
     });
 
-    let abil = 0;
-    (card.abilities || []).forEach((a) => { const v = parseFloat(a.score); if (!isNaN(v) && v) { abil += v; out.steps.push({ label: `能力：${clean(a.text).split('：')[0].slice(0, 24)}`, calc: '手動輸入', value: v }); } });
-
-    const total = round5(unit + abil);
-    out.steps.push({ label: '總分', calc: `${unit}${abil ? ' + 能力 ' + abil : ''}`, value: total });
+    const total = round5(unit);
+    out.steps.push({ label: '總分', calc: `${unit}`, value: total });
     out.total = total;
     out.modelCount = count;
     out.strValue = b.strV;
