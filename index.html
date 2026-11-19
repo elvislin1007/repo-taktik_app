@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taktik 步兵算分</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>Taktik 步兵算分</h1>
+  <nav>
+    <button type="button" id="btn-new">新單位</button>
+    <button type="button" id="btn-list">已存單位</button>
+    <button type="button" id="btn-settings">GitHub 設定</button>
+  </nav>
+</header>
+
+<dialog id="dlg-settings" aria-labelledby="dlg-title">
+  <form method="dialog" id="form-settings">
+    <h2 id="dlg-title">GitHub 設定</h2>
+    <p class="dlg-note">保存的單位會直接 commit 到這個 repo 的 <code>units/陣營/子陣營/</code>。
+      資料 repo 是私人的，<b>讀取和保存都需要權杖</b>；權杖只存在這台電腦的瀏覽器裡，只會送給 GitHub。</p>
+    <div class="dlg-grid">
+      <label>帳號 <input id="cfg-owner" autocomplete="off" required></label>
+      <label>repo <input id="cfg-repo" autocomplete="off" required></label>
+      <label>分支 <input id="cfg-branch" autocomplete="off" required></label>
+      <label>權杖 <input id="cfg-token" type="password" autocomplete="off" placeholder="github_pat_… 或 ghp_…"></label>
+    </div>
+    <details class="dlg-help">
+      <summary>怎麼拿權杖？</summary>
+      <p><b>repo 擁有者本人</b>：</p>
+      <ol>
+        <li>GitHub 右上角頭像 → Settings → Developer settings → Personal access tokens → <b>Fine-grained tokens</b> → Generate new token。</li>
+        <li>Repository access 選 <b>Only select repositories</b>，只勾資料 repo。</li>
+        <li>Permissions → Repository permissions → <b>Contents：Read and write</b>，其他都不用開。</li>
+        <li>產生後複製，貼到上面「權杖」欄，按儲存。</li>
+      </ol>
+      <p><b>其他人</b>（GitHub 的限制：別人帳號底下的私人 repo，fine-grained 權杖拿不到）：</p>
+      <ol>
+        <li>先請 repo 擁有者把你加為協作者（資料 repo → Settings → Collaborators），並在信箱接受邀請。</li>
+        <li>GitHub 右上角頭像 → Settings → Developer settings → Personal access tokens → <b>Tokens (classic)</b> → Generate new token (classic)。</li>
+        <li>勾 <b>repo</b>，設一個到期日；產生後貼到上面「權杖」欄。注意：classic 權杖能存取你帳號能碰到的所有 repo，請只用在這裡、不要外流。</li>
+      </ol>
+    </details>
+    <p id="cfg-status" class="dlg-status" role="status"></p>
+    <div class="dlg-actions">
+      <button type="button" id="cfg-test">測試連線</button>
+      <button type="button" id="cfg-clear">清除權杖</button>
+      <button type="submit" value="cancel" formnovalidate>關閉</button>
+      <button type="submit" value="save" class="primary">儲存</button>
+    </div>
+  </form>
+</dialog>
+
+<main>
+  <!-- 編輯 -->
+  <section id="view-edit" class="view">
+    <div class="classify">
+      <label>陣營 <input id="in-faction" placeholder="例：人類帝國(40K)"></label>
+      <label>子陣營 <input id="in-subfaction" placeholder="例：極限戰士"></label>
+      <span class="hint">保存時依這兩欄分類；空白會用關鍵字列的前兩個詞</span>
+    </div>
+    <div class="card-zone"><div id="card-edit"></div></div>
+    <div class="actions">
+      <button type="button" class="primary" id="btn-confirm">確認並計分</button>
+    </div>
+  </section>
+
+  <!-- 結果 -->
+  <section id="view-result" class="view" hidden>
+    <div class="result-layout">
+      <div class="card-zone"><div id="card-result"></div></div>
+      <aside class="breakdown" id="breakdown"></aside>
+    </div>
+    <div class="actions">
+      <button type="button" id="btn-back">回上頁繼續編輯</button>
+      <button type="button" class="primary" id="btn-save">保存</button>
+      <span id="save-msg" class="save-msg" role="status"></span>
+    </div>
+  </section>
+
+  <!-- 已存單位 -->
+  <section id="view-list" class="view" hidden>
+    <h2>已存單位</h2>
+    <div id="unit-tree"></div>
+  </section>
+</main>
+
+<script src="calc.js"></script>
+<script src="repo.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
