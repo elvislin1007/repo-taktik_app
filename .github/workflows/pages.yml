@@ -3,7 +3,6 @@ name: 發布算分網頁到 GitHub Pages
 on:
   push:
     branches: [main]
-    paths-ignore: ["README.md"]
   workflow_dispatch:
 
 permissions:
