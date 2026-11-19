@@ -7,19 +7,33 @@
     ranged: { label: '射擊', icon: 'icons/ranged.png' },
     melee: { label: '近戰', icon: 'icons/melee.png' },
     shield: { label: '盾牌', icon: 'icons/shield.png' },
+    grenade: { label: '手榴彈', icon: 'icons/grenade.png' },
   };
+  const isShootType = (t) => !t || t === 'ranged' || t === 'grenade';
   const DRAFT_KEY = 'taktik-draft-v1';
 
-  const blankWeapon = (type) => (type === 'ranged' || !type
-    ? { type: 'ranged', name: '', rules: '', RNG: '', STR: '', D: '', AS: '', RL: '-' }
+  const blankWeapon = (type) => (isShootType(type)
+    ? { type: type || 'ranged', name: '', rules: '', RNG: '', STR: '', D: '', AS: '', RL: '-' }
     : { type, name: '', rules: '', RNG: 'CC1', STR: '', D: '', AS: '+0', RL: '-' });
+  const blankStats = () => Object.fromEntries(STAT_KEYS.map((k) => [k, '']));
+  const blankProfile = () => ({ name: '', keywords: '', stats: blankStats() });
   const blankCard = () => ({
-    faction: '', subfaction: '', name: '', keywords: '',
-    stats: Object.fromEntries(STAT_KEYS.map((k) => [k, ''])),
+    faction: '', subfaction: '', name: '',
+    profiles: [blankProfile()],
     composition: [''], abilities: [{ text: '', score: '' }],
     weapons: [blankWeapon('ranged')], options: [],
     savedPath: null,
   });
+
+  // 舊格式（單一 keywords／stats）轉成 profiles
+  function normalize(c) {
+    const card = Object.assign(blankCard(), c);
+    if (!Array.isArray(c.profiles) || !c.profiles.length) {
+      card.profiles = [{ name: '', keywords: c.keywords || '', stats: Object.assign(blankStats(), c.stats || {}) }];
+    } else card.profiles = c.profiles.map((p) => ({ name: p.name || '', keywords: p.keywords || '', stats: Object.assign(blankStats(), p.stats || {}) }));
+    delete card.keywords; delete card.stats;
+    return card;
+  }
 
   let state = blankCard();
   let lastResult = null;
@@ -73,21 +87,37 @@
       el('td', null, edit ? editable(card.name, (v) => { card.name = v; }, { tag: 'div', ph: '單位名稱 English Name' }) : card.name),
       el('td', { class: 'pts' }, pts))));
 
-    // 關鍵字列（藍字）
-    root.append(edit
-      ? editable(card.keywords, (v) => { card.keywords = v; }, { tag: 'div', class: 'kw', ph: '關鍵字：陣營、子陣營、類型、特規，用「、」分隔（例：人類帝國(40K)、阿斯塔特、步兵、生物、免傷(5+)）' })
-      : el('div', { class: 'kw' }, stripBrackets(card.keywords)));
-
-    // 能力值
-    const shieldOn = /能量護盾/.test(card.keywords || '');
-    root.append(el('table', { class: 'stats' },
-      el('tr', { class: 'h' }, STAT_KEYS.map((k) => el('td', null, k))),
-      el('tr', { class: 'v' }, STAT_KEYS.map((k) => el('td', null,
-        edit ? editable(card.stats[k], (v) => { card.stats[k] = v; }, { tag: 'div', ph: '–' }) : statView(card.stats[k], k, shieldOn))))));
+    // 模型：只有一種時 = 關鍵字列＋能力值；能力值不同的模型分開列（範本：歐克老大／歐克小子）
+    const multi = card.profiles.length > 1;
+    card.profiles.forEach((p, i) => {
+      if (!multi) {
+        root.append(edit
+          ? editable(p.keywords, (v) => { p.keywords = v; }, { tag: 'div', class: 'kw', ph: '關鍵字：陣營、子陣營、類型、特規，用「、」分隔（例：人類帝國(40K)、阿斯塔特、步兵、生物、免傷(5+)）' })
+          : el('div', { class: 'kw' }, stripBrackets(p.keywords)));
+      } else {
+        const row = el('div', { class: 'prof-name row-ctrl-anchor' });
+        if (edit) {
+          row.append(editable(p.name, (v) => { p.name = v; }, { class: 'pname', ph: '模型名稱 English' }), ' ',
+            editable(p.keywords, (v) => { p.keywords = v; }, { class: 'kwtag', ph: '這種模型的關鍵字，用「、」分隔' }),
+            el('span', { class: 'ctrl' }, el('button', { type: 'button', title: '刪除這種模型', 'aria-label': '刪除這種模型', onclick: () => { card.profiles.splice(i, 1); rerender(); } }, '×')));
+        } else row.append(el('span', { class: 'pname' }, text(p.name)), ' ', el('span', { class: 'kwtag' }, stripBrackets(p.keywords)));
+        root.append(row);
+      }
+      const shieldOn = /能量護盾/.test(p.keywords || '');
+      root.append(el('table', { class: 'stats' },
+        el('tr', { class: 'h' }, STAT_KEYS.map((k) => el('td', null, k))),
+        el('tr', { class: 'v' }, STAT_KEYS.map((k) => el('td', null,
+          edit ? editable(p.stats[k], (v) => { p.stats[k] = v; }, { tag: 'div', ph: '–' }) : statView(p.stats[k], k, shieldOn))))));
+    });
+    if (edit) root.append(el('div', { class: 'add-row add-in' }, el('button', { type: 'button', title: '同一個單位裡能力值不同的模型（例：小子隊裡的老大）分開列', onclick: () => {
+      const last = card.profiles[card.profiles.length - 1];
+      card.profiles.push({ name: '', keywords: last.keywords, stats: Object.assign({}, last.stats) });
+      rerender(); focusLast('.pname');
+    } }, '＋ 新增模型（能力值不同）')));
 
     // 單位構成
     root.append(el('div', { class: 'gray' }, 'UNIT COMPOSITION'));
-    root.append(bulletList(card.composition, edit, 'comp', '例：1個劍衛老兵士官[領導(Lv1)]配備：重爆彈手槍、精工動力劍'));
+    root.append(bulletList(card.composition, edit, 'comp', multi ? '每種模型一行：例 1個歐克老大[領導(Lv1)]配備：…／9個歐克小子配備：…' : '例：1個劍衛老兵士官[領導(Lv1)]配備：重爆彈手槍、精工動力劍', multi ? card.profiles.map((p) => text(p.name).split(' ')[0]).filter(Boolean) : []));
 
     // 能力
     root.append(el('div', { class: 'gray' }, 'ABILITIES'));
@@ -115,9 +145,9 @@
     return s;
   }
 
-  function bulletList(arr, edit, key, ph) {
+  function bulletList(arr, edit, key, ph, boldNames) {
     const ul = el('ul', { class: 'bul' });
-    if (!edit) { arr.filter((x) => text(x)).forEach((x) => ul.append(el('li', null, blueTags(x)))); return ul; }
+    if (!edit) { arr.filter((x) => text(x)).forEach((x) => ul.append(el('li', null, blueTags(x, boldNames)))); return ul; }
     arr.forEach((v, i) => {
       const li = el('li', { class: 'row-ctrl-anchor' });
       const ed = editable(v, (nv) => { arr[i] = nv; }, {
@@ -159,10 +189,14 @@
     return ul;
   }
   // 單位構成：[ ] 裡的特規（如 領導(Lv1)、砲塔）照範本用 7.5pt 藍字，括號拿掉
-  function blueTags(s) {
+  function blueTags(s, boldNames) {
     const span = el('span');
+    const names = (boldNames || []).filter(Boolean).sort((a, b) => b.length - a.length);
+    const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const nameRe = names.length ? new RegExp('(' + names.map(esc).join('|') + ')') : null;
     String(s).split(/(\[[^\]]*\])/).forEach((part) => {
       if (/^\[.*\]$/.test(part)) span.append(el('span', { class: 'kwtag' }, part.slice(1, -1)));
+      else if (part && nameRe) part.split(nameRe).forEach((q) => { if (q) span.append(names.includes(q) ? el('b', null, q) : q); });
       else if (part) span.append(part);
     });
     return span;
@@ -227,8 +261,8 @@
     }
     const cell = (k, ph) => el('td', { class: 'n' }, edit
       ? editable(w[k], (v) => { w[k] = v; }, { tag: 'div', ph })
-      : (k === 'STR' && type !== 'ranged' ? meleeStr(w.STR, result) : text(w[k])));
-    const melee = type !== 'ranged';
+      : (k === 'STR' && !isShootType(type) ? meleeStr(w.STR, result) : text(w[k])));
+    const melee = !isShootType(type);
     const rl = cell('RL', '-');
     if (edit) rl.append(el('span', { class: 'ctrl' }, el('button', { type: 'button', title: '刪除這把武器', 'aria-label': '刪除這把武器', onclick: () => { card.weapons.splice(i, 1); rerender(); } }, '×')));
     return el('tr', null, nameCell,
@@ -265,9 +299,9 @@
   }
   function switchType(w, type) {
     if (w.type === type) return;
-    const wasRanged = (w.type || 'ranged') === 'ranged';
+    const wasRanged = isShootType(w.type);
     w.type = type;
-    if (type === 'ranged') {
+    if (isShootType(type)) {
       if (/^CC/i.test(w.RNG)) w.RNG = '';
       if (/^\+/.test(w.STR)) w.STR = '';
       if (/^[+\-×x*]/.test(w.AS)) w.AS = '';
@@ -306,7 +340,7 @@
   }
 
   function confirmScore() {
-    const kw = C.splitList(state.keywords);
+    const kw = C.splitList(state.profiles[0] && state.profiles[0].keywords);
     if (!text(state.faction) && kw[0]) state.faction = kw[0];
     if (!text(state.subfaction) && kw[1]) state.subfaction = kw[1];
     lastResult = C.scoreUnit(state);
@@ -369,13 +403,13 @@
     let data;
     try { data = await R.loadUnit(path); } catch (e) { alert(`讀取失敗：${e.message}`); return; }
     delete data.result; delete data.savedAt;
-    state = Object.assign(blankCard(), data, { savedPath: path });
+    state = normalize(Object.assign(data, { savedPath: path }));
     rerender(); show('edit');
   }
 
   // ---------- 草稿（只是本機方便，正式資料以保存為準） ----------
   function saveDraft() { if (!booted) return; try { localStorage.setItem(DRAFT_KEY, JSON.stringify(state)); } catch (e) { /* 無痕或封鎖時略過 */ } }
-  function loadDraft() { try { const s = localStorage.getItem(DRAFT_KEY); return s ? Object.assign(blankCard(), JSON.parse(s)) : null; } catch (e) { return null; } }
+  function loadDraft() { try { const s = localStorage.getItem(DRAFT_KEY); return s ? normalize(JSON.parse(s)) : null; } catch (e) { return null; } }
 
   // ---------- GitHub 設定 ----------
   const dlg = document.getElementById('dlg-settings');
@@ -423,7 +457,7 @@
   // 開啟時：一律從空白卡開始（使用者要求）；有上次的草稿就多一個按鈕可以載回來
   const draft = loadDraft();
   state = blankCard();
-  if (draft && (text(draft.name) || text(draft.keywords))) {
+  if (draft && (text(draft.name) || draft.profiles.some((p) => text(p.keywords)))) {
     const b = el('button', { type: 'button', onclick: () => { state = draft; b.remove(); rerender(); show('edit'); } }, `繼續上次草稿：${text(draft.name) || '未命名'}`);
     document.querySelector('.topbar nav').prepend(b);
   }
@@ -437,5 +471,5 @@
     loadUnit(qs.get('load')).then(() => { if (qs.get('view') === 'result') confirmScore(); });
   }
 
-  window.__taktik = { get state() { return state; }, set state(v) { state = Object.assign(blankCard(), v); rerender(); }, confirmScore };
+  window.__taktik = { get state() { return state; }, set state(v) { state = normalize(v); rerender(); }, confirmScore };
 })();

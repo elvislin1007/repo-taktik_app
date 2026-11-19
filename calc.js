@@ -243,7 +243,7 @@
   // ---------- 武器 ----------
   function asMult(asText, rules, type, warn, name) {
     const s = String(asText || '').trim();
-    if (type !== 'ranged') {
+    if (type === 'melee' || type === 'shield') {
       if (s === '' || /^\+?0$/.test(s)) return [1, '一般 ×1'];
       if (/^-1$/.test(s)) return [0.7, '慢 ×0.7'];
       if (/^\+1$/.test(s)) return [1.3, '快 ×1.3'];
@@ -280,6 +280,7 @@
     const directAdd = { v: 0 };
     rules.forEach((tok) => {
       const t = W_ALIAS[tok] || tok;
+      if (type === 'grenade' && (t === '手榴彈' || t === '一次性')) { modP.push(`${tok}（手榴彈類型已乘 ×0.2，不重複）`); return; }
       const he = t.match(/^HE\s*(\d+(?:\.\d+)?)\s*[”"]?$/i) || t.match(/^HE\((\d+)/i);
       if (he) { heRadius = parseFloat(he[1]); return; }
       const heat = t.match(/^HEAT\s*(\d+)/i);
@@ -304,6 +305,8 @@
       warn.push(`${name}：武器特規「${tok}」資料庫查不到，這次沒算`);
     });
     if (type === 'shield') addP.push('盾牌（類型） +0');
+    if (type === 'grenade') { mod *= 0.2; modP.unshift('手榴彈（類型） ×0.2'); }
+    const isShooting = type === 'ranged' || type === 'grenade';
 
     const [asM, asTxt] = asMult(w.AS, rules, type, warn, name);
     const dPair = String(w.D || '').split('/').map(num);
@@ -311,7 +314,7 @@
     let lines = [];
     let total = 0;
 
-    if (type === 'ranged') {
+    if (isShooting) {
       const strPair = String(w.STR || '').split('/').map(num);
       const rngV = num(w.RNG);
       const rngM = rngV * 0.05;
@@ -329,7 +332,7 @@
         lines.push(`爆炸 (${bBase} + ${baseAdd}) × ${r2(dmg(dPair[1]))} × ${r2(rngM)} × ${r2(1 + bAdd)} × ${heRadius}" × ${r2(asM)} × ${rlM} × ${r2(mod)} = ${r2(blast)}，×0.5`);
         total = direct + blast * 0.5;
       } else if (strPair.length > 1) warn.push(`${name}：STR 有兩個值但沒有 HE／HEAT 半徑`);
-      out.steps.push({ label: `武器：${name}`, calc: `RNG ${rngV}、STR ${w.STR}、D ${w.D}、AS ${asTxt}、${rlTxt}；規則 ${addP.join('、') || '無'}${baseP.length ? '；基數加值 ' + baseP.join('、') : ''}${modP.length ? '；修正 ' + modP.join('、') : ''}`, value: '' });
+      out.steps.push({ label: `武器：${name}${type === 'grenade' ? '（手榴彈）' : ''}`, calc: `RNG ${rngV}、STR ${w.STR}、D ${w.D}、AS ${asTxt}、${rlTxt}；規則 ${addP.join('、') || '無'}${baseP.length ? '；基數加值 ' + baseP.join('、') : ''}${modP.length ? '；修正 ' + modP.join('、') : ''}`, value: '' });
     } else {
       const x = num(w.STR);
       const strIdx = 2 * x - 1;
@@ -355,48 +358,81 @@
     return n || 1;
   }
 
+  // 模型種類（能力值不同的模型分開列，例：歐克老大／歐克小子）
+  function profilesOf(card) {
+    if (Array.isArray(card.profiles) && card.profiles.length) return card.profiles;
+    return [{ name: '', keywords: card.keywords, stats: card.stats }];
+  }
+  const profileKey = (p) => clean(p.name).split(' ')[0];
+  // 某種模型的數量：單位構成裡提到它名稱的那幾行的數字
+  function profileCount(p, lines, warn) {
+    const key = profileKey(p);
+    let n = 0;
+    (lines || []).forEach((l) => {
+      const c = clean(l);
+      const m = c.match(/^(\d+)\s*[個名台隻位]/);
+      if (m && key && c.includes(key)) n += parseInt(m[1], 10);
+    });
+    if (!n) warn.push(`單位構成裡找不到「${key || '（未命名模型）'}」的數量（要寫成「N個${key || '模型名'}…」），先當 1 個算`);
+    return n || 1;
+  }
+
   function scoreUnit(card) {
     const out = { steps: [], warnings: [], notes: [] };
-    const b = scoreBody(card, out);
+    const profiles = profilesOf(card);
+    const multi = profiles.length > 1;
+
+    // 武器：每個模型都帶單位的全部武器，分數只算一次
     let wSum = 0;
     (card.weapons || []).forEach((w) => {
       if (!clean(w.name) && !w.STR && !w.RNG) return;
-      wSum += scoreWeapon(w, b, out);
-    });
-    // 能力：輸入的是獨立模型的分數；部隊每個模型算 1/5（同額外加成 30X／6X），算進每個模型
-    let abil = 0;
-    const abilK = b.independent ? 1 : 0.2;
-    (card.abilities || []).forEach((a) => {
-      const v = parseFloat(a.score);
-      if (isNaN(v) || !v) return;
-      abil += v * abilK;
-      out.steps.push({ label: `能力：${clean(a.text).split('：')[0].slice(0, 24)}`, calc: b.independent ? `手動輸入 ${v}（獨立）` : `手動輸入 ${v} × 1/5（部隊，每個模型）`, value: r2(v * abilK) });
+      wSum += scoreWeapon(w, null, out);
     });
 
-    const model = b.body + b.extra + abil + wSum;
-    const modelR = round5(model);
-    out.steps.push({ label: '每個模型', calc: `本體 ${r2(b.body)} + 額外 ${r2(b.extra)}${abil ? ' + 能力 ' + r2(abil) : ''} + 武器 ${wSum}`, value: `${r2(model)} → ${modelR}` });
-
-    const count = modelCount(card.composition);
-    let unit = round5(modelR * count);
-    out.steps.push({ label: '模型數', calc: `依單位構成：${count} 個；${modelR} × ${count}`, value: unit });
+    let unit = 0;
+    let anyIndependent = false;
+    const perProfile = [];
+    profiles.forEach((p, idx) => {
+      if (multi) out.steps.push({ label: `〔${clean(p.name) || '模型 ' + (idx + 1)}〕`, calc: '', value: '' });
+      const b = scoreBody({ stats: p.stats || {}, keywords: p.keywords }, out);
+      anyIndependent = anyIndependent || b.independent;
+      // 能力：輸入的是獨立模型的分數；部隊每個模型算 1/5（同額外加成 30X／6X），算進每個模型
+      let abil = 0;
+      const abilK = b.independent ? 1 : 0.2;
+      (card.abilities || []).forEach((a) => {
+        const v = parseFloat(a.score);
+        if (isNaN(v) || !v) return;
+        abil += v * abilK;
+        out.steps.push({ label: `能力：${clean(a.text).split('：')[0].slice(0, 24)}`, calc: b.independent ? `手動輸入 ${v}（獨立）` : `手動輸入 ${v} × 1/5（部隊，每個模型）`, value: r2(v * abilK) });
+      });
+      const model = b.body + b.extra + abil + wSum;
+      const modelR = round5(model);
+      out.steps.push({ label: '每個模型', calc: `本體 ${r2(b.body)} + 額外 ${r2(b.extra)}${abil ? ' + 能力 ' + r2(abil) : ''} + 武器 ${wSum}`, value: `${r2(model)} → ${modelR}` });
+      const count = multi ? profileCount(p, card.composition, out.warnings) : modelCount(card.composition);
+      const sub = round5(modelR * count);
+      out.steps.push({ label: '模型數', calc: `依單位構成：${count} 個；${modelR} × ${count}`, value: sub });
+      unit += sub;
+      perProfile.push({ name: clean(p.name), strValue: b.strV, count, model: modelR });
+    });
+    if (wSum) out.notes.push('武器分數算在每一個模型上（單位裡的模型都帶列出的全部武器）');
 
     // 單位構成裡的指揮模型：Lv2 以上才算
     (card.composition || []).forEach((l) => {
-      const m = clean(l).match(/領導\(Lv(\d+)\)/i);
+      const m = clean(l).match(/領導\s*\(?\s*Lv\s*(\d+)\)?/i);
       if (m) {
         const lv = parseInt(m[1], 10);
-        const per = b.independent ? 30 : 6;
+        const per = anyIndependent ? 30 : 6;
         if (lv > 1) { const v = per * (lv - 1); unit += v; out.steps.push({ label: '指揮模型 領導', calc: `${per} × (${lv} − 1)`, value: v }); }
         else out.notes.push('單位構成裡的 領導(Lv1) 不算分');
       }
     });
 
     const total = round5(unit);
-    out.steps.push({ label: '總分', calc: `${unit}`, value: total });
+    out.steps.push({ label: '總分', calc: multi ? perProfile.map((x) => `${x.name} ${x.model}×${x.count}`).join(' + ') : `${unit}`, value: total });
     out.total = total;
-    out.modelCount = count;
-    out.strValue = b.strV;
+    out.profiles = perProfile;
+    out.modelCount = perProfile.reduce((s, x) => s + x.count, 0);
+    out.strValue = perProfile.length === 1 ? perProfile[0].strValue : NaN;
     return out;
   }
 
