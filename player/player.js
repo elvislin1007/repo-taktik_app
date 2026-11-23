@@ -197,14 +197,15 @@
     // 玩家端只能看，不放任何編輯入口
     if (saved) $('unit-meta').append(`最後保存：${saved.toLocaleDateString('zh-TW')}`);
   }
-  // 資料卡固定 540px 寬，手機上整張等比例縮小
+  // 資料卡原本 540px 寬；手機上把卡片的寬度和字級變數（--card-w、--s）一起按比例縮小。
+  // 不用 CSS zoom：iPhone Safari 的 zoom 只縮框不縮字，字會擠成一團。
   function fitCard() {
     const frame = $('card-frame');
-    const inner = frame.querySelector('.card-scale');
-    if (!inner) return;
     const avail = frame.clientWidth;
-    // 還沒排版（寬度 0）時先用原尺寸，等尺寸出來再縮
-    inner.style.zoom = avail > 0 ? Math.min(1, avail / 540) : 1;
+    if (!(avail > 0)) return; // 還沒排版時先用原尺寸
+    const w = Math.min(540, Math.floor(avail));
+    frame.style.setProperty('--card-w', w + 'px');
+    frame.style.setProperty('--s', (1.556 * w / 540).toFixed(4));
   }
   window.addEventListener('resize', fitCard);
   if ('ResizeObserver' in window) new ResizeObserver(fitCard).observe($('card-frame'));

@@ -8,15 +8,16 @@
   --card-w: 540px;
 }
 .card { width: var(--card-w); margin: 0 auto; background: var(--c-white); color: var(--c-black);
+  -webkit-text-size-adjust: 100%; text-size-adjust: 100%; /* iPhone 不要自動放大字 */
   font-family: Calibri, "PMingLiU", "新細明體", "MingLiU", serif; font-size: calc(8pt * var(--s));
   line-height: 1.2; border-bottom: 1px solid var(--c-black); }
 .card table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.card td { padding: 1px 4px; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; position: relative; }
+.card td { padding: 1px calc(4px * var(--s) / 1.556); vertical-align: top; overflow-wrap: anywhere; word-break: break-word; position: relative; }
 .card .bar-name td { background: var(--c-black); color: var(--c-white); font-weight: 700; }
 .card .bar-name td.pts { text-align: right; width: 18%; white-space: nowrap; }
 .card .kw { color: var(--c-blue); font-size: calc(7.5pt * var(--s)); padding: 1px 4px; }
 .card .gray { background: var(--c-gray); font-size: calc(7pt * var(--s)); padding: 0 4px; }
-.card .stats td { text-align: center; padding: 1px 0; }
+.card .stats td { text-align: center; padding: 1px 0; white-space: nowrap; }
 .card .stats tr.h td { background: var(--c-gray); font-size: calc(7pt * var(--s)); }
 .card .stats tr.v td { font-weight: 700; }
 .card .blue { color: var(--c-blue); }
