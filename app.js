@@ -697,7 +697,7 @@
     try {
       const t = await R.test();
       if (t.hasToken && t.canPush) cfgStatus(`連線成功：${t.fullName}，這個權杖可以保存。`, 'ok');
-      else if (t.hasToken) cfgStatus(`讀得到 ${t.fullName}，但這個權杖沒有寫入權限。`, 'err');
+      else if (t.hasToken) cfgStatus(`讀得到 ${t.fullName}，但不能保存：${t.pushError}`, 'err');
       else cfgStatus(`讀得到 ${t.fullName}（沒填權杖，不能保存）。`, 'ok');
     } catch (e) { cfgStatus(`失敗：${e.message}`, 'err'); }
     R.setConfig(prev);

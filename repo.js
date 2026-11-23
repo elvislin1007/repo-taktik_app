@@ -44,17 +44,22 @@
     if (!r.ok) {
       let msg = r.statusText;
       try { msg = (await r.json()).message || msg; } catch (e) { /* 非 JSON */ }
-      const err = new Error(explain(r.status, msg));
+      const err = new Error(explain(r.status, msg, (opts.method || 'GET') !== 'GET'));
       err.status = r.status;
       throw err;
     }
     return r;
   }
-  function explain(status, msg) {
+  function explain(status, msg, writing) {
+    const { owner, repo } = getConfig();
+    const where = `${owner}/${repo}`;
     if (status === 401) return '權杖無效或過期，請到「GitHub 設定」重新填';
     if (status === 403 && /rate limit/i.test(msg)) return 'GitHub 讀取次數用完了（未填權杖時每小時 60 次），稍後再試或填權杖';
-    if (status === 403) return '這個權杖沒有寫入這個 repo 的權限（需要 Contents: Read and write）';
-    if (status === 404) return '找不到 repo 或檔案（檢查「GitHub 設定」的帳號／repo 名稱；私人 repo 要填權杖）';
+    if (status === 403 || (status === 404 && writing)) {
+      return `這個權杖不能寫入 ${where}。請確認：①「GitHub 設定」裡的 repo 是 repo-taktik_app；` +
+        '②權杖有勾這個 repo、Contents 是 Read and write（協作者要用 classic 權杖勾 public_repo，並先接受協作邀請）';
+    }
+    if (status === 404) return `找不到 ${where} 或檔案（檢查「GitHub 設定」的帳號／repo 名稱）`;
     if (status === 409) return '有人剛改過這個檔案，請重新開啟後再保存';
     if (status === 422) return `GitHub 拒絕：${msg}`;
     return `${status} ${msg}`;
@@ -150,12 +155,23 @@
   }
 
   // 測試：讀得到 repo、權杖有沒有寫入權限
+  // 測試：讀得到 repo 嗎？權杖真的能寫入嗎？
+  // 寫入用「建立一個沒被引用的 blob」來試：需要 Contents 寫入權限，但不會產生 commit、repo 內容不變
   async function test() {
-    const { owner, repo } = getConfig();
+    const { owner, repo, token } = getConfig();
     const r = await gh(`/repos/${owner}/${repo}`);
     const j = await r.json();
-    const canPush = !!(j.permissions && j.permissions.push);
-    return { fullName: j.full_name, canPush, hasToken: !!getConfig().token };
+    let canPush = false, pushError = '';
+    if (token) {
+      try {
+        await gh(`/repos/${owner}/${repo}/git/blobs`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: 'taktik 權限測試', encoding: 'utf-8' }),
+        });
+        canPush = true;
+      } catch (e) { pushError = e.message; }
+    }
+    return { fullName: j.full_name, canPush, pushError, hasToken: !!token };
   }
 
   global.TaktikRepo = { getConfig, setConfig, unitPath, weaponPath, listFiles, listUnitFiles, loadBundle, loadBlob, loadUnit, saveUnit, saveFile, deleteFile, test };
