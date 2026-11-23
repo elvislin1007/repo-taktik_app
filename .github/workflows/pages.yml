@@ -41,11 +41,11 @@ jobs:
           pathlib.Path('weapons.json').write_text(json.dumps({'generatedAt': now, 'items': weapons}, ensure_ascii=False), encoding='utf-8')
           print(f'{len(units)} 個單位、{len(weapons)} 把武器')
           PY
-      - name: 蓋上版本號（舊頁面保存前會被擋下來，要求重新整理）
+      - name: 蓋上版本號（檔案網址加 ?v=版本，手機不會用到舊檔；舊頁面保存前會被擋下來）
         run: |
           echo "{\"build\": \"${GITHUB_SHA}\"}" > version.json
-          sed -i "s/__BUILD__/${GITHUB_SHA}/" app.js
-          grep -c "${GITHUB_SHA}" app.js
+          sed -i "s/__BUILD__/${GITHUB_SHA}/g" app.js index.html player/index.html
+          grep -c "${GITHUB_SHA}" app.js index.html player/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
