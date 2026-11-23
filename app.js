@@ -360,6 +360,10 @@
   async function save() {
     const msg = document.getElementById('save-msg');
     if (!text(state.name)) { msg.textContent = '單位名稱是空的，回上頁填好再保存。'; msg.className = 'save-msg err'; return; }
+    // 一定要照分類存：units/<陣營>/<子陣營>/
+    if (!text(state.faction) || !text(state.subfaction)) {
+      msg.textContent = '陣營和子陣營都要填，才能照分類保存。請回上頁填卡片上方的「陣營」「子陣營」。'; msg.className = 'save-msg err'; return;
+    }
     const payload = { ...state, result: { total: lastResult.total, steps: lastResult.steps, warnings: lastResult.warnings }, savedAt: new Date().toISOString() };
     delete payload.savedPath;
     const path = R.unitPath(state);
