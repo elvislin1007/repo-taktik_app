@@ -1,0 +1,14 @@
+{
+  "type": "grenade",
+  "name": "破片手榴彈Frag grenade",
+  "rules": "[HE3”]",
+  "RNG": "8",
+  "STR": "7/7",
+  "D": "3/1",
+  "AS": "1",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "星際戰士",
+  "subfaction": "戰團",
+  "savedAt": "2026-11-23T10:18:49.703Z"
+}
