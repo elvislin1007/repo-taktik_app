@@ -30,9 +30,9 @@
   function unitPath(card) {
     return `units/${safePart(card.series, '未分類')}/${safePart(card.faction, '未分類')}/${safePart(card.subfaction, '未分類')}/${safePart(card.name, '未命名')}.json`;
   }
-  // 共用武器庫：weapons/<系列>/<陣營>/<武器名稱>.json（不分子陣營）
-  function weaponPath(series, faction, name) {
-    return `weapons/${safePart(series, '未分類')}/${safePart(faction, '未分類')}/${safePart(name, '未命名')}.json`;
+  // 共用武器庫：weapons/<系列>/<陣營>/<子陣營>/<武器名稱>.json
+  function weaponPath(series, faction, subfaction, name) {
+    return `weapons/${safePart(series, '未分類')}/${safePart(faction, '未分類')}/${safePart(subfaction, '未分類')}/${safePart(name, '未命名')}.json`;
   }
   const encPath = (p) => p.split('/').map(encodeURIComponent).join('/');
 

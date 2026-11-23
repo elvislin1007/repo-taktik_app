@@ -24,6 +24,7 @@
   <div class="wlib-filters">
     <label>系列 <select id="wlib-series"></select></label>
     <label>陣營 <select id="wlib-faction"></select></label>
+    <label>子陣營 <select id="wlib-sub"></select></label>
     <label class="wlib-q">搜尋 <input id="wlib-q" type="search" placeholder="武器名稱、特規…" autocomplete="off"></label>
   </div>
   <p id="wlib-status" class="dlg-status" role="status"></p>
@@ -115,7 +116,8 @@
     <div class="classify">
       <label>系列 <input id="w-series" placeholder="例：戰錘40K"></label>
       <label>陣營 <input id="w-faction" placeholder="例：星際戰士"></label>
-      <span class="hint">存到 weapons/系列/陣營/武器名稱.json（系列、陣營必填，不分子陣營）。近戰 STR 填 +X。</span>
+      <label>子陣營 <input id="w-sub" placeholder="例：戰團"></label>
+      <span class="hint">存到 weapons/系列/陣營/子陣營/武器名稱.json（三欄必填）。近戰 STR 填 +X。</span>
     </div>
     <div class="card-zone"><div id="w-edit"></div></div>
     <div class="actions">
@@ -128,6 +130,7 @@
     <div class="wlib-filters w-filters">
       <label>系列 <select id="wl-series"></select></label>
       <label>陣營 <select id="wl-faction"></select></label>
+      <label>子陣營 <select id="wl-sub"></select></label>
       <label class="wlib-q">搜尋 <input id="wl-q" type="search" placeholder="武器名稱、特規…" autocomplete="off"></label>
       <button type="button" id="wl-reload" title="包含剛保存、還沒發布的武器">重新讀取</button>
     </div>
