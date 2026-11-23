@@ -1,0 +1,14 @@
+{
+  "type": "ranged",
+  "name": "精工爆彈步槍MC. Bolt Rifle",
+  "rules": "爆彈、速射",
+  "RNG": "30",
+  "STR": "9",
+  "D": "2",
+  "AS": "1/2",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "星際戰士",
+  "subfaction": "戰團",
+  "savedAt": "2026-11-23T10:18:57.783Z"
+}
