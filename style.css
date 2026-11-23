@@ -34,7 +34,9 @@ body { margin: 0; background: var(--page-bg); color: var(--page-fg);
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 10px 16px; background: var(--panel-bg); border-bottom: 1px solid var(--panel-border); }
 .topbar h1 { font-size: 17px; margin: 0; }
-.topbar nav { display: flex; gap: 8px; }
+.topbar nav { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.topbar .navlink { color: var(--accent); text-decoration: none; padding: 6px 10px; }
+.topbar .navlink:hover { text-decoration: underline; }
 main { padding: 16px; }
 button { font: inherit; padding: 6px 14px; border-radius: 6px; border: 1px solid var(--panel-border);
   background: var(--panel-bg); color: var(--page-fg); cursor: pointer; }
@@ -90,50 +92,6 @@ dialog h2 { margin: 0 0 8px; font-size: 17px; }
 .dlg-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
 .save-msg a { color: inherit; }
 @media (max-width: 520px) { .dlg-grid { grid-template-columns: 1fr; } }
-
-/* ---------- 資料卡（照 11_資料卡格式.md） ---------- */
-.card { width: var(--card-w); margin: 0 auto; background: var(--c-white); color: var(--c-black);
-  font-family: Calibri, "PMingLiU", "新細明體", "MingLiU", serif; font-size: calc(8pt * var(--s));
-  line-height: 1.2; border-bottom: 1px solid var(--c-black); }
-.card table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.card td { padding: 1px 4px; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; position: relative; }
-.card .bar-name td { background: var(--c-black); color: var(--c-white); font-weight: 700; }
-.card .bar-name td.pts { text-align: right; width: 18%; white-space: nowrap; }
-.card .kw { color: var(--c-blue); font-size: calc(7.5pt * var(--s)); padding: 1px 4px; }
-.card .gray { background: var(--c-gray); font-size: calc(7pt * var(--s)); padding: 0 4px; }
-.card .stats td { text-align: center; padding: 1px 0; }
-.card .stats tr.h td { background: var(--c-gray); font-size: calc(7pt * var(--s)); }
-.card .stats tr.v td { font-weight: 700; }
-.card .blue { color: var(--c-blue); }
-.card .kwtag { color: var(--c-blue); font-size: calc(7.5pt * var(--s)); }
-/* 能力值不同的模型：名稱（粗體）＋關鍵字（藍字）一列，接著自己的能力值 */
-.card .prof-name { padding: 1px 4px; position: relative; }
-.card .prof-name .pname { font-weight: 700; }
-.card .prof-name [contenteditable].pname, .card .prof-name [contenteditable].kwtag { display: inline; }
-.card .add-in { margin: 3px 4px; }
-.card ul.bul { margin: 0; padding: 1px 4px 1px calc(14px * var(--s)); list-style: disc; }
-.card ul.bul li { position: relative; }
-.card ul.opts { list-style: none; padding-left: 4px; }
-.card ul.opts li { display: flex; gap: 2px; align-items: baseline; }
-.card ul.opts li.sub { padding-left: calc(10px * var(--s)); }
-.card ul.opts li.main::before { content: "•"; margin-right: 6px; }
-.card ul.opts li.sub::before { content: "‐"; margin-right: 6px; }
-.card ul.opts .otext { flex: 0 1 auto; }
-.card ul.opts .leader { flex: 1 1 auto; border-bottom: 1.5px dotted var(--c-black); min-width: 16px; transform: translateY(-4px); }
-.card ul.opts .opts-pts { flex: 0 0 auto; white-space: nowrap; }
-.card .wg col.c-name { width: 57.25%; }
-.card .wg col.c-rng { width: 13.63%; }
-.card .wg col.c-str { width: 8.94%; }
-.card .wg col.c-d { width: 6.59%; }
-.card .wg col.c-as { width: 6.57%; }
-.card .wg col.c-rl { width: 7.02%; }
-.card .wg tr.h td { background: var(--c-gray); font-size: calc(7pt * var(--s)); }
-.card .wg td.n { text-align: center; font-weight: 700; padding: 1px 0; letter-spacing: -0.02em; }
-.card .wg td.n > span:not([contenteditable]) { white-space: nowrap; }
-.card .wg tr.h td.n { font-weight: 400; }
-.card .wg .wname { font-weight: 700; }
-.card .wg .wrules { color: var(--c-blue); font-size: calc(7pt * var(--s)); }
-.card .wg .icon { height: calc(9px * var(--s)); width: auto; vertical-align: -1px; margin-right: 2px; }
 
 /* 可編輯欄位：像 Word 一樣自動換行、往下長 */
 .card [contenteditable] { outline: none; min-width: 1ch; display: inline-block; max-width: 100%; white-space: pre-wrap; }

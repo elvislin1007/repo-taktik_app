@@ -64,6 +64,22 @@
     return tree;
   }
 
+  // 玩家端圖鑑用：列出 units/ 底下所有 .json（任意層資料夾），附 sha 以便快取
+  async function listUnitFiles() {
+    const { owner, repo, branch } = getConfig();
+    const r = await gh(`/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`);
+    const data = await r.json();
+    return (data.tree || [])
+      .filter((n) => n.type === 'blob' && /^units\/.+\.json$/.test(n.path))
+      .map((n) => ({ path: n.path, sha: n.sha }));
+  }
+  // 用 sha 讀檔（內容不會變，可以永久快取）
+  async function loadBlob(sha) {
+    const { owner, repo } = getConfig();
+    const r = await gh(`/repos/${owner}/${repo}/git/blobs/${sha}`, { headers: { Accept: 'application/vnd.github.raw+json' } });
+    return JSON.parse(await r.text());
+  }
+
   async function loadUnit(path) {
     const { owner, repo, branch } = getConfig();
     const r = await gh(`/repos/${owner}/${repo}/contents/${encPath(path)}?ref=${encodeURIComponent(branch)}`,
@@ -106,5 +122,5 @@
     return { fullName: j.full_name, canPush, hasToken: !!getConfig().token };
   }
 
-  global.TaktikRepo = { getConfig, setConfig, unitPath, listUnits, loadUnit, saveUnit, test };
+  global.TaktikRepo = { getConfig, setConfig, unitPath, listUnits, listUnitFiles, loadBlob, loadUnit, saveUnit, test };
 })(window);

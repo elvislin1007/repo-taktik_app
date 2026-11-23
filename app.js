@@ -351,7 +351,7 @@
     if (!text(state.faction) && kw[0]) state.faction = kw[0];
     if (!text(state.subfaction) && kw[1]) state.subfaction = kw[1];
     lastResult = C.scoreUnit(state);
-    document.getElementById('card-result').replaceChildren(renderCard(state, 'view', lastResult));
+    document.getElementById('card-result').replaceChildren(window.TaktikCard.render(state, lastResult));
     renderBreakdown(lastResult);
     const msg = document.getElementById('save-msg'); msg.textContent = ''; msg.className = 'save-msg';
     show('result');

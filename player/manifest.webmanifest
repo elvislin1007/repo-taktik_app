@@ -1,0 +1,17 @@
+{
+  "name": "Taktik 單位圖鑑",
+  "short_name": "Taktik 圖鑑",
+  "description": "搜尋 Taktik 單位資料庫",
+  "lang": "zh-Hant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#111214",
+  "theme_color": "#16181b",
+  "icons": [
+    { "src": "icons/app-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/app-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/app-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

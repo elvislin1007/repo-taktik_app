@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16181b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Taktik 圖鑑">
+<title>Taktik 單位圖鑑</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/app-192.png">
+<link rel="apple-touch-icon" href="icons/app-180.png">
+<link rel="stylesheet" href="../card.css">
+<link rel="stylesheet" href="player.css">
+</head>
+<body>
+<!-- 列表 -->
+<section id="screen-list" class="screen" aria-labelledby="list-title">
+  <header class="appbar">
+    <h1 id="list-title">單位圖鑑</h1>
+    <div class="appbar-actions">
+      <button type="button" class="icon-btn" id="btn-refresh" aria-label="重新整理資料">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5"/></svg>
+      </button>
+      <button type="button" class="icon-btn" id="btn-settings" aria-label="設定">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <label class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="搜尋名稱、關鍵字、能力、武器…" autocomplete="off" enterkeyhint="search" aria-label="搜尋單位">
+    </label>
+    <nav class="crumbs" id="crumbs" aria-label="分類路徑"></nav>
+    <div class="chips" id="chips" role="list" aria-label="下一層分類"></div>
+    <div class="listhead">
+      <span id="count" role="status"></span>
+      <label class="sort">排序
+        <select id="sort">
+          <option value="name">名稱</option>
+          <option value="pts-desc">分數高→低</option>
+          <option value="pts-asc">分數低→高</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <main class="list" id="list" aria-live="polite"></main>
+</section>
+
+<!-- 單位內容 -->
+<section id="screen-unit" class="screen" hidden aria-labelledby="unit-title">
+  <header class="appbar">
+    <button type="button" class="icon-btn" id="btn-back" aria-label="返回列表">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <h1 id="unit-title"></h1>
+  </header>
+  <main class="unit">
+    <p class="unit-path" id="unit-path"></p>
+    <div class="card-frame" id="card-frame"></div>
+    <p class="unit-meta" id="unit-meta"></p>
+  </main>
+</section>
+
+<!-- 設定 -->
+<dialog id="dlg" aria-labelledby="dlg-title">
+  <form method="dialog" id="dlg-form">
+    <h2 id="dlg-title">設定</h2>
+    <p class="muted">單位資料放在私人 GitHub repo，要有權杖才讀得到。權杖只存在這台裝置的瀏覽器裡，和「算分編輯器」共用。</p>
+    <label>權杖 <input id="cfg-token" type="password" autocomplete="off" placeholder="github_pat_… 或 ghp_…"></label>
+    <details>
+      <summary>進階：資料來源</summary>
+      <div class="grid">
+        <label>帳號 <input id="cfg-owner" autocomplete="off"></label>
+        <label>repo <input id="cfg-repo" autocomplete="off"></label>
+        <label>分支 <input id="cfg-branch" autocomplete="off"></label>
+      </div>
+    </details>
+    <details>
+      <summary>怎麼拿權杖？</summary>
+      <ol>
+        <li>請 repo 擁有者把你加為協作者，並到信箱接受邀請。</li>
+        <li>GitHub → 右上頭像 → Settings → Developer settings → Personal access tokens → <b>Tokens (classic)</b> → Generate new token (classic)。</li>
+        <li>勾 <b>repo</b>，設到期日，產生後貼到上面。（repo 擁有者本人可以改用 Fine-grained token，只開這個 repo 的 Contents 權限）</li>
+      </ol>
+    </details>
+    <p id="cfg-status" class="status" role="status"></p>
+    <div class="actions">
+      <button type="button" id="cfg-test">測試</button>
+      <button type="submit" value="cancel" formnovalidate>關閉</button>
+      <button type="submit" value="save" class="primary">儲存</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="../calc.js"></script>
+<script src="../repo.js"></script>
+<script src="../cardview.js"></script>
+<script src="player.js"></script>
+</body>
+</html>
