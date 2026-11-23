@@ -22,7 +22,7 @@
   <form method="dialog" id="form-settings">
     <h2 id="dlg-title">GitHub 設定</h2>
     <p class="dlg-note">保存的單位會直接 commit 到這個 repo 的 <code>units/陣營/子陣營/</code>。
-      資料 repo 是私人的，<b>讀取和保存都需要權杖</b>；權杖只存在這台電腦的瀏覽器裡，只會送給 GitHub。</p>
+      單位資料是公開的（玩家用「單位圖鑑」不用權杖就能看）；<b>保存</b>需要權杖，權杖只存在這台電腦的瀏覽器裡，只會送給 GitHub。</p>
     <div class="dlg-grid">
       <label>帳號 <input id="cfg-owner" autocomplete="off" required></label>
       <label>repo <input id="cfg-repo" autocomplete="off" required></label>
@@ -34,15 +34,15 @@
       <p><b>repo 擁有者本人</b>：</p>
       <ol>
         <li>GitHub 右上角頭像 → Settings → Developer settings → Personal access tokens → <b>Fine-grained tokens</b> → Generate new token。</li>
-        <li>Repository access 選 <b>Only select repositories</b>，只勾資料 repo。</li>
+        <li>Repository access 選 <b>Only select repositories</b>，只勾 <b>repo-taktik_app</b>。</li>
         <li>Permissions → Repository permissions → <b>Contents：Read and write</b>，其他都不用開。</li>
         <li>產生後複製，貼到上面「權杖」欄，按儲存。</li>
       </ol>
-      <p><b>其他人</b>（GitHub 的限制：別人帳號底下的私人 repo，fine-grained 權杖拿不到）：</p>
+      <p><b>其他人</b>（GitHub 的限制：要寫入別人帳號底下的 repo，fine-grained 權杖做不到）：</p>
       <ol>
-        <li>先請 repo 擁有者把你加為協作者（資料 repo → Settings → Collaborators），並在信箱接受邀請。</li>
+        <li>先請擁有者把你加為 <b>repo-taktik_app</b> 的協作者（Settings → Collaborators），並在信箱接受邀請。</li>
         <li>GitHub 右上角頭像 → Settings → Developer settings → Personal access tokens → <b>Tokens (classic)</b> → Generate new token (classic)。</li>
-        <li>勾 <b>repo</b>，設一個到期日；產生後貼到上面「權杖」欄。注意：classic 權杖能存取你帳號能碰到的所有 repo，請只用在這裡、不要外流。</li>
+        <li>只勾 <b>public_repo</b>，設一個到期日；產生後貼到上面「權杖」欄。這個權杖能寫入你能寫的所有公開 repo，請只用在這裡、不要外流。</li>
       </ol>
     </details>
     <p id="cfg-status" class="dlg-status" role="status"></p>

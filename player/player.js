@@ -1,11 +1,11 @@
-// Taktik 單位圖鑑（玩家端）— 搜尋 taktik_rules/units/ 的單位，照資料夾一層層篩選。
+// Taktik 單位圖鑑（玩家端）— 搜尋 units/ 的單位，照資料夾一層層篩選。不需要權杖：
+// 發布時 GitHub Actions 會把 units/ 打包成網站上的 units.json，這裡只讀那個檔案。
 (function () {
   'use strict';
   const R = window.TaktikRepo;
   const C = window.TaktikCalc;
   const CARD = window.TaktikCard;
-  const CACHE_KEY = 'taktik-units-cache-v1';   // { sha: 單位資料 }，內容由 sha 決定，可以一直留著
-  const INDEX_KEY = 'taktik-units-index-v1';   // 上次的檔案清單 [{path, sha}]，離線時先顯示
+  const BUNDLE_KEY = 'taktik-units-bundle-v1'; // 上次讀到的 units.json，沒網路時先顯示
 
   const $ = (id) => document.getElementById(id);
   const text = (s) => String(s == null ? '' : s).trim();
@@ -26,9 +26,10 @@
   };
 
   // ---------- 資料 ----------
-  let units = [];          // [{ path, segs, data, name, total, hay }]
-  let status = 'idle';     // idle | loading | ready | error | no-token
+  let units = [];          // [{ path, segs, data, name, total, hay, keywords }]
+  let status = 'idle';     // idle | loading | ready | error
   let statusMsg = '';
+  let generatedAt = null;
 
   function toUnit(path, data) {
     const segs = path.replace(/^units\//, '').replace(/\.json$/, '').split('/');
@@ -46,45 +47,40 @@
     const keywords = [...new Set(card.profiles.map((p) => C.clean(p.keywords)).filter(Boolean))].join('／');
     return { path, segs, data, name, total, hay, keywords };
   }
+  function useBundle(b) {
+    units = (b && Array.isArray(b.units) ? b.units : []).filter((u) => u && u.path && u.data).map((u) => toUnit(u.path, u.data));
+    generatedAt = b && b.generatedAt ? new Date(b.generatedAt) : null;
+  }
 
-  function fromCache(index) {
-    const cache = store.get(CACHE_KEY, {});
-    return index.filter((f) => cache[f.sha]).map((f) => toUnit(f.path, cache[f.sha]));
+  // 網站上沒有 units.json（例如在自己電腦上測試）時，直接讀公開 repo 的 units/
+  async function bundleFromRepo() {
+    const files = await R.listUnitFiles();
+    const out = [];
+    const queue = files.slice();
+    async function worker() {
+      while (queue.length) {
+        const f = queue.shift();
+        try { out.push({ path: f.path, data: await R.loadBlob(f.sha) }); } catch (e) { console.warn('讀不到', f.path, e); }
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(6, files.length) }, worker));
+    return { generatedAt: new Date().toISOString(), units: out };
   }
 
   async function sync() {
-    if (!R.getConfig().token) {
-      status = 'no-token';
-      units = fromCache(store.get(INDEX_KEY, []));
-      render();
-      return;
-    }
-    status = 'loading'; statusMsg = '讀取單位清單…'; render();
+    status = 'loading'; statusMsg = '讀取單位資料…'; render();
     try {
-      const index = await R.listUnitFiles();
-      const cache = store.get(CACHE_KEY, {});
-      const need = index.filter((f) => !cache[f.sha]);
-      let done = 0;
-      // 只下載新增或改過的檔案，同時最多 6 個
-      const queue = need.slice();
-      async function worker() {
-        while (queue.length) {
-          const f = queue.shift();
-          try { cache[f.sha] = await R.loadBlob(f.sha); } catch (e) { console.warn('讀不到', f.path, e); }
-          done += 1; statusMsg = `下載單位 ${done}/${need.length}…`; renderStatus();
-        }
-      }
-      await Promise.all(Array.from({ length: Math.min(6, need.length) }, worker));
-      // 清掉已經不在 repo 的舊快取
-      const keep = new Set(index.map((f) => f.sha));
-      Object.keys(cache).forEach((sha) => { if (!keep.has(sha)) delete cache[sha]; });
-      store.set(CACHE_KEY, cache);
-      store.set(INDEX_KEY, index);
-      units = index.filter((f) => cache[f.sha]).map((f) => toUnit(f.path, cache[f.sha]));
+      let bundle;
+      const r = await fetch('../units.json', { cache: 'no-cache' });
+      if (r.ok) bundle = await r.json();
+      else if (r.status === 404) bundle = await bundleFromRepo();
+      else throw new Error(`${r.status} ${r.statusText}`);
+      useBundle(bundle);
+      store.set(BUNDLE_KEY, bundle);
       status = 'ready'; statusMsg = '';
     } catch (e) {
-      units = fromCache(store.get(INDEX_KEY, []));
-      status = 'error'; statusMsg = e.message;
+      useBundle(store.get(BUNDLE_KEY, null));
+      status = 'error'; statusMsg = navigator.onLine === false ? '目前沒有網路' : e.message;
     }
     render();
   }
@@ -159,19 +155,11 @@
     // 數量／狀態
     const count = $('count');
     if (status === 'loading') count.textContent = statusMsg;
-    else count.textContent = `共 ${sorted.length} 個單位`;
+    else count.textContent = `共 ${sorted.length} 個單位${generatedAt ? `・資料更新 ${generatedAt.toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}` : ''}`;
 
     const list = $('list');
     list.replaceChildren();
-    if (status === 'no-token' && !units.length) {
-      list.append(el('div', { class: 'empty' },
-        el('h2', null, '先設定權杖'),
-        el('p', null, '單位資料在私人 GitHub repo，要先填權杖才讀得到。'),
-        el('button', { type: 'button', class: 'primary', onclick: openSettings }, '開啟設定')));
-      return;
-    }
     if (status === 'error') list.append(el('div', { class: 'notice' }, `讀取失敗：${statusMsg}${units.length ? '（先顯示上次存在這台裝置的資料）' : ''}`));
-    if (status === 'no-token') list.append(el('div', { class: 'notice' }, '沒有權杖，顯示的是上次存在這台裝置的資料。', el('button', { type: 'button', class: 'link', onclick: openSettings }, '設定權杖')));
     if (status === 'loading' && !units.length) { list.append(el('div', { class: 'empty' }, el('p', null, '讀取中…'))); return; }
     if (!sorted.length) {
       list.append(el('div', { class: 'empty' }, el('p', null, units.length ? '找不到符合的單位。' : '資料庫裡還沒有單位。'),
@@ -266,40 +254,13 @@
   $('sort').addEventListener('change', (e) => go(listHash({ ...listState, s: e.target.value }), true));
   $('btn-refresh').addEventListener('click', sync);
 
-  // ---------- 設定 ----------
-  const dlg = $('dlg');
-  const cfg = (k) => $('cfg-' + k);
-  const setStatus = (t, cls) => { const s = $('cfg-status'); s.textContent = t; s.className = 'status ' + (cls || ''); };
-  function openSettings() {
-    const c = R.getConfig();
-    ['owner', 'repo', 'branch', 'token'].forEach((k) => { cfg(k).value = c[k] || ''; });
-    setStatus(c.token ? '已有權杖' : '還沒填權杖');
-    dlg.showModal();
-  }
-  const readForm = () => ({ owner: cfg('owner').value.trim(), repo: cfg('repo').value.trim(), branch: cfg('branch').value.trim() || 'main', token: cfg('token').value.trim() });
-  $('btn-settings').addEventListener('click', openSettings);
-  $('cfg-test').addEventListener('click', async () => {
-    const prev = R.getConfig();
-    R.setConfig(readForm());
-    setStatus('測試中…');
-    try { const t = await R.test(); setStatus(`連線成功：${t.fullName}`, 'ok'); }
-    catch (e) { setStatus(`失敗：${e.message}`, 'err'); }
-    R.setConfig(prev);
-  });
-  $('dlg-form').addEventListener('submit', (e) => {
-    if (e.submitter && e.submitter.value === 'save') {
-      if (!R.setConfig(readForm())) { e.preventDefault(); setStatus('這個瀏覽器不允許儲存設定（可能是無痕模式）', 'err'); return; }
-      setTimeout(sync, 0);
-    }
-  });
-
   // ---------- 加到主畫面（離線也能開） ----------
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     navigator.serviceWorker.register('sw.js').catch((e) => console.warn('service worker', e));
   }
 
   // ---------- 開始 ----------
-  units = fromCache(store.get(INDEX_KEY, []));
+  useBundle(store.get(BUNDLE_KEY, null));
   if (!location.hash) history.replaceState(null, '', '#/');
   route();
   sync().then(() => { if (parseHash().view === 'unit') route(); });

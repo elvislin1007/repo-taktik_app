@@ -22,6 +22,22 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: 把所有單位打包成 units.json（玩家端圖鑑讀這個，不用權杖）
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, datetime
+          units = []
+          for p in sorted(pathlib.Path('units').rglob('*.json')):
+              try:
+                  data = json.loads(p.read_text(encoding='utf-8'))
+              except Exception as e:
+                  print(f'::warning file={p}::略過（JSON 讀不了）：{e}')
+                  continue
+              units.append({'path': p.as_posix(), 'data': data})
+          out = {'generatedAt': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'units': units}
+          pathlib.Path('units.json').write_text(json.dumps(out, ensure_ascii=False), encoding='utf-8')
+          print(f'{len(units)} 個單位')
+          PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

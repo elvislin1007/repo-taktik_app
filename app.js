@@ -425,7 +425,7 @@
   function openSettings() {
     const c = R.getConfig();
     ['owner', 'repo', 'branch', 'token'].forEach((k) => { cfgIn(k).value = c[k] || ''; });
-    cfgStatus(c.token ? '已有權杖' : '尚未填權杖：讀不到也存不了已存單位（資料 repo 是私人的）');
+    cfgStatus(c.token ? '已有權杖（可保存）' : '尚未填權杖：可以讀取、不能保存');
     if (!dlg.open) dlg.showModal();
   }
   const readCfgForm = () => ({ owner: cfgIn('owner').value.trim(), repo: cfgIn('repo').value.trim(), branch: cfgIn('branch').value.trim() || 'main', token: cfgIn('token').value.trim() });

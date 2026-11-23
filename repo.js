@@ -1,13 +1,19 @@
 // 保存／讀取單位：直接用 GitHub API 讀寫使用者的 repo（不需要伺服器）。
-// 網頁本身放在公開 repo（taktik_app），資料放在私人 repo（taktik_rules），所以讀取和保存都要在「GitHub 設定」填權杖，只存在這台電腦的瀏覽器裡。
+// 單位資料和網頁放在同一個公開 repo（repo-taktik_app）的 units/：讀取不用權杖；
+// 保存（編輯器）要在「GitHub 設定」填權杖，只存在這台電腦的瀏覽器裡。規則文件另外放在私人 repo taktik_rules。
 (function (global) {
   'use strict';
   const CFG_KEY = 'taktik-github-v1';
-  const DEFAULTS = { owner: 'elvislin1007', repo: 'taktik_rules', branch: 'main', token: '' };
+  const DEFAULTS = { owner: 'elvislin1007', repo: 'repo-taktik_app', branch: 'main', token: '' };
+  const OLD_DATA_REPOS = ['taktik_rules']; // 2026-11-23 以前單位存在私人 repo，舊設定自動改過來
   const API = 'https://api.github.com';
 
   function getConfig() {
-    try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(CFG_KEY) || '{}')); }
+    try {
+      const c = Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(CFG_KEY) || '{}'));
+      if (c.owner === DEFAULTS.owner && OLD_DATA_REPOS.includes(c.repo)) c.repo = DEFAULTS.repo;
+      return c;
+    }
     catch (e) { return Object.assign({}, DEFAULTS); }
   }
   function setConfig(cfg) {
