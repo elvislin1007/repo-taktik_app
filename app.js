@@ -2,6 +2,18 @@
   'use strict';
   const C = window.TaktikCalc;
   const R = window.TaktikRepo;
+  // 發布時 GitHub Actions 會把下面換成這次發布的版本號，並產生 version.json。
+  // 保存前比對：這個頁面如果是舊版（開著沒重新整理），就不讓它保存，免得用舊程式存錯地方。
+  const BUILD = '__BUILD__';
+  async function pageIsCurrent() {
+    if (BUILD === '__' + 'BUILD__') return true; // 自己電腦上測試時沒有版本號
+    try {
+      const r = await fetch('version.json', { cache: 'no-store' });
+      if (!r.ok) return true;
+      return (await r.json()).build === BUILD;
+    } catch (e) { return true; } // 沒網路時交給後面的保存去報錯
+  }
+  const STALE_MSG = '網頁已經更新，這個頁面是舊版，先不要保存。請按 Ctrl+F5 重新整理；你填的內容已存成草稿，重新整理後按上方「繼續上次草稿」就會回來。';
   const STAT_KEYS = ['M', 'STR', 'FS', 'BS', 'CON', 'AGI', 'PER', 'INT', 'WP', 'DEF', 'HP', 'WT'];
   const WTYPES = {
     ranged: { label: '射擊', icon: 'icons/ranged.png' },
@@ -372,6 +384,7 @@
     if (!text(state.series) || !text(state.faction) || !text(state.subfaction)) {
       msg.textContent = '系列、陣營、子陣營都要填，才能照分類保存。請回上頁填卡片上方的三個欄位。'; msg.className = 'save-msg err'; return;
     }
+    if (!(await pageIsCurrent())) { saveDraft(); msg.textContent = STALE_MSG; msg.className = 'save-msg err'; return; }
     const payload = { ...state, result: { total: lastResult.total, steps: lastResult.steps, warnings: lastResult.warnings }, savedAt: new Date().toISOString() };
     delete payload.savedPath;
     const path = R.unitPath(state);
@@ -469,6 +482,7 @@
   async function saveWeaponToLib(w) {
     if (!text(w.name)) { libMsg('武器名稱是空的，不能存入武器庫', 'err'); return; }
     if (!text(state.series) || !text(state.faction) || !text(state.subfaction)) { libMsg('要先填卡片上方的「系列」「陣營」「子陣營」，武器才知道存在哪個分類', 'err'); return; }
+    if (!(await pageIsCurrent())) { saveDraft(); libMsg(STALE_MSG, 'err'); return; }
     const path = R.weaponPath(state.series, state.faction, state.subfaction, w.name);
     if (!confirm(`存入共用武器庫：\n${path}\n\n同名的武器會被覆蓋。`)) return;
     const item = {};
@@ -605,6 +619,7 @@
     const fail = (t) => { msg.textContent = t; msg.className = 'save-msg err'; };
     if (!text(w.name)) return fail('武器名稱是空的。');
     if (!text(wstate.series) || !text(wstate.faction) || !text(wstate.subfaction)) return fail('系列、陣營、子陣營都要填。');
+    if (!(await pageIsCurrent())) return fail(STALE_MSG.replace('；你填的內容已存成草稿，重新整理後按上方「繼續上次草稿」就會回來', '（武器欄位要重新填）'));
     const path = R.weaponPath(wstate.series, wstate.faction, wstate.subfaction, w.name);
     const item = {};
     WEAPON_FIELDS.forEach((k) => { item[k] = w[k] == null ? '' : w[k]; });
@@ -684,11 +699,11 @@
   const cfgStatus = (t, cls) => { const s = document.getElementById('cfg-status'); s.textContent = t; s.className = 'dlg-status ' + (cls || ''); };
   function openSettings() {
     const c = R.getConfig();
-    ['owner', 'repo', 'branch', 'token'].forEach((k) => { cfgIn(k).value = c[k] || ''; });
+    cfgIn('token').value = c.token || '';
     cfgStatus(c.token ? '已有權杖（可保存）' : '尚未填權杖：可以讀取、不能保存');
     if (!dlg.open) dlg.showModal();
   }
-  const readCfgForm = () => ({ owner: cfgIn('owner').value.trim(), repo: cfgIn('repo').value.trim(), branch: cfgIn('branch').value.trim() || 'main', token: cfgIn('token').value.trim() });
+  const readCfgForm = () => ({ token: cfgIn('token').value.trim() });
   document.getElementById('btn-settings').addEventListener('click', openSettings);
   document.getElementById('cfg-test').addEventListener('click', async () => {
     const prev = R.getConfig();

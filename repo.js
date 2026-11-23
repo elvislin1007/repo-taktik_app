@@ -4,20 +4,17 @@
 (function (global) {
   'use strict';
   const CFG_KEY = 'taktik-github-v1';
-  const DEFAULTS = { owner: 'elvislin1007', repo: 'repo-taktik_app', branch: 'main', token: '' };
-  const OLD_DATA_REPOS = ['taktik_rules']; // 2026-11-23 以前單位存在私人 repo，舊設定自動改過來
+  // 單位、武器一律存在這裡，不能改（避免存錯 repo）。這台電腦只記權杖。
+  const DATA_REPO = Object.freeze({ owner: 'elvislin1007', repo: 'repo-taktik_app', branch: 'main' });
   const API = 'https://api.github.com';
 
   function getConfig() {
-    try {
-      const c = Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(CFG_KEY) || '{}'));
-      if (c.owner === DEFAULTS.owner && OLD_DATA_REPOS.includes(c.repo)) c.repo = DEFAULTS.repo;
-      return c;
-    }
-    catch (e) { return Object.assign({}, DEFAULTS); }
+    let token = '';
+    try { token = (JSON.parse(localStorage.getItem(CFG_KEY) || '{}').token || '').trim(); } catch (e) { /* 讀不到就當沒填 */ }
+    return Object.assign({}, DATA_REPO, { token });
   }
   function setConfig(cfg) {
-    try { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); return true; } catch (e) { return false; }
+    try { localStorage.setItem(CFG_KEY, JSON.stringify({ token: (cfg && cfg.token) || '' })); return true; } catch (e) { return false; }
   }
 
   // 與資料夾分類相同的檔名規則
@@ -56,10 +53,10 @@
     if (status === 401) return '權杖無效或過期，請到「GitHub 設定」重新填';
     if (status === 403 && /rate limit/i.test(msg)) return 'GitHub 讀取次數用完了（未填權杖時每小時 60 次），稍後再試或填權杖';
     if (status === 403 || (status === 404 && writing)) {
-      return `這個權杖不能寫入 ${where}。請確認：①「GitHub 設定」裡的 repo 是 repo-taktik_app；` +
-        '②權杖有勾這個 repo、Contents 是 Read and write（協作者要用 classic 權杖勾 public_repo，並先接受協作邀請）';
+      return `這個權杖不能寫入 ${where}。請確認權杖有勾 ${repo}、Contents 是 Read and write` +
+        '（協作者要用 classic 權杖勾 public_repo，並先接受協作邀請）';
     }
-    if (status === 404) return `找不到 ${where} 或檔案（檢查「GitHub 設定」的帳號／repo 名稱）`;
+    if (status === 404) return `在 ${where} 找不到這個檔案`;
     if (status === 409) return '有人剛改過這個檔案，請重新開啟後再保存';
     if (status === 422) return `GitHub 拒絕：${msg}`;
     return `${status} ${msg}`;
