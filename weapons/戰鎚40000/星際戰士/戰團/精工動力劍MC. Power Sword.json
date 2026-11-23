@@ -1,0 +1,14 @@
+{
+  "type": "melee",
+  "name": " 精工動力劍MC. Power Sword",
+  "rules": "能量力場",
+  "RNG": "CC1",
+  "STR": "+6",
+  "D": "2",
+  "AS": "+0",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "星際戰士",
+  "subfaction": "戰團",
+  "savedAt": "2026-11-23T10:18:53.776Z"
+}
