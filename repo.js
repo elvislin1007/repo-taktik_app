@@ -26,8 +26,13 @@
     s = String(s || '').trim().replace(BAD, '_').replace(/^[ .]+|[ .]+$/g, '');
     return s.slice(0, 80) || fallback;
   }
+  // 單位：units/<系列>/<陣營>/<子陣營>/<單位名稱>.json
   function unitPath(card) {
-    return `units/${safePart(card.faction, '未分類')}/${safePart(card.subfaction, '未分類')}/${safePart(card.name, '未命名')}.json`;
+    return `units/${safePart(card.series, '未分類')}/${safePart(card.faction, '未分類')}/${safePart(card.subfaction, '未分類')}/${safePart(card.name, '未命名')}.json`;
+  }
+  // 共用武器庫：weapons/<系列>/<陣營>/<武器名稱>.json（不分子陣營）
+  function weaponPath(series, faction, name) {
+    return `weapons/${safePart(series, '未分類')}/${safePart(faction, '未分類')}/${safePart(name, '未命名')}.json`;
   }
   const encPath = (p) => p.split('/').map(encodeURIComponent).join('/');
 
@@ -55,29 +60,38 @@
     return `${status} ${msg}`;
   }
 
-  // 列出 units/<陣營>/<子陣營>/<名稱>.json
-  async function listUnits() {
+  // 列出某個資料夾（units、weapons）底下所有 .json（任意層），附 sha 以便快取
+  async function listFiles(root) {
     const { owner, repo, branch } = getConfig();
     const r = await gh(`/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`);
     const data = await r.json();
-    const tree = {};
-    (data.tree || []).forEach((n) => {
-      const m = n.type === 'blob' && n.path.match(/^units\/([^/]+)\/([^/]+)\/([^/]+)\.json$/);
-      if (!m) return;
-      (tree[m[1]] = tree[m[1]] || {});
-      (tree[m[1]][m[2]] = tree[m[1]][m[2]] || []).push({ name: m[3], path: n.path });
-    });
-    return tree;
-  }
-
-  // 玩家端圖鑑用：列出 units/ 底下所有 .json（任意層資料夾），附 sha 以便快取
-  async function listUnitFiles() {
-    const { owner, repo, branch } = getConfig();
-    const r = await gh(`/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`);
-    const data = await r.json();
+    const re = new RegExp('^' + root + '/.+\\.json$');
     return (data.tree || [])
-      .filter((n) => n.type === 'blob' && /^units\/.+\.json$/.test(n.path))
+      .filter((n) => n.type === 'blob' && re.test(n.path))
       .map((n) => ({ path: n.path, sha: n.sha }));
+  }
+  const listUnitFiles = () => listFiles('units');
+
+  // 讀整包資料：網站上有發布好的 units.json／weapons.json 就用它（一個檔、不用權杖），
+  // 沒有（例如在自己電腦測試）才逐檔讀 repo。includeRepo=true 時一律讀 repo（剛保存、還沒發布的也看得到）
+  async function loadBundle(root, bundleUrl, includeRepo) {
+    if (!includeRepo) {
+      try {
+        const r = await fetch(bundleUrl, { cache: 'no-cache' });
+        if (r.ok) { const j = await r.json(); return j.units || j.items || []; }
+      } catch (e) { /* 改讀 repo */ }
+    }
+    const files = await listFiles(root);
+    const out = [];
+    const queue = files.slice();
+    async function worker() {
+      while (queue.length) {
+        const f = queue.shift();
+        try { out.push({ path: f.path, data: await loadBlob(f.sha) }); } catch (e) { console.warn('讀不到', f.path, e); }
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(6, files.length) }, worker));
+    return out;
   }
   // 用 sha 讀檔（內容不會變，可以永久快取）
   async function loadBlob(sha) {
@@ -101,6 +115,22 @@
   }
 
   // 新增或覆蓋一個檔案（一次 commit）
+  async function saveFile(path, obj, message) { return saveUnit(path, obj, message); }
+  // 刪除一個檔案（一次 commit；歷史裡還找得到）。用在單位改了分類或名稱、搬到新路徑後清掉舊檔
+  async function deleteFile(path, message) {
+    const cfg = getConfig();
+    if (!cfg.token) { const e = new Error('還沒填 GitHub 權杖'); e.status = 0; throw e; }
+    const { owner, repo, branch } = cfg;
+    let sha;
+    try {
+      const r = await gh(`/repos/${owner}/${repo}/contents/${encPath(path)}?ref=${encodeURIComponent(branch)}`);
+      sha = (await r.json()).sha;
+    } catch (e) { if (e.status === 404) return false; throw e; }
+    await gh(`/repos/${owner}/${repo}/contents/${encPath(path)}`, {
+      method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message, branch, sha }),
+    });
+    return true;
+  }
   async function saveUnit(path, obj, message) {
     const cfg = getConfig();
     if (!cfg.token) { const e = new Error('還沒填 GitHub 權杖，請先到「GitHub 設定」'); e.status = 0; throw e; }
@@ -128,5 +158,5 @@
     return { fullName: j.full_name, canPush, hasToken: !!getConfig().token };
   }
 
-  global.TaktikRepo = { getConfig, setConfig, unitPath, listUnits, listUnitFiles, loadBlob, loadUnit, saveUnit, test };
+  global.TaktikRepo = { getConfig, setConfig, unitPath, weaponPath, listFiles, listUnitFiles, loadBundle, loadBlob, loadUnit, saveUnit, saveFile, deleteFile, test };
 })(window);

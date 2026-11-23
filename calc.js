@@ -238,6 +238,12 @@
     return { body, extra: extraSum, independent, strV };
   }
 
+  // 近戰 STR 填 +X；也接受資料卡上的寫法「13(+6)」→ 取括號裡的 +6
+  function meleeX(s) {
+    const t = String(s == null ? '' : s);
+    const m = t.match(/\(\s*\+?\s*(-?\d+)\s*\)/);
+    return m ? parseInt(m[1], 10) : num(t);
+  }
   const fmtSigned = (v) => (v >= 0 ? '+' : '−') + Math.abs(v);
 
   // ---------- 武器 ----------
@@ -334,7 +340,7 @@
       } else if (strPair.length > 1) warn.push(`${name}：STR 有兩個值但沒有 HE／HEAT 半徑`);
       out.steps.push({ label: `武器：${name}${type === 'grenade' ? '（手榴彈）' : ''}`, calc: `RNG ${rngV}、STR ${w.STR}、D ${w.D}、AS ${asTxt}、${rlTxt}；規則 ${addP.join('、') || '無'}${baseP.length ? '；基數加值 ' + baseP.join('、') : ''}${modP.length ? '；修正 ' + modP.join('、') : ''}`, value: '' });
     } else {
-      const x = num(w.STR);
+      const x = meleeX(w.STR);
       const strIdx = 2 * x - 1;
       const base = STR_BASE[strIdx];
       if (base == null) warn.push(`${name}：近戰 STR 要填 +X（例 +6），「${w.STR || ''}」查不到`);
@@ -450,5 +456,5 @@
     return out;
   }
 
-  global.TaktikCalc = { scoreUnit, parseAbility, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
+  global.TaktikCalc = { scoreUnit, parseAbility, meleeX, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
 })(typeof window !== 'undefined' ? window : globalThis);

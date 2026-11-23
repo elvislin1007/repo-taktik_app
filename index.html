@@ -18,6 +18,21 @@
   </nav>
 </header>
 
+<dialog id="dlg-weapons" class="wlib" aria-labelledby="wlib-title">
+  <h2 id="wlib-title">從武器庫加入</h2>
+  <div class="wlib-filters">
+    <label>系列 <select id="wlib-series"></select></label>
+    <label>陣營 <select id="wlib-faction"></select></label>
+    <label class="wlib-q">搜尋 <input id="wlib-q" type="search" placeholder="武器名稱、特規…" autocomplete="off"></label>
+  </div>
+  <p id="wlib-status" class="dlg-status" role="status"></p>
+  <ul id="wlib-list" class="wlib-list"></ul>
+  <div class="dlg-actions">
+    <button type="button" id="wlib-reload" title="包含剛存入、還沒發布的武器">重新讀取</button>
+    <button type="button" id="wlib-close" class="primary">關閉</button>
+  </div>
+</dialog>
+
 <dialog id="dlg-settings" aria-labelledby="dlg-title">
   <form method="dialog" id="form-settings">
     <h2 id="dlg-title">GitHub 設定</h2>
@@ -59,9 +74,10 @@
   <!-- 編輯 -->
   <section id="view-edit" class="view">
     <div class="classify">
+      <label>系列 <input id="in-series" placeholder="例：戰錘40K"></label>
       <label>陣營 <input id="in-faction" placeholder="例：人類帝國(40K)"></label>
       <label>子陣營 <input id="in-subfaction" placeholder="例：極限戰士"></label>
-      <span class="hint">保存時照這兩欄分類（必填）；空白時會先帶入關鍵字列的前兩個詞</span>
+      <span class="hint">保存時照這三欄分資料夾（必填）：系列／陣營／子陣營。系列會記住上次填的；陣營、子陣營空白時先帶入關鍵字列的前兩個詞</span>
     </div>
     <div class="card-zone"><div id="card-edit"></div></div>
     <div class="actions">

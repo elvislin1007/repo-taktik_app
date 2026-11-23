@@ -30,7 +30,7 @@
   function normalize(c) {
     c = c || {};
     const card = {
-      faction: c.faction || '', subfaction: c.subfaction || '', name: c.name || '',
+      series: c.series || '', faction: c.faction || '', subfaction: c.subfaction || '', name: c.name || '',
       composition: Array.isArray(c.composition) ? c.composition : [],
       weapons: Array.isArray(c.weapons) ? c.weapons : [],
       options: Array.isArray(c.options) ? c.options : [],
@@ -76,8 +76,8 @@
   }
   // 近戰 STR 顯示成 合計(+X)；多種模型時只寫 +X
   function meleeStr(s, strValue) {
-    const x = C.num(s);
-    if (isNaN(x) || isNaN(strValue)) return text(s);
+    const x = C.meleeX(s); // 「+6」或「13(+6)」都取 6，再用持有者的 STR 算合計
+    if (isNaN(x) || isNaN(strValue)) return isNaN(x) ? text(s) : `+${x}`;
     return `${strValue + x}(+${x})`;
   }
 

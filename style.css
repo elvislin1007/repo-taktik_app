@@ -125,3 +125,23 @@ dialog h2 { margin: 0 0 8px; font-size: 17px; }
 .icon-menu button { display: flex; width: 100%; gap: 8px; align-items: center; border: none; background: none; color: #000; padding: 4px 6px; text-align: left; }
 .icon-menu button:hover, .icon-menu button[aria-selected="true"] { background: #e6f0fa; }
 .icon-menu .icon { height: 16px; }
+
+/* 共用武器庫 */
+.wlib-msg { font-size: 13px; align-self: center; }
+.wlib-msg.ok { color: var(--ok); }
+.wlib-msg.err { color: #c62828; }
+dialog.wlib { width: min(640px, calc(100vw - 24px)); }
+.wlib-filters { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-bottom: 6px; }
+.wlib-filters label { display: flex; flex-direction: column; gap: 3px; font-size: 13px; }
+.wlib-filters .wlib-q { flex: 1 1 180px; }
+.wlib-filters select, .wlib-filters input { font: inherit; min-height: 34px; padding: 3px 8px; border: 1px solid var(--panel-border); border-radius: 6px; background: var(--page-bg); color: var(--page-fg); }
+.wlib-list { list-style: none; margin: 0 0 10px; padding: 0; max-height: min(55vh, 460px); overflow: auto; border: 1px solid var(--panel-border); border-radius: 8px; }
+.wlib-list li { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-top: 1px solid var(--panel-border); }
+.wlib-list li:first-child { border-top: 0; }
+.wlib-list li.empty { color: var(--muted); justify-content: center; }
+.wlib-list .icon { width: 18px; height: 18px; background: #fff; border-radius: 3px; flex: none; }
+.wlib-list .wl-main { flex: 1; min-width: 0; }
+.wlib-list .wl-name { font-weight: 700; }
+.wlib-list .wl-rules { font-weight: 400; color: var(--accent); font-size: 13px; }
+.wlib-list .wl-stats { font-size: 13px; font-variant-numeric: tabular-nums; }
+.wlib-list .wl-where { font-size: 12px; color: var(--muted); }
