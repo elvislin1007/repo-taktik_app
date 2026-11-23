@@ -358,6 +358,19 @@
     return n || 1;
   }
 
+  // 能力的分數：寫在能力文字最後面，例「虎威：說明… 20」「虎威：說明…「20」」「…[20分]」。
+  // 數字前面要有空格，或用「」／[ ] 包起來（不用小括號，因為「戰術家(2)」這種是特規寫法），
+  // 避免把「WP+1」這種內文當成分數。輸出資料卡時隱藏。
+  const ABIL_SCORE = /(?:[\s　]+[「\[［]?\s*|[「\[［]\s*)(\d+(?:\.\d+)?)\s*(?:分|pts?)?\s*[」\]］]?\s*$/i;
+  function parseAbility(a) {
+    const raw = String((a && a.text) || '');
+    const m = raw.match(ABIL_SCORE);
+    if (m) return { text: clean(raw.slice(0, m.index)), score: parseFloat(m[1]) };
+    // 舊存檔：分數放在另一欄
+    const old = parseFloat(a && a.score);
+    return { text: clean(raw), score: isNaN(old) ? NaN : old };
+  }
+
   // 模型種類（能力值不同的模型分開列，例：歐克老大／歐克小子）
   function profilesOf(card) {
     if (Array.isArray(card.profiles) && card.profiles.length) return card.profiles;
@@ -400,10 +413,11 @@
       let abil = 0;
       const abilK = b.independent ? 1 : 0.2;
       (card.abilities || []).forEach((a) => {
-        const v = parseFloat(a.score);
+        const pa = parseAbility(a);
+        const v = pa.score;
         if (isNaN(v) || !v) return;
         abil += v * abilK;
-        out.steps.push({ label: `能力：${clean(a.text).split('：')[0].slice(0, 24)}`, calc: b.independent ? `手動輸入 ${v}（獨立）` : `手動輸入 ${v} × 1/5（部隊，每個模型）`, value: r2(v * abilK) });
+        out.steps.push({ label: `能力：${pa.text.split('：')[0].slice(0, 24)}`, calc: b.independent ? `能力後面寫的 ${v}（獨立）` : `能力後面寫的 ${v} × 1/5（部隊，每個模型）`, value: r2(v * abilK) });
       });
       const model = b.body + b.extra + abil + wSum;
       const modelR = round5(model);
@@ -436,5 +450,5 @@
     return out;
   }
 
-  global.TaktikCalc = { scoreUnit, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
+  global.TaktikCalc = { scoreUnit, parseAbility, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -20,7 +20,7 @@
   const blankCard = () => ({
     faction: '', subfaction: '', name: '',
     profiles: [blankProfile()],
-    composition: [''], abilities: [{ text: '', score: '' }],
+    composition: [''], abilities: [{ text: '' }],
     weapons: [blankWeapon('ranged')], options: [],
     savedPath: null,
   });
@@ -32,6 +32,14 @@
       card.profiles = [{ name: '', keywords: c.keywords || '', stats: Object.assign(blankStats(), c.stats || {}) }];
     } else card.profiles = c.profiles.map((p) => ({ name: p.name || '', keywords: p.keywords || '', stats: Object.assign(blankStats(), p.stats || {}) }));
     delete card.keywords; delete card.stats;
+    // 舊存檔的能力分數放在另一欄 → 改成寫在能力文字最後面
+    card.abilities = (card.abilities || []).map((a) => {
+      const t = String(a.text || '');
+      const sc = String(a.score == null ? '' : a.score).trim();
+      const hasNum = !isNaN(C.parseAbility({ text: t }).score);
+      return { text: sc && !hasNum ? `${t} ${sc}` : t };
+    });
+    if (!card.abilities.length) card.abilities = [{ text: '' }];
     return card;
   }
 
@@ -168,24 +176,23 @@
     const ul = el('ul', { class: 'bul' });
     const arr = card.abilities;
     if (!edit) {
-      arr.filter((a) => text(a.text)).forEach((a) => ul.append(el('li', null, abilityView(a.text))));
+      // 輸出時隱藏能力後面寫的分數
+      arr.filter((a) => text(C.parseAbility(a).text)).forEach((a) => ul.append(el('li', null, abilityView(C.parseAbility(a).text))));
       return ul;
     }
     arr.forEach((a, i) => {
       const li = el('li', { class: 'row-ctrl-anchor' });
       li.append(editable(a.text, (v) => { a.text = v; }, {
-        tag: 'div', class: 'ed-abil', ph: i === 0 ? '例：爆彈訓練、戰鬥教條（陣營共用，不填分）／戰爭之儀 Rites of Battle：說明…' : '',
-        onEnter: () => { arr.splice(i + 1, 0, { text: '', score: '' }); rerender(); focusAt('.ed-abil', i + 1); },
+        tag: 'div', class: 'ed-abil', ph: i === 0 ? '例：爆彈訓練、戰鬥教條（陣營共用，不寫分數）／虎威 Tiger Fear：說明… 20（最後的數字是分數，輸出時隱藏）' : '',
+        onEnter: () => { arr.splice(i + 1, 0, { text: '' }); rerender(); focusAt('.ed-abil', i + 1); },
         onEmptyBackspace: () => { if (arr.length > 1) { arr.splice(i, 1); rerender(); focusAt('.ed-abil', Math.max(0, i - 1)); } },
       }));
-      const inp = el('input', { type: 'number', step: '5', placeholder: '分數', title: '填「獨立模型」的分數；部隊會自動每個模型算 1/5', 'aria-label': '這條能力的分數（獨立模型的值，部隊自動算 1/5）', value: a.score });
-      inp.addEventListener('input', () => { a.score = inp.value; saveDraft(); });
-      li.append(el('span', { class: 'ctrl' }, inp,
-        el('button', { type: 'button', title: '刪除這一行', 'aria-label': '刪除這一行', onclick: () => { arr.splice(i, 1); if (!arr.length) arr.push({ text: '', score: '' }); rerender(); } }, '×')));
+      li.append(el('span', { class: 'ctrl' },
+        el('button', { type: 'button', title: '刪除這一行', 'aria-label': '刪除這一行', onclick: () => { arr.splice(i, 1); if (!arr.length) arr.push({ text: '' }); rerender(); } }, '×')));
       ul.append(li);
     });
     ul.append(el('li', { style: 'list-style:none' }, el('div', { class: 'add-row' },
-      el('button', { type: 'button', onclick: () => { arr.push({ text: '', score: '' }); rerender(); focusLast('.ed-abil'); } }, '＋ 新增能力'))));
+      el('button', { type: 'button', onclick: () => { arr.push({ text: '' }); rerender(); focusLast('.ed-abil'); } }, '＋ 新增能力'))));
     return ul;
   }
   // 單位構成：[ ] 裡的特規（如 領導(Lv1)、砲塔）照範本用 7.5pt 藍字，括號拿掉
