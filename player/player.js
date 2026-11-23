@@ -168,15 +168,18 @@
     }
     const ul = el('ul', { class: 'units' });
     sorted.forEach((u) => {
-      ul.append(el('li', null, el('a', { class: 'unit-row', href: '#/unit/' + encodeURIComponent(u.path) },
+      ul.append(el('li', { class: 'unit-item' }, el('a', { class: 'unit-row', href: '#/unit/' + encodeURIComponent(u.path) },
         el('div', { class: 'row-main' },
           el('div', { class: 'row-name' }, u.name),
           el('div', { class: 'row-path' }, u.segs.join(' › ')),
           u.keywords ? el('div', { class: 'row-kw' }, u.keywords) : null),
-        el('div', { class: 'row-pts' }, u.total != null ? el('span', null, String(u.total), el('small', null, 'pts')) : '—'))));
+        el('div', { class: 'row-pts' }, u.total != null ? el('span', null, String(u.total), el('small', null, 'pts')) : '—')),
+        el('a', { class: 'row-edit', href: editUrl(u.path), 'aria-label': `在算分編輯器編輯 ${u.name}`, title: '在算分編輯器重新編輯（保存需要權杖）' }, '編輯')));
     });
     list.append(ul);
   }
+
+  const editUrl = (path) => '../?load=' + encodeURIComponent(path);
 
   // ---------- 單位頁 ----------
   function renderUnit(path) {
@@ -196,7 +199,8 @@
     const saved = u.data.savedAt ? new Date(u.data.savedAt) : null;
     $('unit-meta').append(
       saved ? `最後保存：${saved.toLocaleDateString('zh-TW')}　` : '',
-      el('a', { href: '../?load=' + encodeURIComponent(u.path) }, '在算分編輯器開啟'));
+      el('a', { href: editUrl(u.path) }, '在算分編輯器重新編輯'));
+    $('btn-edit').href = editUrl(u.path);
   }
   // 資料卡固定 540px 寬，手機上整張等比例縮小
   function fitCard() {

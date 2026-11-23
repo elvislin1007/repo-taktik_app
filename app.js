@@ -342,7 +342,7 @@
   }
 
   // ---------- 畫面切換 ----------
-  const views = ['edit', 'result', 'list'];
+  const views = ['edit', 'result', 'list', 'weapons'];
   function show(v) { views.forEach((x) => { document.getElementById('view-' + x).hidden = x !== v; }); window.scrollTo(0, 0); }
 
   function rerender() {
@@ -400,35 +400,52 @@
   }
   const res0 = (s) => (s.savedPath ? '更新單位' : '新增單位');
 
+  // 已存單位：可搜尋（名稱、系列、陣營、子陣營），點名稱就打開重新編輯
+  let unitFilesCache = [];
+  let unitTreeRoot = null;
+  function renderUnitTree() {
+    const host = document.getElementById('unit-tree-inner');
+    if (!host) return;
+    const q = document.getElementById('unit-q').value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const root = { dirs: {}, units: [] };
+    unitFilesCache.forEach((f) => {
+      const segs = f.path.replace(/^units\//, '').replace(/\.json$/, '').split('/');
+      const hay = segs.join(' ').toLowerCase();
+      if (!q.every((t) => hay.includes(t))) return;
+      const name = segs.pop();
+      let node = root;
+      segs.forEach((g) => { node = node.dirs[g] = node.dirs[g] || { dirs: {}, units: [] }; });
+      node.units.push({ name, path: f.path });
+    });
+    const build = (node) => {
+      const out = [];
+      Object.keys(node.dirs).sort((x, y) => x.localeCompare(y, 'zh-Hant')).forEach((g) => {
+        out.push(el('details', { open: true }, el('summary', null, g), build(node.dirs[g])));
+      });
+      node.units.sort((x, y) => x.name.localeCompare(y.name, 'zh-Hant')).forEach((u) =>
+        out.push(el('div', { class: 'unit-line' },
+          el('button', { type: 'button', class: 'unit', onclick: () => loadUnit(u.path) }, u.name),
+          el('button', { type: 'button', class: 'mini', onclick: () => loadUnit(u.path) }, '編輯'))));
+      return out;
+    };
+    const kids = build(root);
+    host.replaceChildren(...(kids.length ? kids : [el('p', { class: 'empty' }, '找不到符合的單位。')]));
+  }
+  document.getElementById('unit-q').addEventListener('input', renderUnitTree);
+
   async function showList() {
     show('list');
     const box = document.getElementById('unit-tree');
     box.replaceChildren(el('p', { class: 'empty' }, '讀取中…'));
     try {
-      const files = await R.listUnitFiles();
+      const files = unitFilesCache = await R.listUnitFiles();
+      unitTreeRoot = null;
       box.replaceChildren();
       const { owner, repo, branch } = R.getConfig();
       box.append(el('p', { class: 'empty' }, `來源：github.com/${owner}/${repo}（${branch}）的 units/`));
       if (!files.length) { box.append(el('p', { class: 'empty' }, '還沒有保存的單位。')); return; }
-      // 依資料夾一層層：系列 › 陣營 › 子陣營 › 單位
-      const root = { dirs: {}, units: [] };
-      files.forEach((f) => {
-        const segs = f.path.replace(/^units\//, '').replace(/\.json$/, '').split('/');
-        const name = segs.pop();
-        let node = root;
-        segs.forEach((g) => { node = node.dirs[g] = node.dirs[g] || { dirs: {}, units: [] }; });
-        node.units.push({ name, path: f.path });
-      });
-      const build = (node) => {
-        const out = [];
-        Object.keys(node.dirs).sort((x, y) => x.localeCompare(y, 'zh-Hant')).forEach((g) => {
-          out.push(el('details', { open: true }, el('summary', null, g), build(node.dirs[g])));
-        });
-        node.units.sort((x, y) => x.name.localeCompare(y.name, 'zh-Hant')).forEach((u) =>
-          out.push(el('button', { type: 'button', class: 'unit', onclick: () => loadUnit(u.path) }, u.name)));
-        return out;
-      };
-      box.append(el('div', { class: 'tree' }, build(root)));
+      box.append(el('div', { class: 'tree', id: 'unit-tree-inner' }));
+      renderUnitTree();
     } catch (e) {
       box.replaceChildren(el('p', { class: 'empty' }, `讀不到 repo 的單位：${e.message}`));
     }
@@ -471,8 +488,8 @@
 
   const wdlg = document.getElementById('dlg-weapons');
   let libItems = null; // [{ path, series, faction, w }]
-  async function loadLib(includeRepo) {
-    const st = document.getElementById('wlib-status');
+  async function loadLib(includeRepo, statusId) {
+    const st = document.getElementById(statusId || 'wlib-status');
     st.textContent = '讀取武器庫…'; st.className = 'dlg-status';
     try {
       const raw = await R.loadBundle('weapons', 'weapons.json', includeRepo);
@@ -516,7 +533,9 @@
           el('div', { class: 'wl-name' }, text(x.w.name), ' ', el('span', { class: 'wl-rules' }, C.clean(x.w.rules))),
           el('div', { class: 'wl-stats' }, `RNG ${text(x.w.RNG) || '-'}　STR ${text(x.w.STR) || '-'}　D ${text(x.w.D) || '-'}　AS ${text(x.w.AS) || '-'}　RL ${text(x.w.RL) || '-'}`),
           el('div', { class: 'wl-where' }, `${x.series} › ${x.faction}`)),
-        el('button', { type: 'button', class: 'primary', onclick: () => addFromLib(x) }, '加入')));
+        el('div', { class: 'wl-btns' },
+          el('button', { type: 'button', onclick: () => { wdlg.close(); openWeaponEditor(x); } }, '編輯'),
+          el('button', { type: 'button', class: 'primary', onclick: () => addFromLib(x) }, '加入'))));
     });
   }
   function addFromLib(x) {
@@ -541,6 +560,109 @@
   document.getElementById('wlib-q').addEventListener('input', renderLib);
   document.getElementById('wlib-close').addEventListener('click', () => wdlg.close());
   document.getElementById('wlib-reload').addEventListener('click', async () => { await loadLib(true); renderLib(); });
+
+  // ---------- 共用武器庫：編輯頁 ----------
+  // 格式和資料卡的武器列一樣；保存到 weapons/<系列>/<陣營>/<武器名稱>.json
+  let wstate = null; // { series, faction, w, editingPath }
+  const blankWState = () => ({ series: text(state.series) || lastSeries(), faction: '', w: blankWeapon('ranged'), editingPath: null });
+  function renderWeaponEditor() {
+    const w = wstate.w;
+    document.getElementById('w-series').value = wstate.series || '';
+    document.getElementById('w-faction').value = wstate.faction || '';
+    document.getElementById('w-title').textContent = wstate.editingPath ? `共用武器庫：編輯 ${wstate.editingPath}` : '共用武器庫：新增武器';
+    const type = WTYPES[w.type] ? w.type : 'ranged';
+    const melee = !isShootType(type);
+    const cell = (k, ph) => el('td', { class: 'n' }, editable(w[k], (v) => { w[k] = v; }, { tag: 'div', ph }));
+    const nameCell = el('td', null, iconPicker(w, renderWeaponEditor), ' ',
+      editable(w.name, (v) => { w.name = v; }, { class: 'wname ed-wlname', ph: '武器名稱 English' }), ' ',
+      editable(w.rules, (v) => { w.rules = v; }, { class: 'wrules', ph: '武器特規（例：能量彈、突擊）' }));
+    const card = el('div', { class: 'card' }, el('table', { class: 'wg' },
+      el('colgroup', null, ['name', 'rng', 'str', 'd', 'as', 'rl'].map((c) => el('col', { class: 'c-' + c }))),
+      el('tr', { class: 'h' }, el('td', null, 'WARGEARS'), ['RNG(”)', 'STR', 'D', 'AS', 'RL'].map((h) => el('td', { class: 'n' }, h))),
+      el('tr', null, nameCell, cell('RNG', melee ? 'CC1' : '24'), cell('STR', melee ? '+6' : '6'), cell('D', '1'), cell('AS', melee ? '+0' : '2'), cell('RL', '-'))));
+    document.getElementById('w-edit').replaceChildren(card);
+  }
+  function openWeaponEditor(item) {
+    if (item) {
+      const w = {};
+      WEAPON_FIELDS.forEach((k) => { w[k] = item.w[k] == null ? '' : String(item.w[k]); });
+      if (!WTYPES[w.type]) w.type = 'ranged';
+      wstate = { series: item.series, faction: item.faction, w, editingPath: item.path };
+    } else if (!wstate) wstate = blankWState();
+    const msg = document.getElementById('w-msg'); msg.textContent = ''; msg.className = 'save-msg';
+    renderWeaponEditor();
+    show('weapons');
+    if (!libItems) loadLib(false, 'wl-status').then(renderWList); else renderWList();
+  }
+  async function saveWeaponEditor() {
+    const msg = document.getElementById('w-msg');
+    const w = wstate.w;
+    const fail = (t) => { msg.textContent = t; msg.className = 'save-msg err'; };
+    if (!text(w.name)) return fail('武器名稱是空的。');
+    if (!text(wstate.series) || !text(wstate.faction)) return fail('系列、陣營都要填。');
+    const path = R.weaponPath(wstate.series, wstate.faction, w.name);
+    const item = {};
+    WEAPON_FIELDS.forEach((k) => { item[k] = w[k] == null ? '' : w[k]; });
+    if (!isShootType(item.type)) { const x = C.meleeX(item.STR); if (!isNaN(x)) item.STR = `+${x}`; }
+    Object.assign(item, { series: text(wstate.series), faction: text(wstate.faction), savedAt: new Date().toISOString() });
+    const btn = document.getElementById('w-save');
+    btn.disabled = true; msg.textContent = '保存中…'; msg.className = 'save-msg';
+    try {
+      const res = await R.saveFile(path, item, `武器庫${wstate.editingPath ? '更新' : '新增'}：${text(w.name)}（${item.series}／${item.faction}）`);
+      let moved = '';
+      if (wstate.editingPath && wstate.editingPath !== path) {
+        try { if (await R.deleteFile(wstate.editingPath, `搬移武器：${wstate.editingPath} → ${path}`)) moved = '（舊位置已移除）'; }
+        catch (e) { moved = `（舊位置 ${wstate.editingPath} 沒刪掉：${e.message}）`; }
+      }
+      wstate.editingPath = path;
+      w.STR = item.STR;
+      rememberSeries(item.series);
+      msg.replaceChildren(`已${res.created ? '新增' : '更新'}：${path}${moved} `,
+        res.commitUrl ? el('a', { href: res.commitUrl, target: '_blank', rel: 'noopener' }, '看這次 commit') : '');
+      msg.className = 'save-msg ok';
+      renderWeaponEditor();
+      await loadLib(true, 'wl-status'); // 直接讀 repo，剛存的馬上看得到
+      renderWList();
+    } catch (e) {
+      fail(`保存失敗：${e.message}`);
+      if (e.status === 0 || e.status === 401 || e.status === 403) openSettings();
+    } finally { btn.disabled = false; }
+  }
+  // 已存的武器：系列／陣營篩選＋搜尋，每把都能「編輯」
+  let wlSeries = '', wlFaction = '';
+  function renderWList() {
+    const items = libItems || [];
+    const uniq = (a) => [...new Set(a)].sort((x, y) => x.localeCompare(y, 'zh-Hant'));
+    wlSeries = fillSelect(document.getElementById('wl-series'), uniq(items.map((x) => x.series).filter(Boolean)), wlSeries);
+    const inSeries = items.filter((x) => !wlSeries || x.series === wlSeries);
+    wlFaction = fillSelect(document.getElementById('wl-faction'), uniq(inSeries.map((x) => x.faction).filter(Boolean)), wlFaction);
+    const q = document.getElementById('wl-q').value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const hits = inSeries.filter((x) => !wlFaction || x.faction === wlFaction)
+      .filter((x) => q.every((t) => `${x.w.name} ${x.w.rules}`.toLowerCase().includes(t)))
+      .sort((a, b) => text(a.w.name).localeCompare(text(b.w.name), 'zh-Hant'));
+    const list = document.getElementById('wl-list');
+    list.replaceChildren();
+    if (items.length && !hits.length) list.append(el('li', { class: 'empty' }, '沒有符合的武器'));
+    hits.forEach((x) => {
+      const t = WTYPES[x.w.type] ? x.w.type : 'ranged';
+      list.append(el('li', { class: wstate && wstate.editingPath === x.path ? 'current' : null },
+        el('img', { class: 'icon', src: WTYPES[t].icon, alt: WTYPES[t].label }),
+        el('div', { class: 'wl-main' },
+          el('div', { class: 'wl-name' }, text(x.w.name), ' ', el('span', { class: 'wl-rules' }, C.clean(x.w.rules))),
+          el('div', { class: 'wl-stats' }, `RNG ${text(x.w.RNG) || '-'}　STR ${text(x.w.STR) || '-'}　D ${text(x.w.D) || '-'}　AS ${text(x.w.AS) || '-'}　RL ${text(x.w.RL) || '-'}`),
+          el('div', { class: 'wl-where' }, `${x.series} › ${x.faction}`)),
+        el('button', { type: 'button', onclick: () => { openWeaponEditor(x); window.scrollTo(0, 0); } }, '編輯')));
+    });
+  }
+  document.getElementById('btn-weapons').addEventListener('click', () => openWeaponEditor(null));
+  document.getElementById('w-new').addEventListener('click', () => { wstate = blankWState(); wstate.faction = document.getElementById('w-faction').value; openWeaponEditor(null); });
+  document.getElementById('w-save').addEventListener('click', saveWeaponEditor);
+  document.getElementById('w-series').addEventListener('input', (e) => { wstate.series = e.target.value; });
+  document.getElementById('w-faction').addEventListener('input', (e) => { wstate.faction = e.target.value; });
+  document.getElementById('wl-series').addEventListener('change', (e) => { wlSeries = e.target.value; wlFaction = ''; renderWList(); });
+  document.getElementById('wl-faction').addEventListener('change', (e) => { wlFaction = e.target.value; renderWList(); });
+  document.getElementById('wl-q').addEventListener('input', renderWList);
+  document.getElementById('wl-reload').addEventListener('click', async () => { await loadLib(true, 'wl-status'); renderWList(); });
 
   // ---------- GitHub 設定 ----------
   const dlg = document.getElementById('dlg-settings');

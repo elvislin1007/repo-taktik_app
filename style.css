@@ -145,3 +145,20 @@ dialog.wlib { width: min(640px, calc(100vw - 24px)); }
 .wlib-list .wl-rules { font-weight: 400; color: var(--accent); font-size: 13px; }
 .wlib-list .wl-stats { font-size: 13px; font-variant-numeric: tabular-nums; }
 .wlib-list .wl-where { font-size: 12px; color: var(--muted); }
+
+/* 已存單位：搜尋＋編輯 */
+#view-list, #view-weapons { max-width: 760px; margin: 0 auto; }
+.list-tools input { font: inherit; width: 100%; min-height: 40px; padding: 6px 12px; border: 1px solid var(--panel-border); border-radius: 8px; background: var(--panel-bg); color: var(--page-fg); }
+#view-list .hint, #view-weapons .hint { color: var(--muted); font-size: 13px; }
+.tree .unit-line { display: flex; align-items: center; gap: 8px; margin-left: 16px; }
+.tree .unit-line button.unit { margin: 4px 0; }
+button.mini { padding: 1px 10px; font-size: 12.5px; }
+
+/* 共用武器庫：編輯頁 */
+#w-edit .card { margin: 0 auto; }
+#view-weapons .classify { max-width: none; }
+.w-list-title { font-size: 16px; margin: 26px 0 8px; }
+.w-filters { align-items: flex-end; }
+.wlib-list li.current { background: rgba(91, 155, 213, .14); }
+.wlib-list .wl-btns { display: flex; gap: 6px; flex: none; }
+.w-page-list { max-height: none; }

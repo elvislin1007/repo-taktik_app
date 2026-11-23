@@ -13,6 +13,7 @@
   <nav>
     <button type="button" id="btn-new">新單位</button>
     <button type="button" id="btn-list">已存單位</button>
+    <button type="button" id="btn-weapons">武器庫</button>
     <button type="button" id="btn-settings">GitHub 設定</button>
     <a class="navlink" href="player/">單位圖鑑</a>
   </nav>
@@ -101,7 +102,37 @@
   <!-- 已存單位 -->
   <section id="view-list" class="view" hidden>
     <h2>已存單位</h2>
+    <div class="list-tools">
+      <input id="unit-q" type="search" placeholder="搜尋單位名稱、系列、陣營、子陣營…" autocomplete="off" aria-label="搜尋已存單位">
+    </div>
+    <p class="hint">點單位名稱就會打開來重新編輯。</p>
     <div id="unit-tree"></div>
+  </section>
+
+  <!-- 共用武器庫 -->
+  <section id="view-weapons" class="view" hidden>
+    <h2 id="w-title">共用武器庫：新增武器</h2>
+    <div class="classify">
+      <label>系列 <input id="w-series" placeholder="例：戰錘40K"></label>
+      <label>陣營 <input id="w-faction" placeholder="例：星際戰士"></label>
+      <span class="hint">存到 weapons/系列/陣營/武器名稱.json（系列、陣營必填，不分子陣營）。近戰 STR 填 +X。</span>
+    </div>
+    <div class="card-zone"><div id="w-edit"></div></div>
+    <div class="actions">
+      <button type="button" id="w-new">清空，新增另一把</button>
+      <button type="button" class="primary" id="w-save">保存到武器庫</button>
+      <span id="w-msg" class="save-msg" role="status"></span>
+    </div>
+
+    <h3 class="w-list-title">已存的武器</h3>
+    <div class="wlib-filters w-filters">
+      <label>系列 <select id="wl-series"></select></label>
+      <label>陣營 <select id="wl-faction"></select></label>
+      <label class="wlib-q">搜尋 <input id="wl-q" type="search" placeholder="武器名稱、特規…" autocomplete="off"></label>
+      <button type="button" id="wl-reload" title="包含剛保存、還沒發布的武器">重新讀取</button>
+    </div>
+    <p id="wl-status" class="dlg-status" role="status"></p>
+    <ul id="wl-list" class="wlib-list w-page-list"></ul>
   </section>
 </main>
 
