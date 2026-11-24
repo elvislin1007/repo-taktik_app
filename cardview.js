@@ -9,6 +9,7 @@
     melee: { label: '近戰', icon: 'melee.png' },
     shield: { label: '盾牌', icon: 'shield.png' },
     grenade: { label: '手榴彈', icon: 'grenade.png' },
+    multi: { label: '複合武器', icon: 'multi.png' },
   };
   const isShootType = (t) => !t || t === 'ranged' || t === 'grenade';
   const text = (s) => String(s == null ? '' : s).trim();
@@ -120,6 +121,21 @@
       el('colgroup', null, ['name', 'rng', 'str', 'd', 'as', 'rl'].map((c) => el('col', { class: 'c-' + c }))),
       el('tr', { class: 'h' }, el('td', null, 'WARGEARS'), ['RNG(”)', 'STR', 'D', 'AS', 'RL'].map((h) => el('td', { class: 'n' }, h))));
     card.weapons.forEach((w) => {
+      // 複合武器：名稱一列（數值空白）＋每個模式一列（▶ 開頭）
+      if (w.type === 'multi') {
+        tbl.append(el('tr', null,
+          el('td', null, el('img', { class: 'icon', src: iconBase + WTYPES.multi.icon, alt: WTYPES.multi.label }), el('span', { class: 'wname' }, text(w.name))),
+          ...['RNG', 'STR', 'D', 'AS', 'RL'].map(() => el('td', { class: 'n' }))));
+        (w.modes || []).forEach((m) => {
+          const melee = C.modeType(m) === 'melee';
+          const n = (k) => el('td', { class: 'n' }, el('span', null, k === 'STR' && melee ? meleeStr(m.STR, multi ? NaN : strValue) : text(m[k])));
+          tbl.append(el('tr', { class: 'mode' },
+            el('td', null, el('img', { class: 'icon mode-icon', src: iconBase + 'mode.png', alt: '▶' }),
+              el('span', { class: 'wname' }, text(m.name)), ' ', el('span', { class: 'wrules' }, strip(m.rules))),
+            n('RNG'), n('STR'), n('D'), n('AS'), n('RL')));
+        });
+        return;
+      }
       if (!text(w.name) && !text(w.STR) && !text(w.RNG)) return;
       const type = WTYPES[w.type] ? w.type : 'ranged';
       const melee = !isShootType(type);

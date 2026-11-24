@@ -357,6 +357,20 @@
     return rounded;
   }
 
+  // 複合武器（例：極限雙拳）：名稱一列＋每個模式一列。RNG 是 CC 開頭的模式算近戰，其他算射擊；
+  // 每個模式各自算、各自取整，再相加（07 #47）
+  function modeType(m) { return /^\s*CC/i.test(String(m.RNG || '')) ? 'melee' : 'ranged'; }
+  function scoreMulti(w, out) {
+    const modes = (w.modes || []).filter((m) => clean(m.name) || m.STR || m.RNG);
+    if (!modes.length) { out.warnings.push(`${clean(w.name) || '複合武器'}：還沒有填任何模式`); return 0; }
+    let sum = 0;
+    modes.forEach((m) => {
+      sum += scoreWeapon({ type: modeType(m), name: `${clean(w.name)} ▶${clean(m.name)}`, rules: m.rules, RNG: m.RNG, STR: m.STR, D: m.D, AS: m.AS, RL: m.RL }, null, out);
+    });
+    out.steps.push({ label: `　${clean(w.name) || '複合武器'} 合計`, calc: `${modes.length} 個模式各自取整後相加`, value: sum });
+    return sum;
+  }
+
   // ---------- 單位 ----------
   function modelCount(lines) {
     let n = 0;
@@ -404,6 +418,7 @@
     // 武器：每個模型都帶單位的全部武器，分數只算一次
     let wSum = 0;
     (card.weapons || []).forEach((w) => {
+      if (w.type === 'multi') { wSum += scoreMulti(w, out); return; }
       if (!clean(w.name) && !w.STR && !w.RNG) return;
       wSum += scoreWeapon(w, null, out);
     });
@@ -456,5 +471,5 @@
     return out;
   }
 
-  global.TaktikCalc = { scoreUnit, parseAbility, meleeX, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
+  global.TaktikCalc = { scoreUnit, parseAbility, meleeX, modeType, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
 })(typeof window !== 'undefined' ? window : globalThis);

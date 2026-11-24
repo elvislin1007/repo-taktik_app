@@ -44,7 +44,7 @@
       ...card.profiles.map((p) => `${p.name} ${p.keywords}`),
       ...card.composition,
       ...card.abilities.map((a) => C.parseAbility(a).text),
-      ...card.weapons.map((w) => `${w.name} ${w.rules}`),
+      ...card.weapons.map((w) => `${w.name} ${w.rules} ${(w.modes || []).map((m) => `${m.name} ${m.rules}`).join(' ')}`),
     ].join(' ').toLowerCase();
     const keywords = [...new Set(card.profiles.map((p) => C.clean(p.keywords)).filter(Boolean))].join('／');
     return { path, segs, data, name, total, hay, keywords };
@@ -130,29 +130,16 @@
   function render() {
     renderNav();
     const st = listState;
-    $('q').value = st.q;
     $('sort').value = st.s;
-
-    // 路徑（麵包屑）
-    const crumbs = $('crumbs');
-    crumbs.replaceChildren();
-    const all = el('button', { type: 'button', class: 'crumb', 'aria-current': st.p.length ? null : 'page', onclick: () => go(listHash({ ...st, p: [] })) }, '全部');
-    crumbs.append(all);
-    st.p.forEach((seg, i) => {
-      crumbs.append(el('span', { class: 'sep', 'aria-hidden': 'true' }, '›'),
-        el('button', { type: 'button', class: 'crumb', 'aria-current': i === st.p.length - 1 ? 'page' : null, onclick: () => go(listHash({ ...st, p: st.p.slice(0, i + 1) })) }, seg));
-    });
-
-    // 下一層分類（照資料夾）
+    // 目前顯示的範圍（篩選從左上 ☰ 選單操作；本頁不放搜尋和資料夾篩選）
     const hits = units.filter((u) => matches(u, st));
-    const depth = st.p.length;
-    const next = new Map();
-    hits.forEach((u) => { if (u.segs.length > depth) next.set(u.segs[depth], (next.get(u.segs[depth]) || 0) + 1); });
-    const chips = $('chips');
-    chips.replaceChildren(...[...next.entries()].sort((a, b) => a[0].localeCompare(b[0], 'zh-Hant')).map(([seg, n]) =>
-      el('button', { type: 'button', class: 'chip', role: 'listitem', onclick: () => go(listHash({ ...st, p: [...st.p, seg] })) },
-        el('span', null, seg), el('span', { class: 'n' }, String(n)))));
-    chips.hidden = next.size === 0;
+    const scope = $('scope');
+    scope.replaceChildren();
+    const parts = [];
+    if (st.p.length) parts.push(st.p.join(' › '));
+    if (st.q) parts.push(`搜尋「${st.q}」`);
+    scope.append(el('span', null, parts.length ? parts.join('　') : '全部單位'));
+    if (parts.length) scope.append(' ', el('a', { href: listHash({ p: [], q: '', s: st.s }), class: 'scope-all' }, '顯示全部'));
 
     // 排序
     const sorted = hits.slice();
@@ -171,7 +158,7 @@
     if (status === 'loading' && !units.length) { list.append(el('div', { class: 'empty' }, el('p', null, '讀取中…'))); return; }
     if (!sorted.length) {
       list.append(el('div', { class: 'empty' }, el('p', null, units.length ? '找不到符合的單位。' : '資料庫裡還沒有單位。'),
-        st.q || st.p.length ? el('button', { type: 'button', onclick: () => go(listHash({ p: [], q: '', s: st.s })) }, '清除搜尋和篩選') : null));
+        st.q || st.p.length ? el('button', { type: 'button', onclick: () => go(listHash({ p: [], q: '', s: st.s })) }, '顯示全部單位') : null));
       return;
     }
     const ul = el('ul', { class: 'units' });
@@ -264,39 +251,34 @@
     else go(listHash(listState), true);
   });
 
-  // 搜尋：打字時即時篩選，不要每個字都塞進瀏覽紀錄
-  let qTimer = null;
-  $('q').addEventListener('input', (e) => {
-    clearTimeout(qTimer);
-    const v = e.target.value;
-    qTimer = setTimeout(() => go(listHash({ ...listState, q: v.trim() }), true), 150);
-  });
   $('sort').addEventListener('change', (e) => go(listHash({ ...listState, s: e.target.value }), true));
   $('btn-refresh').addEventListener('click', sync);
 
   // ---------- 側邊選單 ----------
-  // 之後新增功能（規則、武器圖鑑…）就在 MENU 加一項；children 會變成可展開的子選單
+  // 之後新增功能（規則、武器圖鑑…）就在 MENU 加一項；children 回傳子項目（可以再有 children，一層層展開）
   const seriesList = () => [...new Set(units.map((u) => u.segs[0]).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'zh-Hant'));
+  // 依 units/ 的資料夾長出選單樹：系列 › 陣營 › 子陣營
+  function folderTree(prefix) {
+    const depth = prefix.length;
+    const next = [...new Set(units.filter((u) => prefix.every((g, i) => u.segs[i] === g) && u.segs.length > depth).map((u) => u.segs[depth]))]
+      .sort((a, b) => a.localeCompare(b, 'zh-Hant'));
+    return next.map((g) => {
+      const path = [...prefix, g];
+      const node = { id: 'units/' + path.join('/'), label: g, href: listHash({ p: path }) };
+      if (path.length < 3) node.children = () => folderTree(path); // 子陣營是最後一層
+      return node;
+    });
+  }
   const MENU = [
     { id: 'home', label: '首頁', href: '#/' },
-    { id: 'units', label: '單位圖鑑', href: '#/units', children: () => seriesList().map((x) => ({ label: x, href: listHash({ p: [x] }) })) },
+    { id: 'units', label: '單位圖鑑', href: '#/units', children: () => folderTree([]) },
   ];
   const openSub = new Set();
-  function renderNav() {
-    // 搜尋框的分類下拉：全部＋各系列
-    const sel = $('ds-series');
-    const cur = sel.value;
-    const list = seriesList();
-    sel.replaceChildren(el('option', { value: '' }, '全部'), ...list.map((x) => el('option', { value: x }, x)));
-    sel.value = list.includes(cur) ? cur : '';
-    // 選單
-    const r = parseHash();
-    const activeId = r.view === 'home' ? 'home' : 'units';
-    const ul = $('menu');
-    ul.replaceChildren(...MENU.map((m) => {
+  function menuItems(items, level, activeId) {
+    return items.map((m) => {
       const kids = m.children ? m.children() : [];
       const open = openSub.has(m.id);
-      const li = el('li', { class: 'menu-item' + (m.id === activeId ? ' active' : '') });
+      const li = el('li', { class: `menu-item lv${level}` + (m.id === activeId ? ' active' : '') });
       const row = el('div', { class: 'menu-row' },
         el('a', { href: m.href, class: 'menu-link', 'aria-current': m.id === activeId ? 'page' : null }, m.label));
       if (kids.length) {
@@ -306,11 +288,15 @@
         row.append(tog);
       }
       li.append(row);
-      if (kids.length && open) {
-        li.append(el('ul', { class: 'submenu' }, kids.map((k) => el('li', null, el('a', { href: k.href }, k.label)))));
-      }
+      if (kids.length && open) li.append(el('ul', { class: 'submenu' }, menuItems(kids, level + 1, activeId)));
       return li;
-    }));
+    });
+  }
+  function renderNav() {
+    const r = parseHash();
+    // 目前所在的資料夾也標示出來
+    const activeId = r.view === 'home' ? 'home' : (r.view === 'list' && r.p.length && !r.q ? 'units/' + r.p.join('/') : 'units');
+    $('menu').replaceChildren(...menuItems(MENU, 0, activeId));
     renderHome();
   }
   // 首頁下方：各功能入口
@@ -329,7 +315,9 @@
     renderNav();
     lastFocus = document.activeElement;
     ['scrim', 'btn-close', 'drawer'].forEach((id) => { $(id).hidden = false; });
-    requestAnimationFrame(() => document.body.classList.add('drawer-open'));
+    // 先讓瀏覽器排版一次再加 class，滑入動畫才會出現；不用 requestAnimationFrame，免得在它執行前就關掉時又被打開
+    void $('drawer').offsetWidth;
+    document.body.classList.add('drawer-open');
     $('btn-menu').setAttribute('aria-expanded', 'true');
     // 焦點放在選單本身（不要直接進搜尋框，免得手機一打開選單就跳出鍵盤）
     setTimeout(() => $('drawer').focus({ preventScroll: true }), 50);
@@ -346,13 +334,12 @@
   $('scrim').addEventListener('click', () => closeDrawer());
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
   $('drawer').addEventListener('click', (e) => { if (e.target.closest('a')) closeDrawer(false); });
-  // 選單裡的搜尋：系列＋關鍵字 → 單位圖鑑
+  // 選單裡的搜尋：關鍵字 → 單位圖鑑（搜尋全部單位）
   $('drawer-search').addEventListener('submit', (e) => {
     e.preventDefault();
-    const series = $('ds-series').value;
     const q = $('ds-q').value.trim();
     closeDrawer(false);
-    go(listHash({ p: series ? [series] : [], q, s: listState.s }));
+    go(listHash({ p: [], q, s: listState.s }));
   });
 
   // ---------- 加到主畫面（離線也能開） ----------

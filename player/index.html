@@ -36,10 +36,6 @@
 </button>
 <nav class="drawer" id="drawer" aria-label="主選單" tabindex="-1" hidden>
   <form class="drawer-search" id="drawer-search" role="search">
-    <label class="ds-cat">
-      <span class="visually-hidden">分類</span>
-      <select id="ds-series" aria-label="系列"><option value="">全部</option></select>
-    </label>
     <input id="ds-q" type="search" placeholder="搜尋單位…" autocomplete="off" enterkeyhint="search" aria-label="搜尋單位">
     <button type="submit" class="ds-go" aria-label="搜尋">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -68,12 +64,7 @@
       </button>
     </div>
     <div class="toolbar">
-      <label class="search">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="q" type="search" placeholder="搜尋名稱、關鍵字、能力、武器…" autocomplete="off" enterkeyhint="search" aria-label="搜尋單位">
-      </label>
-      <nav class="crumbs" id="crumbs" aria-label="分類路徑"></nav>
-      <div class="chips" id="chips" role="list" aria-label="下一層分類"></div>
+      <p class="scope" id="scope"></p>
       <div class="listhead">
         <span id="count" role="status"></span>
         <label class="sort">排序

@@ -20,6 +20,7 @@
     melee: { label: '近戰', icon: 'icons/melee.png' },
     shield: { label: '盾牌', icon: 'icons/shield.png' },
     grenade: { label: '手榴彈', icon: 'icons/grenade.png' },
+    multi: { label: '複合武器', icon: 'icons/multi.png' },
   };
   const isShootType = (t) => !t || t === 'ranged' || t === 'grenade';
   const DRAFT_KEY = 'taktik-draft-v1';
@@ -258,7 +259,11 @@
       el('tr', { class: 'h' }, el('td', null, 'WARGEARS'), ['RNG(”)', 'STR', 'D', 'AS', 'RL'].map((h) => el('td', { class: 'n' }, h))));
     card.weapons.forEach((w, i) => {
       if (!edit && !text(w.name) && !text(w.STR) && !text(w.RNG)) return;
-      tbl.append(weaponRow(card, w, i, edit, result));
+      tbl.append(...weaponRows(w, {
+        rerender,
+        onSaveLib: () => saveWeaponToLib(w),
+        onDelete: () => { card.weapons.splice(i, 1); rerender(); },
+      }));
     });
     wrap.append(tbl);
     if (edit) {
@@ -272,28 +277,50 @@
     return wrap;
   }
 
-  function weaponRow(card, w, i, edit, result) {
+  // 一把武器的編輯列：一般武器 1 列；複合武器＝名稱 1 列＋每個模式 1 列（▶）
+  // opts：{ rerender, onSaveLib, onDelete }（武器庫頁不需要後兩個）
+  const blankMode = () => ({ name: '', rules: '', RNG: '', STR: '', D: '', AS: '', RL: '-' });
+  function weaponRows(w, opts) {
     const type = WTYPES[w.type] ? w.type : 'ranged';
-    const nameCell = el('td', { class: 'row-ctrl-anchor' });
-    if (edit) {
-      nameCell.append(iconPicker(w, () => rerender()), ' ',
-        editable(w.name, (v) => { w.name = v; }, { class: 'wname ed-wname', ph: '武器名稱 English' }), ' ',
-        editable(w.rules, (v) => { w.rules = v; }, { class: 'wrules', ph: '武器特規（例：能量彈、突擊）' }));
-    } else {
-      nameCell.append(el('img', { class: 'icon', src: WTYPES[type].icon, alt: WTYPES[type].label }),
-        el('span', { class: 'wname' }, text(w.name)), ' ', el('span', { class: 'wrules' }, stripBrackets(w.rules)));
+    const ctrl = (extra) => {
+      const btns = [...(extra || [])];
+      if (opts.onSaveLib) btns.push(el('button', { type: 'button', title: '把這把武器存進共用武器庫（依卡片的系列、陣營、子陣營分類）', onclick: opts.onSaveLib }, '存入武器庫'));
+      if (opts.onDelete) btns.push(el('button', { type: 'button', title: '刪除這把武器', 'aria-label': '刪除這把武器', onclick: opts.onDelete }, '×'));
+      return btns.length ? el('span', { class: 'ctrl' }, btns) : null;
+    };
+    const numCell = (obj, k, ph, after) => {
+      const td = el('td', { class: 'n' }, editable(obj[k], (v) => { obj[k] = v; }, { tag: 'div', ph }));
+      if (after) td.append(after);
+      return td;
+    };
+    if (type === 'multi') {
+      if (!Array.isArray(w.modes) || !w.modes.length) w.modes = [blankMode(), blankMode()];
+      const nameRow = el('tr', { class: 'multi-head' },
+        el('td', { class: 'row-ctrl-anchor' }, iconPicker(w, opts.rerender), ' ',
+          editable(w.name, (v) => { w.name = v; }, { class: 'wname ed-wname', ph: '複合武器名稱 English（例：極限雙拳 Gauntlets of Ultramar）' })),
+        el('td', { class: 'n' }), el('td', { class: 'n' }), el('td', { class: 'n' }), el('td', { class: 'n' }),
+        el('td', { class: 'n' }, ctrl([el('button', { type: 'button', title: '多加一種模式（多一列）', onclick: () => { w.modes.push(blankMode()); opts.rerender(); } }, '＋模式')])));
+      const rows = w.modes.map((m, mi) => {
+        const melee = C.modeType(m) === 'melee';
+        const del = w.modes.length > 1
+          ? el('span', { class: 'ctrl' }, el('button', { type: 'button', title: '刪除這個模式', 'aria-label': '刪除這個模式', onclick: () => { w.modes.splice(mi, 1); opts.rerender(); } }, '×'))
+          : null;
+        return el('tr', { class: 'mode' },
+          el('td', null, el('img', { class: 'icon mode-icon', src: 'icons/mode.png', alt: '▶' }),
+            editable(m.name, (v) => { m.name = v; }, { class: 'wname', ph: '模式名稱（例：射擊 Range）' }), ' ',
+            editable(m.rules, (v) => { m.rules = v; }, { class: 'wrules', ph: '特規' })),
+          numCell(m, 'RNG', '24／CC1'), numCell(m, 'STR', melee ? '+6' : '6'), numCell(m, 'D', '1'),
+          numCell(m, 'AS', melee ? '+0' : '2'), numCell(m, 'RL', '-', del));
+      });
+      return [nameRow, ...rows];
     }
-    const cell = (k, ph) => el('td', { class: 'n' }, edit
-      ? editable(w[k], (v) => { w[k] = v; }, { tag: 'div', ph })
-      : (k === 'STR' && !isShootType(type) ? meleeStr(w.STR, result) : text(w[k])));
     const melee = !isShootType(type);
-    const rl = cell('RL', '-');
-    if (edit) rl.append(el('span', { class: 'ctrl' },
-      el('button', { type: 'button', title: '把這把武器存進共用武器庫（依卡片的系列、陣營分類）', onclick: () => saveWeaponToLib(w) }, '存入武器庫'),
-      el('button', { type: 'button', title: '刪除這把武器', 'aria-label': '刪除這把武器', onclick: () => { card.weapons.splice(i, 1); rerender(); } }, '×')));
-    return el('tr', null, nameCell,
-      cell('RNG', melee ? 'CC1' : '24'), cell('STR', melee ? '+6' : '6'), cell('D', '1'),
-      cell('AS', melee ? '+0' : '2'), rl);
+    const nameCell = el('td', { class: 'row-ctrl-anchor' }, iconPicker(w, opts.rerender), ' ',
+      editable(w.name, (v) => { w.name = v; }, { class: 'wname ed-wname', ph: '武器名稱 English' }), ' ',
+      editable(w.rules, (v) => { w.rules = v; }, { class: 'wrules', ph: '武器特規（例：能量彈、突擊）' }));
+    return [el('tr', null, nameCell,
+      numCell(w, 'RNG', melee ? 'CC1' : '24'), numCell(w, 'STR', melee ? '+6' : '6'), numCell(w, 'D', '1'),
+      numCell(w, 'AS', melee ? '+0' : '2'), numCell(w, 'RL', '-', ctrl()))];
   }
   // 近戰 STR 顯示成 合計(+X)
   function meleeStr(s, result) {
@@ -315,7 +342,7 @@
     btn.addEventListener('click', () => {
       if (menu) return close();
       menu = el('div', { class: 'icon-menu', role: 'listbox' }, Object.entries(WTYPES).map(([k, t]) =>
-        el('button', { type: 'button', role: 'option', 'aria-selected': String(k === w.type), onclick: () => { switchType(w, k); close(); onPick(); } },
+        el('button', { type: 'button', role: 'option', 'aria-selected': String(k === w.type), onclick: () => { close(); if (switchType(w, k)) onPick(); } },
           el('img', { class: 'icon', src: t.icon, alt: '' }), t.label)));
       box.append(menu);
       document.addEventListener('mousedown', outside);
@@ -324,7 +351,21 @@
     return box;
   }
   function switchType(w, type) {
-    if (w.type === type) return;
+    if (w.type === type) return false;
+    if (type === 'multi') {
+      // 複合武器：先問有幾種模式，照這個數字生成（名稱一列＋每個模式一列）
+      const ans = prompt('這把複合武器有幾種模式？\n（例：卡爾加的極限雙拳＝射擊＋近戰，填 2；畫面上會是名稱一列＋2 列模式）', '2');
+      if (ans == null) return false;
+      const n = parseInt(String(ans).trim(), 10);
+      if (!(n >= 1 && n <= 8)) { alert('請填 1 到 8 的數字'); return false; }
+      w.type = 'multi';
+      w.modes = Array.from({ length: n }, blankMode);
+      ['rules', 'RNG', 'STR', 'D', 'AS'].forEach((k) => { w[k] = ''; });
+      w.RL = '-';
+      saveDraft();
+      return true;
+    }
+    if (w.type === 'multi') { delete w.modes; Object.assign(w, blankWeapon(type), { name: w.name }); saveDraft(); return true; }
     const wasRanged = isShootType(w.type);
     w.type = type;
     if (isShootType(type)) {
@@ -338,6 +379,7 @@
       w.RL = '-';
     }
     saveDraft();
+    return true;
   }
 
   // ---------- 結果 ----------
@@ -478,6 +520,27 @@
   // ---------- 共用武器庫 ----------
   // weapons/<系列>/<陣營>/<武器名稱>.json；近戰 STR 一律存成 +X，放到單位上會自動顯示成 合計(+X)
   const WEAPON_FIELDS = ['type', 'name', 'rules', 'RNG', 'STR', 'D', 'AS', 'RL'];
+  // 複製武器資料（含複合武器的各模式）；forSave=true 時近戰 STR 統一存成 +X
+  function copyWeapon(src, forSave) {
+    const w = {};
+    WEAPON_FIELDS.forEach((k) => { w[k] = src[k] == null ? '' : String(src[k]); });
+    if (!WTYPES[w.type]) w.type = 'ranged';
+    const plusX = (o, melee) => { if (forSave && melee) { const x = C.meleeX(o.STR); if (!isNaN(x)) o.STR = `+${x}`; } };
+    if (w.type === 'multi') {
+      w.modes = (src.modes || []).map((m) => {
+        const o = {};
+        ['name', 'rules', 'RNG', 'STR', 'D', 'AS', 'RL'].forEach((k) => { o[k] = m[k] == null ? '' : String(m[k]); });
+        plusX(o, C.modeType(o) === 'melee');
+        return o;
+      });
+    } else plusX(w, !isShootType(w.type));
+    return w;
+  }
+  // 武器庫清單上的數值摘要
+  function weaponSummary(w) {
+    if (w.type === 'multi') return `複合武器・${(w.modes || []).length} 種模式：${(w.modes || []).map((m) => text(m.name) || '（未命名）').join('、')}`;
+    return `RNG ${text(w.RNG) || '-'}　STR ${text(w.STR) || '-'}　D ${text(w.D) || '-'}　AS ${text(w.AS) || '-'}　RL ${text(w.RL) || '-'}`;
+  }
   const libMsg = (t, cls) => { const m = document.getElementById('wlib-msg'); if (m) { m.textContent = t; m.className = 'wlib-msg ' + (cls || ''); } };
   async function saveWeaponToLib(w) {
     if (!text(w.name)) { libMsg('武器名稱是空的，不能存入武器庫', 'err'); return; }
@@ -485,9 +548,7 @@
     if (!(await pageIsCurrent())) { saveDraft(); libMsg(STALE_MSG, 'err'); return; }
     const path = R.weaponPath(state.series, state.faction, state.subfaction, w.name);
     if (!confirm(`存入共用武器庫：\n${path}\n\n同名的武器會被覆蓋。`)) return;
-    const item = {};
-    WEAPON_FIELDS.forEach((k) => { item[k] = w[k] == null ? '' : w[k]; });
-    if (!isShootType(item.type)) { const x = C.meleeX(item.STR); if (!isNaN(x)) item.STR = `+${x}`; }
+    const item = copyWeapon(w, true);
     Object.assign(item, { series: text(state.series), faction: text(state.faction), subfaction: text(state.subfaction), savedAt: new Date().toISOString() });
     libMsg('存入中…');
     try {
@@ -548,7 +609,7 @@
         el('img', { class: 'icon', src: WTYPES[t].icon, alt: WTYPES[t].label }),
         el('div', { class: 'wl-main' },
           el('div', { class: 'wl-name' }, text(x.w.name), ' ', el('span', { class: 'wl-rules' }, C.clean(x.w.rules))),
-          el('div', { class: 'wl-stats' }, `RNG ${text(x.w.RNG) || '-'}　STR ${text(x.w.STR) || '-'}　D ${text(x.w.D) || '-'}　AS ${text(x.w.AS) || '-'}　RL ${text(x.w.RL) || '-'}`),
+          el('div', { class: 'wl-stats' }, weaponSummary(x.w)),
           el('div', { class: 'wl-where' }, [x.series, x.faction, x.subfaction].filter(Boolean).join(' › '))),
         el('div', { class: 'wl-btns' },
           el('button', { type: 'button', onclick: () => { wdlg.close(); openWeaponEditor(x); } }, '編輯'),
@@ -556,9 +617,7 @@
     });
   }
   function addFromLib(x) {
-    const w = {};
-    WEAPON_FIELDS.forEach((k) => { w[k] = x.w[k] == null ? '' : String(x.w[k]); });
-    if (!WTYPES[w.type]) w.type = 'ranged';
+    const w = copyWeapon(x.w, false);
     // 空白的那一列（剛開的新卡片）直接換掉
     const blank = state.weapons.findIndex((v) => !text(v.name) && !text(v.STR) && !text(v.RNG));
     if (blank >= 0) state.weapons.splice(blank, 1, w); else state.weapons.push(w);
@@ -589,24 +648,15 @@
     document.getElementById('w-faction').value = wstate.faction || '';
     document.getElementById('w-sub').value = wstate.subfaction || '';
     document.getElementById('w-title').textContent = wstate.editingPath ? `共用武器庫：編輯 ${wstate.editingPath}` : '共用武器庫：新增武器';
-    const type = WTYPES[w.type] ? w.type : 'ranged';
-    const melee = !isShootType(type);
-    const cell = (k, ph) => el('td', { class: 'n' }, editable(w[k], (v) => { w[k] = v; }, { tag: 'div', ph }));
-    const nameCell = el('td', null, iconPicker(w, renderWeaponEditor), ' ',
-      editable(w.name, (v) => { w.name = v; }, { class: 'wname ed-wlname', ph: '武器名稱 English' }), ' ',
-      editable(w.rules, (v) => { w.rules = v; }, { class: 'wrules', ph: '武器特規（例：能量彈、突擊）' }));
     const card = el('div', { class: 'card' }, el('table', { class: 'wg' },
       el('colgroup', null, ['name', 'rng', 'str', 'd', 'as', 'rl'].map((c) => el('col', { class: 'c-' + c }))),
       el('tr', { class: 'h' }, el('td', null, 'WARGEARS'), ['RNG(”)', 'STR', 'D', 'AS', 'RL'].map((h) => el('td', { class: 'n' }, h))),
-      el('tr', null, nameCell, cell('RNG', melee ? 'CC1' : '24'), cell('STR', melee ? '+6' : '6'), cell('D', '1'), cell('AS', melee ? '+0' : '2'), cell('RL', '-'))));
+      ...weaponRows(w, { rerender: renderWeaponEditor })));
     document.getElementById('w-edit').replaceChildren(card);
   }
   function openWeaponEditor(item) {
     if (item) {
-      const w = {};
-      WEAPON_FIELDS.forEach((k) => { w[k] = item.w[k] == null ? '' : String(item.w[k]); });
-      if (!WTYPES[w.type]) w.type = 'ranged';
-      wstate = { series: item.series, faction: item.faction, subfaction: item.subfaction, w, editingPath: item.path };
+      wstate = { series: item.series, faction: item.faction, subfaction: item.subfaction, w: copyWeapon(item.w, false), editingPath: item.path };
     } else if (!wstate) wstate = blankWState();
     const msg = document.getElementById('w-msg'); msg.textContent = ''; msg.className = 'save-msg';
     renderWeaponEditor();
@@ -621,9 +671,7 @@
     if (!text(wstate.series) || !text(wstate.faction) || !text(wstate.subfaction)) return fail('系列、陣營、子陣營都要填。');
     if (!(await pageIsCurrent())) return fail(STALE_MSG.replace('；你填的內容已存成草稿，重新整理後按上方「繼續上次草稿」就會回來', '（武器欄位要重新填）'));
     const path = R.weaponPath(wstate.series, wstate.faction, wstate.subfaction, w.name);
-    const item = {};
-    WEAPON_FIELDS.forEach((k) => { item[k] = w[k] == null ? '' : w[k]; });
-    if (!isShootType(item.type)) { const x = C.meleeX(item.STR); if (!isNaN(x)) item.STR = `+${x}`; }
+    const item = copyWeapon(w, true);
     Object.assign(item, { series: text(wstate.series), faction: text(wstate.faction), subfaction: text(wstate.subfaction), savedAt: new Date().toISOString() });
     const btn = document.getElementById('w-save');
     btn.disabled = true; msg.textContent = '保存中…'; msg.className = 'save-msg';
@@ -635,7 +683,7 @@
         catch (e) { moved = `（舊位置 ${wstate.editingPath} 沒刪掉：${e.message}）`; }
       }
       wstate.editingPath = path;
-      w.STR = item.STR;
+      wstate.w = copyWeapon(item, false);
       rememberSeries(item.series);
       msg.replaceChildren(`已${res.created ? '新增' : '更新'}：${path}${moved} `,
         res.commitUrl ? el('a', { href: res.commitUrl, target: '_blank', rel: 'noopener' }, '看這次 commit') : '');
@@ -671,7 +719,7 @@
         el('img', { class: 'icon', src: WTYPES[t].icon, alt: WTYPES[t].label }),
         el('div', { class: 'wl-main' },
           el('div', { class: 'wl-name' }, text(x.w.name), ' ', el('span', { class: 'wl-rules' }, C.clean(x.w.rules))),
-          el('div', { class: 'wl-stats' }, `RNG ${text(x.w.RNG) || '-'}　STR ${text(x.w.STR) || '-'}　D ${text(x.w.D) || '-'}　AS ${text(x.w.AS) || '-'}　RL ${text(x.w.RL) || '-'}`),
+          el('div', { class: 'wl-stats' }, weaponSummary(x.w)),
           el('div', { class: 'wl-where' }, [x.series, x.faction, x.subfaction].filter(Boolean).join(' › '))),
         el('button', { type: 'button', onclick: () => { openWeaponEditor(x); window.scrollTo(0, 0); } }, '編輯')));
     });

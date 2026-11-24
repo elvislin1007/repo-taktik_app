@@ -50,3 +50,4 @@
 .card .wg .wname { font-weight: 700; }
 .card .wg .wrules { color: var(--c-blue); font-size: calc(7pt * var(--s)); }
 .card .wg .icon { height: calc(9px * var(--s)); width: auto; vertical-align: -1px; margin-right: 2px; }
+.card .wg .mode-icon { height: calc(6px * var(--s)); vertical-align: 0; margin-right: 1px; }
