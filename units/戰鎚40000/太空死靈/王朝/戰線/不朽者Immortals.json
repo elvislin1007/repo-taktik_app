@@ -1,0 +1,130 @@
+{
+  "series": "戰鎚40000",
+  "faction": "太空死靈",
+  "subfaction": "王朝",
+  "category": "戰線",
+  "name": "不朽者Immortals",
+  "profiles": [
+    {
+      "name": "",
+      "keywords": "異形、太空死靈、王朝、步兵、機械、戰線",
+      "stats": {
+        "M": "5",
+        "STR": "6",
+        "FS": "4",
+        "BS": "4",
+        "CON": "5",
+        "AGI": "2",
+        "PER": "4",
+        "INT": "4",
+        "WP": "6",
+        "DEF": "12",
+        "HP": "1",
+        "WT": "4"
+      }
+    }
+  ],
+  "composition": [
+    "5個不朽者配備：高斯爆裂槍"
+  ],
+  "abilities": [
+    {
+      "text": "指揮協定"
+    }
+  ],
+  "weapons": [
+    {
+      "type": "ranged",
+      "name": "高斯爆裂槍Gauss Blaster",
+      "rules": "高斯、速射",
+      "RNG": "30",
+      "STR": "11",
+      "D": "1",
+      "AS": "1/2",
+      "RL": "-"
+    }
+  ],
+  "optionWeapons": [
+    {
+      "type": "ranged",
+      "name": "特斯拉卡賓槍Tesla carbine",
+      "rules": "特斯拉、✶連擊2、突擊",
+      "RNG": "24",
+      "STR": "9",
+      "D": "1",
+      "AS": "2",
+      "RL": "-"
+    }
+  ],
+  "options": [
+    {
+      "text": "此單位可以最多增加5個[不朽者]",
+      "pts": "每個140pts",
+      "sub": false
+    },
+    {
+      "text": "每個[死靈武士]可以將[高斯爆裂槍]替換成[特斯拉卡賓槍]",
+      "pts": "免費",
+      "sub": false
+    }
+  ],
+  "result": {
+    "total": 450,
+    "steps": [
+      {
+        "label": "武器：高斯爆裂槍Gauss Blaster",
+        "calc": "RNG 30、STR 11、D 1、AS ×1.5、無須裝填 ×1；規則 速射 −0.1",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(22.4 + 0) × 1 × 1.5 × 0.9 × 1.5 × 1 × 1 = 45.36 → 取整",
+        "value": 45
+      },
+      {
+        "label": "本體基數總和",
+        "calc": "STR6=6.4 + FS4=1.6 + BS4=1.6 + CON5=3.2 + AGI2=0.1 + PER4=1.6 + INT4=1.6 + WP6=6.4 + DEF12=14.8",
+        "value": 37.3
+      },
+      {
+        "label": "血量加乘",
+        "calc": "1 + (1 − 1) × 0.3",
+        "value": 1
+      },
+      {
+        "label": "速度加乘",
+        "calc": "1 + 5 × 0.05",
+        "value": 1.25
+      },
+      {
+        "label": "本體特規加成",
+        "calc": "無",
+        "value": 1
+      },
+      {
+        "label": "本體分數",
+        "calc": "37.3 × 1 × 1.25 × 1",
+        "value": 46.63
+      },
+      {
+        "label": "每個模型",
+        "calc": "本體 46.63 + 額外 0 + 武器 45",
+        "value": "91.63 → 90"
+      },
+      {
+        "label": "模型數",
+        "calc": "依單位構成：5 個；90 × 5",
+        "value": 450
+      },
+      {
+        "label": "總分",
+        "calc": "450",
+        "value": 450
+      }
+    ],
+    "warnings": [
+      "高斯爆裂槍Gauss Blaster：武器特規「高斯」資料庫查不到，這次沒算"
+    ]
+  },
+  "savedAt": "2026-11-24T17:00:00.000Z"
+}

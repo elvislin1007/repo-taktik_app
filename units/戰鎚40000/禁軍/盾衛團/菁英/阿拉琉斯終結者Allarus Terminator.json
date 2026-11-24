@@ -1,0 +1,172 @@
+{
+  "series": "戰鎚40000",
+  "faction": "禁軍",
+  "subfaction": "盾衛團",
+  "category": "菁英",
+  "name": "阿拉琉斯終結者Allarus Terminator",
+  "profiles": [
+    {
+      "name": "",
+      "keywords": "人類帝國(40K)、禁軍、盾衛團、終結者、步兵、生物、傳送、能量護盾",
+      "stats": {
+        "M": "7",
+        "STR": "8",
+        "FS": "5",
+        "BS": "5",
+        "CON": "5",
+        "AGI": "6",
+        "PER": "5",
+        "INT": "5",
+        "WP": "7",
+        "DEF": "15/14",
+        "HP": "4/2",
+        "WT": "5"
+      }
+    }
+  ],
+  "composition": [
+    "3個阿拉琉斯終結者配備：砲式榴彈發射器、衛士之矛"
+  ],
+  "abilities": [
+    {
+      "text": "帝皇之聲、禁軍武藝"
+    }
+  ],
+  "weapons": [
+    {
+      "type": "multi",
+      "name": "衛士之矛Guardian Spear",
+      "rules": "",
+      "RNG": "",
+      "STR": "",
+      "D": "",
+      "AS": "",
+      "RL": "",
+      "modes": [
+        {
+          "icon": "mode",
+          "name": "射擊Range",
+          "rules": "爆彈、突擊、撕碎",
+          "RNG": "18",
+          "STR": "9",
+          "D": "2",
+          "AS": "2",
+          "RL": "-"
+        },
+        {
+          "icon": "mode",
+          "name": "近戰Melee",
+          "rules": "能量力場、收割1、雙手",
+          "RNG": "CC2",
+          "STR": "+7",
+          "D": "2",
+          "AS": "+0",
+          "RL": "-"
+        }
+      ]
+    }
+  ],
+  "optionWeapons": [
+    {
+      "type": "ranged",
+      "name": "弩砲式榴彈發射器Balistus Grenade Launcher",
+      "rules": "突擊、AOE 2”",
+      "RNG": "18",
+      "STR": "12/12",
+      "D": "1/1",
+      "AS": "1",
+      "RL": "-"
+    }
+  ],
+  "options": [
+    {
+      "text": "此單位可以最多增加9個[阿拉琉斯終結者]",
+      "pts": "每個650pts",
+      "sub": false
+    },
+    {
+      "text": "此單位如果有人類帝國[40k]]關鍵字，整個單位可獲得[傳送]",
+      "pts": "每個50pts",
+      "sub": false
+    }
+  ],
+  "result": {
+    "total": 1260,
+    "steps": [
+      {
+        "label": "武器：衛士之矛Guardian Spear ▶射擊Range",
+        "calc": "RNG 18、STR 9、D 2、AS ×2、無須裝填 ×1；規則 爆彈 +0.1、突擊 +0.1、撕碎 +0.3",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(14.8 + 0) × 1.3 × 0.9 × 1.5 × 2 × 1 × 1 = 51.95 → 取整",
+        "value": 50
+      },
+      {
+        "label": "武器：衛士之矛Guardian Spear ▶近戰Melee（近戰）",
+        "calc": "CC2、STR +7（查 STR 13）、D 2、AS 一般 ×1；規則 能量力場 +0.2、雙手 −0.1",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(31.6 + 0) × 2 × 1.3 × 1.1 × 1.1 × 1 × 1 = 99.41 → 取整",
+        "value": 100
+      },
+      {
+        "label": "　衛士之矛Guardian Spear 合計",
+        "calc": "射擊取最高 50 ＋ 近戰取最高 100",
+        "value": 150
+      },
+      {
+        "label": "本體基數總和",
+        "calc": "STR8=11.6 + FS5=3.2 + BS5=3.2 + CON5=3.2 + AGI6=6.4 + PER5=3.2 + INT5=3.2 + WP7=12.8 + DEF15=26.8",
+        "value": 73.6
+      },
+      {
+        "label": "血量加乘",
+        "calc": "1 + (4 − 1) × 0.3",
+        "value": 1.9
+      },
+      {
+        "label": "速度加乘",
+        "calc": "1 + 7 × 0.05",
+        "value": 1.35
+      },
+      {
+        "label": "本體特規加成",
+        "calc": "1 + (傳送 +0.2)",
+        "value": 1.2
+      },
+      {
+        "label": "本體分數",
+        "calc": "73.6 × 1.9 × 1.35 × 1.2",
+        "value": 226.54
+      },
+      {
+        "label": "額外加成：能量護盾",
+        "calc": "A = 護盾DEF14 基數 22.4，B = 護盾HP 2；A × B（部隊）",
+        "value": 44.8
+      },
+      {
+        "label": "每個模型",
+        "calc": "本體 226.54 + 額外 44.8 + 武器 150",
+        "value": "421.34 → 420"
+      },
+      {
+        "label": "模型數",
+        "calc": "依單位構成：3 個；420 × 3",
+        "value": 1260
+      },
+      {
+        "label": "總分",
+        "calc": "1260",
+        "value": 1260
+      }
+    ],
+    "warnings": [
+      "衛士之矛Guardian Spear ▶近戰Melee：武器特規「收割1」資料庫查不到，這次沒算"
+    ]
+  },
+  "savedAt": "2026-11-24T17:00:00.000Z"
+}

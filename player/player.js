@@ -337,7 +337,7 @@
       frame.append(el('p', { class: 'empty' }, status === 'loading' ? '讀取中…' : '這個單位不在資料庫裡（可能被改名或刪除）。'));
       return;
     }
-    const inner = el('div', { class: 'card-scale' }, CARD.render(u.data, null, { iconBase: '../icons/', total: u.total, keywords: cardKeywords() }));
+    const inner = el('div', { class: 'card-scale' }, CARD.render(u.data, null, { iconBase: '../icons/', total: u.total, keywords: cardKeywords(), showOptionWeapons: true }));
     frame.append(inner);
     fitCard();
     const saved = u.data.savedAt ? new Date(u.data.savedAt) : null;

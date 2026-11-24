@@ -35,6 +35,7 @@
       series: c.series || '', faction: c.faction || '', subfaction: c.subfaction || '', name: c.name || '',
       composition: Array.isArray(c.composition) ? c.composition : [],
       weapons: Array.isArray(c.weapons) ? c.weapons : [],
+      optionWeapons: Array.isArray(c.optionWeapons) ? c.optionWeapons : [],
       options: Array.isArray(c.options) ? c.options : [],
     };
     card.profiles = Array.isArray(c.profiles) && c.profiles.length
@@ -134,7 +135,7 @@
     const tbl = el('table', { class: 'wg' },
       el('colgroup', null, ['name', 'rng', 'str', 'd', 'as', 'rl'].map((c) => el('col', { class: 'c-' + c }))),
       el('tr', { class: 'h' }, el('td', null, 'WARGEARS'), ['RNG(”)', 'STR', 'D', 'AS', 'RL'].map((h) => el('td', { class: 'n' }, h))));
-    card.weapons.forEach((w) => {
+    const addW = (tbl, w) => {
       // 複合武器：名稱一列（數值空白）＋每個模式一列（▶ 開頭）
       if (Array.isArray(w.modes) && w.modes.length) {
         const ht = WTYPES[w.type] ? w.type : 'ranged';
@@ -172,8 +173,17 @@
           el('span', { class: 'wname' }, text(w.name)), ' ', el('span', { class: 'wrules' }, kwText(w.rules))),
         n('RNG'), n('STR'), n('D'), n('AS'), n('RL')));
       if (text(w.text)) tbl.append(el('tr', { class: 'eq-desc' }, el('td', { colspan: '6' }, abilityView(C.parseAbility({ text: w.text }).text))));
-    });
+    };
+    card.weapons.forEach((w) => addW(tbl, w));
     root.append(tbl);
+    // 選項武器（替換用，玩家端顯示）
+    if (opts.showOptionWeapons && card.optionWeapons.length) {
+      const ot = el('table', { class: 'wg opt-wg' },
+        el('colgroup', null, ['name', 'rng', 'str', 'd', 'as', 'rl'].map((c) => el('col', { class: 'c-' + c }))),
+        el('tr', { class: 'h' }, el('td', null, 'WARGEAR OPTIONS 選項武器'), ['RNG(”)', 'STR', 'D', 'AS', 'RL'].map((h) => el('td', { class: 'n' }, h))));
+      card.optionWeapons.forEach((w) => addW(ot, w));
+      root.append(ot);
+    }
 
     if (card.options.length) {
       root.append(el('div', { class: 'gray' }, 'OPTIONS'));

@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "毒晶砲Splinter Cannon",
+  "rules": "反生物4+、毒1、重型",
+  "RNG": "36",
+  "STR": "6",
+  "D": "2",
+  "AS": "3",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "黑暗靈族",
+  "subfaction": "陰謀團",
+  "category": "毒晶",
+  "savedAt": "2026-11-24T17:00:00.000Z"
+}

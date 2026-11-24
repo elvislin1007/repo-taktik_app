@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "毒晶手槍Splinter pistol",
+  "rules": "反生物4+、毒1、手槍",
+  "RNG": "12",
+  "STR": "5",
+  "D": "1",
+  "AS": "1",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "黑暗靈族",
+  "subfaction": "陰謀團",
+  "category": "毒晶",
+  "savedAt": "2026-11-24T17:00:00.000Z"
+}

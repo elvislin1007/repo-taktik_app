@@ -59,3 +59,7 @@
 
 /* 特殊裝備的說明列 */
 .card .wg tr.eq-desc td { font-size: calc(7pt * var(--s)); font-weight: 400; padding: 1px 4px 2px; text-align: left; }
+
+/* 選項武器（玩家端） */
+.card .wg.opt-wg { border-top: 2px solid #fff; }
+.card .wg.opt-wg tr.h td:first-child { white-space: nowrap; }

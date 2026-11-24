@@ -1,0 +1,115 @@
+{
+  "series": "戰鎚40000",
+  "faction": "黑暗靈族",
+  "subfaction": "陰謀團",
+  "category": "戰線",
+  "name": "陰謀團戰士Kabalite Warriors",
+  "profiles": [
+    {
+      "name": "",
+      "keywords": "異形、黑暗靈族、陰謀團、步兵、生物",
+      "stats": {
+        "M": "7",
+        "STR": "4",
+        "FS": "4",
+        "BS": "4",
+        "CON": "3",
+        "AGI": "5",
+        "PER": "5",
+        "INT": "4",
+        "WP": "4",
+        "DEF": "9",
+        "HP": "1",
+        "WT": "1"
+      }
+    }
+  ],
+  "composition": [
+    "1個享樂者[領導(Lv1)]配備：毒晶步槍",
+    "4個陰謀團戰士配備：毒晶步槍"
+  ],
+  "abilities": [
+    {
+      "text": "痛苦之力"
+    }
+  ],
+  "weapons": [
+    {
+      "type": "ranged",
+      "name": "毒晶步槍Splinter Rifle",
+      "rules": "反生物4+、毒1、速射",
+      "RNG": "24",
+      "STR": "5",
+      "D": "1",
+      "AS": "1",
+      "RL": "-"
+    }
+  ],
+  "optionWeapons": [],
+  "options": [
+    {
+      "text": "此單位可以最多增加15個[陰謀團戰士]",
+      "pts": "每個90pts",
+      "sub": false
+    }
+  ],
+  "result": {
+    "total": 175,
+    "steps": [
+      {
+        "label": "武器：毒晶步槍Splinter Rifle",
+        "calc": "RNG 24、STR 5、D 1、AS ×1、無須裝填 ×1；規則 毒1 +0.2×1、速射 −0.1",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(4.4 + 0) × 1 × 1.2 × 1.1 × 1 × 1 × 1 = 5.81 → 取整",
+        "value": 5
+      },
+      {
+        "label": "本體基數總和",
+        "calc": "STR4=2.8 + FS4=1.6 + BS4=1.6 + CON3=0.8 + AGI5=3.2 + PER5=3.2 + INT4=1.6 + WP4=1.6 + DEF9=6.4",
+        "value": 22.8
+      },
+      {
+        "label": "血量加乘",
+        "calc": "1 + (1 − 1) × 0.3",
+        "value": 1
+      },
+      {
+        "label": "速度加乘",
+        "calc": "1 + 7 × 0.05",
+        "value": 1.35
+      },
+      {
+        "label": "本體特規加成",
+        "calc": "無",
+        "value": 1
+      },
+      {
+        "label": "本體分數",
+        "calc": "22.8 × 1 × 1.35 × 1",
+        "value": 30.78
+      },
+      {
+        "label": "每個模型",
+        "calc": "本體 30.78 + 額外 0 + 武器 5",
+        "value": "35.78 → 35"
+      },
+      {
+        "label": "模型數",
+        "calc": "依單位構成：5 個；35 × 5",
+        "value": 175
+      },
+      {
+        "label": "總分",
+        "calc": "175",
+        "value": 175
+      }
+    ],
+    "warnings": [
+      "毒晶步槍Splinter Rifle：武器特規「反生物4+」資料庫查不到，這次沒算"
+    ]
+  },
+  "savedAt": "2026-11-24T17:00:00.000Z"
+}

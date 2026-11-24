@@ -1,0 +1,140 @@
+{
+  "series": "戰鎚40000",
+  "faction": "太空死靈",
+  "subfaction": "王朝",
+  "category": "菁英",
+  "name": "災蝗重型毀滅者Lokhust Heavy Destroyers",
+  "profiles": [
+    {
+      "name": "",
+      "keywords": "異形、太空死靈、王朝、毀滅者教派、步兵、機械、懸浮、穩定作戰",
+      "stats": {
+        "M": "8",
+        "STR": "7",
+        "FS": "4",
+        "BS": "4",
+        "CON": "5",
+        "AGI": "3",
+        "PER": "4",
+        "INT": "4",
+        "WP": "6",
+        "DEF": "13",
+        "HP": "4",
+        "WT": "6"
+      }
+    }
+  ],
+  "composition": [
+    "1個災蝗重型毀滅者配備：高斯毀滅砲"
+  ],
+  "abilities": [
+    {
+      "text": "指揮協定"
+    },
+    {
+      "text": "毀滅天性Hardwired for Destruction：此模型可以重擲結果1的[命中]。「10」"
+    }
+  ],
+  "weapons": [
+    {
+      "type": "ranged",
+      "name": "高斯毀滅砲Gauss Destructor",
+      "rules": "高斯、重刑、瞄準1",
+      "RNG": "36(6-42)",
+      "STR": "19",
+      "D": "6",
+      "AS": "1",
+      "RL": "1"
+    }
+  ],
+  "optionWeapons": [
+    {
+      "type": "ranged",
+      "name": "仇敵滅絕者Enmitic Exterminator",
+      "rules": "高斯、AOE 3”、重型",
+      "RNG": "36",
+      "STR": "13",
+      "D": "1",
+      "AS": "6",
+      "RL": "-"
+    }
+  ],
+  "options": [
+    {
+      "text": "此單位可以最多增加2個[災蝗重型毀滅者]",
+      "pts": "每個500pts",
+      "sub": false
+    },
+    {
+      "text": "每個[災蝗重型毀滅者]可以將[高斯毀滅砲]替換成[仇敵滅絕者]",
+      "pts": "免費",
+      "sub": false
+    }
+  ],
+  "result": {
+    "total": 390,
+    "steps": [
+      {
+        "label": "武器：高斯毀滅砲Gauss Destructor",
+        "calc": "RNG 36、STR 19、D 6、AS ×1、正常裝填 ×0.8；規則 無",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(68.8 + 0) × 2.5 × 1.8 × 1 × 1 × 0.8 × 1 = 247.68 → 取整",
+        "value": 250
+      },
+      {
+        "label": "本體基數總和",
+        "calc": "STR7=8.8 + FS4=1.6 + BS4=1.6 + CON5=3.2 + AGI3=0.8 + PER4=1.6 + INT4=1.6 + WP6=6.4 + DEF13=18.4",
+        "value": 44
+      },
+      {
+        "label": "血量加乘",
+        "calc": "1 + (4 − 1) × 0.3",
+        "value": 1.9
+      },
+      {
+        "label": "速度加乘",
+        "calc": "1 + 8 × 0.05",
+        "value": 1.4
+      },
+      {
+        "label": "本體特規加成",
+        "calc": "1 + (懸浮 +0.1、穩定作戰 +0.1)",
+        "value": 1.2
+      },
+      {
+        "label": "本體分數",
+        "calc": "44 × 1.9 × 1.4 × 1.2",
+        "value": 140.45
+      },
+      {
+        "label": "能力：毀滅天性Hardwired for Destru",
+        "calc": "能力後面寫的 10 × 1/5（部隊，每個模型）",
+        "value": 2
+      },
+      {
+        "label": "每個模型",
+        "calc": "本體 140.45 + 額外 0 + 能力 2 + 武器 250",
+        "value": "392.45 → 390"
+      },
+      {
+        "label": "模型數",
+        "calc": "依單位構成：1 個；390 × 1",
+        "value": 390
+      },
+      {
+        "label": "總分",
+        "calc": "390",
+        "value": 390
+      }
+    ],
+    "warnings": [
+      "高斯毀滅砲Gauss Destructor：武器特規「高斯」資料庫查不到，這次沒算",
+      "高斯毀滅砲Gauss Destructor：武器特規「重刑」資料庫查不到，這次沒算",
+      "高斯毀滅砲Gauss Destructor：武器特規「瞄準1」資料庫查不到，這次沒算"
+    ]
+  },
+  "savedAt": "2026-11-24T17:00:00.000Z"
+}

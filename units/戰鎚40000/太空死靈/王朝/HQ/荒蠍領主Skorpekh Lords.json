@@ -1,0 +1,168 @@
+{
+  "series": "戰鎚40000",
+  "faction": "太空死靈",
+  "subfaction": "王朝",
+  "category": "HQ",
+  "name": "荒蠍領主Skorpekh Lords",
+  "profiles": [
+    {
+      "name": "",
+      "keywords": "異形、太空死靈、王朝、毀滅者教派、人物、巨獸、機械、領導(Lv4)、無懼、能量護盾",
+      "stats": {
+        "M": "8",
+        "STR": "9",
+        "FS": "6",
+        "BS": "5",
+        "CON": "6",
+        "AGI": "4",
+        "PER": "4",
+        "INT": "5",
+        "WP": "7",
+        "DEF": "15(15)",
+        "HP": "7(4)",
+        "WT": "6"
+      }
+    }
+  ],
+  "composition": [
+    "1個荒蠍領主配備：仇敵殲滅者、削骨爪、相位收割者"
+  ],
+  "abilities": [
+    {
+      "text": "指揮協定"
+    },
+    {
+      "text": "聯合摧毀United in Destruction：此模型指揮距離內的友方[王朝][毀滅者教派]單位可以重擲果1的[造傷]。「50」"
+    },
+    {
+      "text": "毀滅天性Hardwired for Destruction：此模型可以重擲結果1的[命中]。"
+    }
+  ],
+  "weapons": [
+    {
+      "type": "ranged",
+      "name": "仇敵殲滅者Enmitic Annihilator",
+      "rules": "高斯、AOE 2”、突儀",
+      "RNG": "18",
+      "STR": "12",
+      "D": "1",
+      "AS": "2",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "削骨爪Flensing claw",
+      "rules": "能量力場、撕碎",
+      "RNG": "CC1",
+      "STR": "+3",
+      "D": "1",
+      "AS": "X2",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "相位收割者Hyperphase harvester",
+      "rules": "能量力場、沉重",
+      "RNG": "CC2",
+      "STR": "+8",
+      "D": "3",
+      "AS": "+0",
+      "RL": "-"
+    }
+  ],
+  "optionWeapons": [],
+  "options": [],
+  "result": {
+    "total": 785,
+    "steps": [
+      {
+        "label": "武器：仇敵殲滅者Enmitic Annihilator",
+        "calc": "RNG 18、STR 12、D 1、AS ×2、無須裝填 ×1；規則 無",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(26.8 + 0) × 1 × 0.9 × 1 × 2 × 1 × 1 = 48.24 → 取整",
+        "value": 50
+      },
+      {
+        "label": "武器：削骨爪Flensing claw（近戰）",
+        "calc": "CC1、STR +3（查 STR 5）、D 1、AS 極快 ×2；規則 能量力場 +0.2、撕碎 +0.3",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(4.4 + 0) × 2 × 1 × 1 × 1.5 × 2 × 1 = 26.4 → 取整",
+        "value": 25
+      },
+      {
+        "label": "武器：相位收割者Hyperphase harvester（近戰）",
+        "calc": "CC2、STR +8（查 STR 15）、D 3、AS 一般 ×1；規則 能量力場 +0.2",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(42.4 + 0) × 2 × 1.6 × 1.1 × 1.2 × 1 × 1 = 179.1 → 取整",
+        "value": 180
+      },
+      {
+        "label": "本體基數總和",
+        "calc": "STR9=14.8 + FS6=6.4 + BS5=3.2 + CON6=6.4 + AGI4=1.6 + PER4=1.6 + INT5=3.2 + WP7=12.8 + DEF15=26.8",
+        "value": 76.8
+      },
+      {
+        "label": "血量加乘",
+        "calc": "1 + (7 − 1) × 0.3",
+        "value": 2.8
+      },
+      {
+        "label": "速度加乘",
+        "calc": "1 + 8 × 0.05",
+        "value": 1.4
+      },
+      {
+        "label": "本體特規加成",
+        "calc": "1 + (無懼 +0.3)",
+        "value": 1.3
+      },
+      {
+        "label": "本體分數",
+        "calc": "76.8 × 2.8 × 1.4 × 1.3",
+        "value": 391.37
+      },
+      {
+        "label": "額外加成：領導(Lv4)",
+        "calc": "Lv1 不算，30 × (4 − 1)（獨立）",
+        "value": 90
+      },
+      {
+        "label": "能力：聯合摧毀United in Destructio",
+        "calc": "能力後面寫的 50（獨立）",
+        "value": 50
+      },
+      {
+        "label": "每個模型",
+        "calc": "本體 391.37 + 額外 90 + 能力 50 + 武器 255",
+        "value": "786.37 → 785"
+      },
+      {
+        "label": "模型數",
+        "calc": "依單位構成：1 個；785 × 1",
+        "value": 785
+      },
+      {
+        "label": "總分",
+        "calc": "785",
+        "value": 785
+      }
+    ],
+    "warnings": [
+      "仇敵殲滅者Enmitic Annihilator：武器特規「高斯」資料庫查不到，這次沒算",
+      "仇敵殲滅者Enmitic Annihilator：武器特規「AOE 2”」資料庫查不到，這次沒算",
+      "仇敵殲滅者Enmitic Annihilator：武器特規「突儀」資料庫查不到，這次沒算",
+      "相位收割者Hyperphase harvester：武器特規「沉重」資料庫查不到，這次沒算",
+      "有「能量護盾」，但 DEF、HP 沒有寫斜線後的護盾值（例：14/14、7/4）"
+    ]
+  },
+  "savedAt": "2026-11-24T17:00:00.000Z"
+}

@@ -1,0 +1,130 @@
+{
+  "series": "戰鎚40000",
+  "faction": "太空死靈",
+  "subfaction": "王朝",
+  "category": "戰線",
+  "name": "死靈戰士Necron Warriors",
+  "profiles": [
+    {
+      "name": "",
+      "keywords": "異形、太空死靈、王朝、步兵、機械、戰線",
+      "stats": {
+        "M": "5",
+        "STR": "5",
+        "FS": "3",
+        "BS": "3",
+        "CON": "4",
+        "AGI": "2",
+        "PER": "3",
+        "INT": "3",
+        "WP": "6",
+        "DEF": "10",
+        "HP": "1",
+        "WT": "3"
+      }
+    }
+  ],
+  "composition": [
+    "10個死靈戰士配備：高斯剝皮槍"
+  ],
+  "abilities": [
+    {
+      "text": "指揮協定"
+    }
+  ],
+  "weapons": [
+    {
+      "type": "ranged",
+      "name": "高斯剝皮槍Gauss flayer",
+      "rules": "高斯、速射",
+      "RNG": "24",
+      "STR": "9",
+      "D": "1",
+      "AS": "1/2",
+      "RL": "-"
+    }
+  ],
+  "optionWeapons": [
+    {
+      "type": "ranged",
+      "name": "高斯收割槍Gauss reaper",
+      "rules": "高斯、突擊",
+      "RNG": "12",
+      "STR": "11",
+      "D": "1",
+      "AS": "2",
+      "RL": "-"
+    }
+  ],
+  "options": [
+    {
+      "text": "此單位可以最多增加10個[死靈武士]",
+      "pts": "每個80pts",
+      "sub": false
+    },
+    {
+      "text": "每個[死靈武士]可以將[高斯剝皮槍]替換成[高斯收割槍]",
+      "pts": "免費",
+      "sub": false
+    }
+  ],
+  "result": {
+    "total": 550,
+    "steps": [
+      {
+        "label": "武器：高斯剝皮槍Gauss flayer",
+        "calc": "RNG 24、STR 9、D 1、AS ×1.5、無須裝填 ×1；規則 速射 −0.1",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(14.8 + 0) × 1 × 1.2 × 0.9 × 1.5 × 1 × 1 = 23.98 → 取整",
+        "value": 25
+      },
+      {
+        "label": "本體基數總和",
+        "calc": "STR5=4.4 + FS3=0.8 + BS3=0.8 + CON4=1.6 + AGI2=0.1 + PER3=0.8 + INT3=0.8 + WP6=6.4 + DEF10=8.8",
+        "value": 24.5
+      },
+      {
+        "label": "血量加乘",
+        "calc": "1 + (1 − 1) × 0.3",
+        "value": 1
+      },
+      {
+        "label": "速度加乘",
+        "calc": "1 + 5 × 0.05",
+        "value": 1.25
+      },
+      {
+        "label": "本體特規加成",
+        "calc": "無",
+        "value": 1
+      },
+      {
+        "label": "本體分數",
+        "calc": "24.5 × 1 × 1.25 × 1",
+        "value": 30.63
+      },
+      {
+        "label": "每個模型",
+        "calc": "本體 30.63 + 額外 0 + 武器 25",
+        "value": "55.63 → 55"
+      },
+      {
+        "label": "模型數",
+        "calc": "依單位構成：10 個；55 × 10",
+        "value": 550
+      },
+      {
+        "label": "總分",
+        "calc": "550",
+        "value": 550
+      }
+    ],
+    "warnings": [
+      "高斯剝皮槍Gauss flayer：武器特規「高斯」資料庫查不到，這次沒算"
+    ]
+  },
+  "savedAt": "2026-11-24T17:00:00.000Z"
+}

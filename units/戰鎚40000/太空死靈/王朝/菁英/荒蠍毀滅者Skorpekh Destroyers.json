@@ -1,0 +1,136 @@
+{
+  "series": "戰鎚40000",
+  "faction": "太空死靈",
+  "subfaction": "王朝",
+  "category": "菁英",
+  "name": "荒蠍毀滅者Skorpekh Destroyers",
+  "profiles": [
+    {
+      "name": "",
+      "keywords": "異形、太空死靈、王朝、毀滅者教派、步兵、機械",
+      "stats": {
+        "M": "8",
+        "STR": "8",
+        "FS": "4",
+        "BS": "4",
+        "CON": "5",
+        "AGI": "4",
+        "PER": "4",
+        "INT": "4",
+        "WP": "6",
+        "DEF": "13",
+        "HP": "3",
+        "WT": "5"
+      }
+    }
+  ],
+  "composition": [
+    "3個荒蠍毀滅者配備：相位掠奪刃"
+  ],
+  "abilities": [
+    {
+      "text": "指揮協定"
+    },
+    {
+      "text": "毀滅天性Hardwired for Destruction：此模型可以重擲結果1的[命中]。「10」"
+    }
+  ],
+  "weapons": [
+    {
+      "type": "melee",
+      "name": "相位掠奪刃Hyperphase Thresshers",
+      "rules": "能量力場、雙持",
+      "RNG": "CC1",
+      "STR": "+5",
+      "D": "2",
+      "AS": "+1",
+      "RL": "-"
+    }
+  ],
+  "optionWeapons": [
+    {
+      "type": "melee",
+      "name": "相位收割刃Hyperphase Reap-Blasde",
+      "rules": "能量力場、沉重",
+      "RNG": "CC1",
+      "STR": "+8",
+      "D": "3",
+      "AS": "+0",
+      "RL": "-"
+    }
+  ],
+  "options": [
+    {
+      "text": "此單位可以最多增加3個[荒蠍毀滅者]",
+      "pts": "每個300pts",
+      "sub": false
+    },
+    {
+      "text": "每個荒蠍毀滅者]可以將[相位掠奪刃]替換成[相位收割刃]",
+      "pts": "免費",
+      "sub": false
+    }
+  ],
+  "result": {
+    "total": 555,
+    "steps": [
+      {
+        "label": "武器：相位掠奪刃Hyperphase Thresshers（近戰）",
+        "calc": "CC1、STR +5（查 STR 9）、D 2、AS 快 ×1.3；規則 能量力場 +0.2、雙持 +0.3",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(14.8 + 0) × 2 × 1.3 × 1 × 1.5 × 1.3 × 1 = 75.04 → 取整",
+        "value": 75
+      },
+      {
+        "label": "本體基數總和",
+        "calc": "STR8=11.6 + FS4=1.6 + BS4=1.6 + CON5=3.2 + AGI4=1.6 + PER4=1.6 + INT4=1.6 + WP6=6.4 + DEF13=18.4",
+        "value": 47.6
+      },
+      {
+        "label": "血量加乘",
+        "calc": "1 + (3 − 1) × 0.3",
+        "value": 1.6
+      },
+      {
+        "label": "速度加乘",
+        "calc": "1 + 8 × 0.05",
+        "value": 1.4
+      },
+      {
+        "label": "本體特規加成",
+        "calc": "無",
+        "value": 1
+      },
+      {
+        "label": "本體分數",
+        "calc": "47.6 × 1.6 × 1.4 × 1",
+        "value": 106.62
+      },
+      {
+        "label": "能力：毀滅天性Hardwired for Destru",
+        "calc": "能力後面寫的 10 × 1/5（部隊，每個模型）",
+        "value": 2
+      },
+      {
+        "label": "每個模型",
+        "calc": "本體 106.62 + 額外 0 + 能力 2 + 武器 75",
+        "value": "183.62 → 185"
+      },
+      {
+        "label": "模型數",
+        "calc": "依單位構成：3 個；185 × 3",
+        "value": 555
+      },
+      {
+        "label": "總分",
+        "calc": "555",
+        "value": 555
+      }
+    ],
+    "warnings": []
+  },
+  "savedAt": "2026-11-24T17:00:00.000Z"
+}

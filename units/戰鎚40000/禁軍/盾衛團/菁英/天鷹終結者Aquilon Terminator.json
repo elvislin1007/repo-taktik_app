@@ -1,0 +1,200 @@
+{
+  "series": "戰鎚40000",
+  "faction": "禁軍",
+  "subfaction": "盾衛團",
+  "category": "菁英",
+  "name": "天鷹終結者Aquilon Terminator",
+  "profiles": [
+    {
+      "name": "",
+      "keywords": "人類帝國(40K)、禁軍、盾衛團、終結者、步兵、生物、人物、領導(Lv4)、減傷1、重裝1、能量護盾",
+      "stats": {
+        "M": "7",
+        "STR": "8",
+        "FS": "5",
+        "BS": "5",
+        "CON": "5",
+        "AGI": "5",
+        "PER": "5",
+        "INT": "5",
+        "WP": "7",
+        "DEF": "15/13",
+        "HP": "4/2",
+        "WT": "6"
+      }
+    }
+  ],
+  "composition": [
+    "1個天鷹終結者配備：烈陽動力拳套、拉斯穆風暴爆彈槍"
+  ],
+  "abilities": [
+    {
+      "text": "禁軍武藝"
+    }
+  ],
+  "weapons": [
+    {
+      "type": "melee",
+      "name": "烈陽動力拳套Solerite Power Gauntlet",
+      "rules": "能量力場、沉重",
+      "RNG": "CC1",
+      "STR": "+11",
+      "D": "3",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "拉斯穆風暴爆彈槍Lastrum Storm Bolter",
+      "rules": "爆彈、速射、撕碎",
+      "RNG": "24",
+      "STR": "10",
+      "D": "2",
+      "AS": "2/4",
+      "RL": "-"
+    }
+  ],
+  "optionWeapons": [
+    {
+      "type": "ranged",
+      "name": "雙聯亞德拉賽特破壞槍Twin-Linked Adrathic Destructor",
+      "rules": "突擊、能量、致命、過熱1",
+      "RNG": "18",
+      "STR": "12",
+      "D": "3",
+      "AS": "2",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "地獄烈火矛Infernus Firepike",
+      "rules": "噴射、重型、無視掩體、燃燒1",
+      "RNG": "12",
+      "STR": "12",
+      "D": "1",
+      "AS": "D6",
+      "RL": "-"
+    }
+  ],
+  "options": [
+    {
+      "text": "此單位可以最多增加9個[天鷹終結者]",
+      "pts": "每個750pts",
+      "sub": false
+    },
+    {
+      "text": "此單位如果有人類帝國[40k]]關鍵字，整個單位可獲得[傳送]",
+      "pts": "每個50pts",
+      "sub": false
+    },
+    {
+      "text": "任意模型可以配備[悲憫匕首]每個50pt",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "任意模型可以將[烈陽動力拳套]和[拉斯穆風暴爆彈槍]替換成：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "烈陽動力爪*2每個-150p",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "任意模型可以將 [拉斯穆風暴爆彈槍]替換成：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "雙聯亞德拉賽特破壞槍",
+      "pts": "免費",
+      "sub": true
+    },
+    {
+      "text": "地獄烈火矛",
+      "pts": "免費",
+      "sub": true
+    }
+  ],
+  "result": {
+    "total": 760,
+    "steps": [
+      {
+        "label": "武器：烈陽動力拳套Solerite Power Gauntlet（近戰）",
+        "calc": "CC1、STR +11（查 STR 21）、D 3、AS 一般 ×1；規則 能量力場 +0.2",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(84.4 + 0) × 2 × 1.6 × 1 × 1.2 × 1 × 1 = 324.1 → 取整",
+        "value": 325
+      },
+      {
+        "label": "武器：拉斯穆風暴爆彈槍Lastrum Storm Bolter",
+        "calc": "RNG 24、STR 10、D 2、AS 3 × 0.8、無須裝填 ×1；規則 爆彈 +0.1、速射 −0.1、撕碎 +0.3",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(18.4 + 0) × 1.3 × 1.2 × 1.3 × 2.4 × 1 × 1 = 89.56 → 取整",
+        "value": 90
+      },
+      {
+        "label": "本體基數總和",
+        "calc": "STR8=11.6 + FS5=3.2 + BS5=3.2 + CON5=3.2 + AGI5=3.2 + PER5=3.2 + INT5=3.2 + WP7=12.8 + DEF15=26.8",
+        "value": 70.4
+      },
+      {
+        "label": "血量加乘",
+        "calc": "1 + (4 − 1) × 0.3",
+        "value": 1.9
+      },
+      {
+        "label": "速度加乘",
+        "calc": "1 + 7 × 0.05",
+        "value": 1.35
+      },
+      {
+        "label": "本體特規加成",
+        "calc": "1 + (減傷1 +0.2×1)",
+        "value": 1.2
+      },
+      {
+        "label": "本體分數",
+        "calc": "70.4 × 1.9 × 1.35 × 1.2",
+        "value": 216.69
+      },
+      {
+        "label": "額外加成：領導(Lv4)",
+        "calc": "Lv1 不算，30 × (4 − 1)（獨立）",
+        "value": 90
+      },
+      {
+        "label": "額外加成：能量護盾",
+        "calc": "A = 護盾DEF13 基數 18.4，B = 護盾HP 2；A × B（獨立）",
+        "value": 36.8
+      },
+      {
+        "label": "每個模型",
+        "calc": "本體 216.69 + 額外 126.8 + 武器 415",
+        "value": "758.49 → 760"
+      },
+      {
+        "label": "模型數",
+        "calc": "依單位構成：1 個；760 × 1",
+        "value": 760
+      },
+      {
+        "label": "總分",
+        "calc": "760",
+        "value": 760
+      }
+    ],
+    "warnings": [
+      "烈陽動力拳套Solerite Power Gauntlet：武器特規「沉重」資料庫查不到，這次沒算"
+    ]
+  },
+  "savedAt": "2026-11-24T17:00:00.000Z"
+}

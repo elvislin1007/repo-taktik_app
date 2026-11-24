@@ -1,0 +1,159 @@
+{
+  "series": "戰鎚40000",
+  "faction": "禁軍",
+  "subfaction": "盾衛團",
+  "category": "HQ",
+  "name": "晨鷹摩托盾衛連長Shield-Captain on Dawneagle Jetbike",
+  "profiles": [
+    {
+      "name": "",
+      "keywords": "人類帝國(40K)、禁軍、盾衛團、摩托、懸浮、生物、領導(Lv6)、重裝、能量護盾",
+      "stats": {
+        "M": "14",
+        "STR": "8/8",
+        "FS": "6",
+        "BS": "6",
+        "CON": "5/6",
+        "AGI": "6",
+        "PER": "5",
+        "INT": "5",
+        "WP": "8",
+        "DEF": "15/14",
+        "HP": "9/5",
+        "WT": "6"
+      }
+    }
+  ],
+  "composition": [
+    "1個晨鷹摩托盾衛連長配備：集束導彈、攔截騎槍"
+  ],
+  "abilities": [
+    {
+      "text": "帝皇之聲、禁軍武藝"
+    },
+    {
+      "text": "激勵鬥士Inspirational Fighter：此模型[指揮距離]內的友方[盾衛團]單位可以重擲結果1的[命中]。"
+    }
+  ],
+  "weapons": [
+    {
+      "type": "ranged",
+      "name": "集束導彈Salvo Launcher",
+      "rules": "HEAT3”、智能導彈1、破甲",
+      "RNG": "24",
+      "STR": "17/6",
+      "D": "3/1",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "攔截騎槍Interceptor lance",
+      "rules": "能量力場、破襲1",
+      "RNG": "CC2",
+      "STR": "+7",
+      "D": "2",
+      "AS": "+0",
+      "RL": "-"
+    }
+  ],
+  "optionWeapons": [
+    {
+      "type": "ranged",
+      "name": "颶風爆彈槍Hurricane Bolter",
+      "rules": "爆彈、速射",
+      "RNG": "24",
+      "STR": "8",
+      "D": "1",
+      "AS": "6/12",
+      "RL": "-"
+    }
+  ],
+  "options": [
+    {
+      "text": "此單位如果有人類帝國[40k]]關鍵字，整個單位可獲得[傳送]",
+      "pts": "每個50pts",
+      "sub": false
+    }
+  ],
+  "result": {
+    "total": 1015,
+    "steps": [
+      {
+        "label": "武器：集束導彈Salvo Launcher",
+        "calc": "RNG 24、STR 17/6、D 3/1、AS ×1、無須裝填 ×1；規則 破甲 +0.5",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(54.8 + 0) × 1.6 × 1.2 × 1.5 × 1 × 1 × 1；爆炸 (6.4 + 0) × 1 × 1.2 × 1.5 × 3\" × 1 × 1 × 1 = 34.56，×0.5 = 175.1 → 取整",
+        "value": 175
+      },
+      {
+        "label": "武器：攔截騎槍Interceptor lance（近戰）",
+        "calc": "CC2、STR +7（查 STR 13）、D 2、AS 一般 ×1；規則 能量力場 +0.2",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(31.6 + 0) × 2 × 1.3 × 1.1 × 1.2 × 1 × 1 = 108.45 → 取整",
+        "value": 110
+      },
+      {
+        "label": "本體基數總和",
+        "calc": "STR8=11.6 + FS6=6.4 + BS6=6.4 + CON5=3.2 + AGI6=6.4 + PER5=3.2 + INT5=3.2 + WP8=25.6 + DEF15=26.8",
+        "value": 92.8
+      },
+      {
+        "label": "血量加乘",
+        "calc": "1 + (9 − 1) × 0.3",
+        "value": 3.4
+      },
+      {
+        "label": "速度加乘",
+        "calc": "1 + 14 × 0.05",
+        "value": 1.7
+      },
+      {
+        "label": "本體特規加成",
+        "calc": "1 + (懸浮 +0.1、重裝 +0)",
+        "value": 1.1
+      },
+      {
+        "label": "本體分數",
+        "calc": "92.8 × 3.4 × 1.7 × 1.1",
+        "value": 590.02
+      },
+      {
+        "label": "額外加成：領導(Lv6)",
+        "calc": "Lv1 不算，6 × (6 − 1)（部隊）",
+        "value": 30
+      },
+      {
+        "label": "額外加成：能量護盾",
+        "calc": "A = 護盾DEF14 基數 22.4，B = 護盾HP 5；A × B（部隊）",
+        "value": 112
+      },
+      {
+        "label": "每個模型",
+        "calc": "本體 590.02 + 額外 142 + 武器 285",
+        "value": "1017.02 → 1015"
+      },
+      {
+        "label": "模型數",
+        "calc": "依單位構成：1 個；1015 × 1",
+        "value": 1015
+      },
+      {
+        "label": "總分",
+        "calc": "1015",
+        "value": 1015
+      }
+    ],
+    "warnings": [
+      "集束導彈Salvo Launcher：武器特規「智能導彈1」資料庫查不到，這次沒算",
+      "攔截騎槍Interceptor lance：武器特規「破襲1」資料庫查不到，這次沒算"
+    ]
+  },
+  "savedAt": "2026-11-24T17:00:00.000Z"
+}
