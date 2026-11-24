@@ -92,9 +92,9 @@
   <!-- 編輯 -->
   <section id="view-edit" class="view">
     <div class="classify">
-      <label>系列 <input id="in-series" placeholder="例：戰鎚40000"></label>
-      <label>陣營 <input id="in-faction" placeholder="例：人類帝國(40K)"></label>
-      <label>子陣營 <input id="in-subfaction" placeholder="例：極限戰士"></label>
+      <label>系列 <input id="in-series"></label>
+      <label>陣營 <input id="in-faction"></label>
+      <label>子陣營 <input id="in-subfaction"></label>
       <label>類別 <select id="in-category"></select></label>
       <span class="hint">保存時照這四欄分資料夾（必填）：系列／陣營／子陣營／類別。系列會記住上次填的；陣營、子陣營空白時先帶入關鍵字列的前兩個詞；類別（HQ、戰線…）所有系列共用，下拉最後可以新增或管理清單</span>
     </div>
@@ -131,9 +131,9 @@
   <section id="view-weapons" class="view" hidden>
     <h2 id="w-title">共用武器庫：新增武器</h2>
     <div class="classify">
-      <label>系列 <input id="w-series" placeholder="例：戰鎚40000" autocomplete="off"></label>
-      <label>陣營 <input id="w-faction" placeholder="例：星際戰士" autocomplete="off"></label>
-      <label>子陣營 <input id="w-sub" placeholder="例：戰團" autocomplete="off"></label>
+      <label>系列 <input id="w-series" autocomplete="off"></label>
+      <label>陣營 <input id="w-faction" autocomplete="off"></label>
+      <label>子陣營 <input id="w-sub" autocomplete="off"></label>
       <label>武器種類 <select id="w-cat"></select></label>
       <span class="hint">存到 weapons/系列/陣營/子陣營/武器種類/武器名稱.json（四欄必填）。武器種類每個子陣營各自一份，下拉最後可以新增或管理清單。近戰 STR 填 +X。</span>
     </div>
@@ -164,33 +164,44 @@
       <div class="kw-side">
         <input id="kw-q" type="search" placeholder="搜尋名稱、英文、說明…" autocomplete="off" aria-label="搜尋關鍵字">
         <div class="kw-side-actions">
-          <button type="button" id="kw-new">＋ 新增關鍵字</button>
+          <button type="button" id="kw-new">＋ 新增一般關鍵字</button>
+          <button type="button" id="kw-new-comp" class="kw-comp-btn">＋ 新增複合關鍵字</button>
           <button type="button" id="kw-reload" title="讀 repo 上最新的">重新讀取</button>
         </div>
         <p id="kw-count" class="hint" role="status"></p>
         <ul id="kw-list" class="kw-list"></ul>
       </div>
       <form id="kw-form" class="kw-form" autocomplete="off">
-        <h3 id="kw-form-title">從左邊選一個關鍵字來編輯</h3>
-        <div class="kw-row">
-          <label>分組 <input id="kw-group" list="dl-kw-group" placeholder="例：通用關鍵字"></label>
-          <label>名稱 <input id="kw-name" placeholder="例：精準"></label>
-          <label>英文 <input id="kw-en" placeholder="例：Accurate"></label>
+        <div class="kw-form-head">
+          <span id="kw-badge" class="kw-badge" hidden></span>
+          <h3 id="kw-form-title">從左邊選一個關鍵字來編輯，或按「＋ 新增」</h3>
         </div>
-        <datalist id="dl-kw-group"></datalist>
-        <label>種類
-          <select id="kw-kind">
-            <option value="rule">一般關鍵字（填說明）</option>
-            <option value="compound">複合關鍵字（填包含的特規，算分時展開）</option>
-          </select>
-        </label>
-        <label id="kw-inc-wrap" hidden>包含的特規（用「、」分開；算分時照這些特規算，名稱本身不算分）<input id="kw-includes" placeholder="例：英勇、先進視覺(24”)"></label>
-        <label>別名（用「、」分開；資料卡上寫成這些也會對到這個關鍵字）<input id="kw-aliases" placeholder="例：能量力場、能量劍刃"></label>
-        <label><span id="kw-text-label">說明（一行一段；「・」開頭是條列；[ ] 裡的字在玩家端會變成連結）</span><textarea id="kw-text" rows="12"></textarea></label>
-        <div class="actions kw-actions">
-          <button type="button" id="kw-delete">刪除</button>
-          <button type="submit" class="primary" id="kw-save">保存</button>
-          <span id="kw-msg" class="save-msg" role="status"></span>
+        <div id="kw-fields" hidden>
+          <div class="kw-row kw-row2">
+            <label>名稱 <input id="kw-name"></label>
+            <label>英文 <input id="kw-en"></label>
+          </div>
+          <!-- 一般關鍵字 -->
+          <div id="kw-rule-fields" class="kw-fields">
+            <label>分組 <input id="kw-group" list="dl-kw-group"></label>
+            <datalist id="dl-kw-group"></datalist>
+            <label>別名（用「、」分開；資料卡上寫成這些也會對到這個關鍵字）<input id="kw-aliases"></label>
+            <label>說明（一行一段；「・」開頭是條列；[ ] 裡的字在玩家端會變成連結）<textarea id="kw-text" rows="12"></textarea></label>
+          </div>
+          <!-- 複合關鍵字 -->
+          <div id="kw-comp-fields" class="kw-fields" hidden>
+            <p class="kw-comp-hint">資料卡上寫這個名稱時，算分會換成下面這些特規（名稱本身不算分）。一列一個特規，有數值的照資料卡寫法填。</p>
+            <div class="kw-inc-head">包含的特規</div>
+            <ol id="kw-inc-list" class="kw-inc-list"></ol>
+            <button type="button" id="kw-inc-add">＋ 加一個特規</button>
+            <datalist id="dl-kw-names"></datalist>
+          </div>
+          <div class="actions kw-actions">
+            <button type="button" id="kw-delete">刪除</button>
+            <button type="button" id="kw-switch" class="linkish"></button>
+            <button type="submit" class="primary" id="kw-save">保存</button>
+            <span id="kw-msg" class="save-msg" role="status"></span>
+          </div>
         </div>
       </form>
     </div>

@@ -201,3 +201,25 @@ button.mini { padding: 1px 10px; font-size: 12.5px; }
 .kw-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 @media (max-width: 560px) { .kw-row { grid-template-columns: 1fr; } }
 .kw-actions { justify-content: flex-start; }
+
+/* 關鍵字表單：一般／複合分開 */
+.kw-form-head { display: flex; align-items: center; gap: 10px; }
+.kw-badge { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #5B9BD5; color: #fff; white-space: nowrap; }
+.kw-form.is-compound { border-color: #C77C1E; border-width: 2px; }
+.kw-form.is-compound .kw-badge { background: #C77C1E; }
+#kw-fields { display: flex; flex-direction: column; gap: 10px; }
+.kw-fields { display: flex; flex-direction: column; gap: 10px; }
+.kw-fields[hidden], #kw-fields[hidden] { display: none; }
+.kw-row2 { grid-template-columns: repeat(2, 1fr); }
+.kw-comp-hint { margin: 0; font-size: 13px; color: var(--muted); }
+.kw-inc-head { font-weight: 700; font-size: 14px; }
+.kw-inc-list { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.kw-inc-list li { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.kw-inc-list input { flex: 1 1 200px; font: inherit; font-size: 15px; color: var(--page-fg); background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 4px; padding: 6px 8px; }
+.kw-inc-del { padding: 2px 9px; }
+.kw-inc-st { font-size: 12px; }
+.kw-inc-st.ok { color: #3a8a3a; }
+.kw-inc-st.warn { color: #c0392b; }
+#kw-inc-add { align-self: flex-start; }
+.kw-comp-btn { border-color: #C77C1E; }
+.linkish { background: none; border: none; color: var(--muted); text-decoration: underline; cursor: pointer; padding: 4px; }

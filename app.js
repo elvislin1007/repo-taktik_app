@@ -30,13 +30,11 @@
   const blankWeapon = (type) => (isShootType(type)
     ? { type: type || 'ranged', name: '', rules: '', RNG: '', STR: '', D: '', AS: '', RL: '-' }
     : { type, name: '', rules: '', RNG: 'CC1', STR: '', D: '', AS: '+0', RL: '-' });
-  const SERIES_KEY = 'taktik-last-series';
-  function lastSeries() { try { return localStorage.getItem(SERIES_KEY) || ''; } catch (e) { return ''; } }
-  function rememberSeries(s) { try { if (s) localStorage.setItem(SERIES_KEY, s); } catch (e) { /* 略過 */ } }
+  try { localStorage.removeItem('taktik-last-series'); } catch (e) { /* 略過 */ } // 以前記的「上次的系列」，已不用
   const blankStats = () => Object.fromEntries(STAT_KEYS.map((k) => [k, '']));
   const blankProfile = () => ({ name: '', keywords: '', stats: blankStats() });
   const blankCard = () => ({
-    series: lastSeries(), faction: '', subfaction: '', category: '', name: '',
+    series: '', faction: '', subfaction: '', category: '', name: '',
     profiles: [blankProfile()],
     composition: [''], abilities: [{ text: '' }],
     weapons: [blankWeapon('ranged')], options: [],
@@ -118,7 +116,7 @@
     card.profiles.forEach((p, i) => {
       if (!multi) {
         root.append(edit
-          ? editable(p.keywords, (v) => { p.keywords = v; }, { tag: 'div', class: 'kw', ph: '關鍵字：陣營、子陣營、類型、特規，用「、」分隔（例：人類帝國(40K)、阿斯塔特、步兵、生物、免傷(5+)）' })
+          ? editable(p.keywords, (v) => { p.keywords = v; }, { tag: 'div', class: 'kw', ph: '關鍵字：陣營、子陣營、類型、特規，用「、」分隔' })
           : el('div', { class: 'kw' }, stripBrackets(p.keywords)));
       } else {
         const row = el('div', { class: 'prof-name row-ctrl-anchor' });
@@ -135,7 +133,7 @@
         el('tr', { class: 'v' }, STAT_KEYS.map((k) => el('td', null,
           edit ? editable(p.stats[k], (v) => { p.stats[k] = v; }, { tag: 'div', ph: '–' }) : statView(p.stats[k], k, shieldOn))))));
     });
-    if (edit) root.append(el('div', { class: 'add-row add-in' }, el('button', { type: 'button', title: '同一個單位裡能力值不同的模型（例：小子隊裡的老大）分開列', onclick: () => {
+    if (edit) root.append(el('div', { class: 'add-row add-in' }, el('button', { type: 'button', title: '同一個單位裡能力值不同的模型分開列', onclick: () => {
       const last = card.profiles[card.profiles.length - 1];
       card.profiles.push({ name: '', keywords: last.keywords, stats: Object.assign({}, last.stats) });
       rerender(); focusLast('.pname');
@@ -143,7 +141,7 @@
 
     // 單位構成
     root.append(el('div', { class: 'gray' }, 'UNIT COMPOSITION'));
-    root.append(bulletList(card.composition, edit, 'comp', multi ? '每種模型一行：例 1個歐克老大[領導(Lv1)]配備：…／9個歐克小子配備：…' : '例：1個劍衛老兵士官[領導(Lv1)]配備：重爆彈手槍、精工動力劍', multi ? card.profiles.map((p) => text(p.name).split(' ')[0]).filter(Boolean) : []));
+    root.append(bulletList(card.composition, edit, 'comp', multi ? '單位構成：每種模型一行' : '單位構成', multi ? card.profiles.map((p) => text(p.name).split(' ')[0]).filter(Boolean) : []));
 
     // 能力
     root.append(el('div', { class: 'gray' }, 'ABILITIES'));
@@ -201,7 +199,7 @@
     arr.forEach((a, i) => {
       const li = el('li', { class: 'row-ctrl-anchor' });
       li.append(editable(a.text, (v) => { a.text = v; }, {
-        tag: 'div', class: 'ed-abil', ph: i === 0 ? '例：爆彈訓練、戰鬥教條（陣營共用，不寫分數）／虎威 Tiger Fear：說明… 20（最後的數字是分數，輸出時隱藏）' : '',
+        tag: 'div', class: 'ed-abil', ph: i === 0 ? '能力（陣營共用能力不寫分數；個別能力最後寫分數，輸出時隱藏）' : '',
         onEnter: () => { arr.splice(i + 1, 0, { text: '' }); rerender(); focusAt('.ed-abil', i + 1); },
         onEmptyBackspace: () => { if (arr.length > 1) { arr.splice(i, 1); rerender(); focusAt('.ed-abil', Math.max(0, i - 1)); } },
       }));
@@ -320,7 +318,7 @@
     if (isComposite(w)) {
       const nameRow = el('tr', { class: 'multi-head' },
         el('td', { class: 'row-ctrl-anchor' }, iconPicker(w, opts.rerender), ' ',
-          editable(w.name, (v) => { w.name = v; }, { class: 'wname ed-wname', ph: '複合武器名稱 English（例：極限雙拳 Gauntlets of Ultramar）' })),
+          editable(w.name, (v) => { w.name = v; }, { class: 'wname ed-wname', ph: '複合武器名稱 English' })),
         el('td', { class: 'n' }), el('td', { class: 'n' }), el('td', { class: 'n' }), el('td', { class: 'n' }),
         el('td', { class: 'n' }, ctrl([el('button', { type: 'button', title: '多加一種模式（多一列）', onclick: () => { w.modes.push(blankMode()); opts.rerender(); } }, '＋模式')])));
       const rows = w.modes.map((m, mi) => {
@@ -330,7 +328,7 @@
           : null;
         return el('tr', { class: 'mode' },
           el('td', null, modeIconPicker(m, opts.rerender), ' ',
-            editable(m.name, (v) => { m.name = v; }, { class: 'wname', ph: '模式名稱（例：射擊 Range）' }), ' ',
+            editable(m.name, (v) => { m.name = v; }, { class: 'wname', ph: '模式名稱' }), ' ',
             editable(m.rules, (v) => { m.rules = v; }, { class: 'wrules', ph: '特規' })),
           numCell(m, 'RNG', '24／CC1'), numCell(m, 'STR', melee ? '+6' : '6'), numCell(m, 'D', '1'),
           numCell(m, 'AS', melee ? '+0' : '2'), numCell(m, 'RL', '-', del));
@@ -340,7 +338,7 @@
     const melee = type === 'multi' ? C.modeType(w) === 'melee' : !isShootType(type);
     const nameCell = el('td', { class: 'row-ctrl-anchor' }, iconPicker(w, opts.rerender), ' ',
       editable(w.name, (v) => { w.name = v; }, { class: 'wname ed-wname', ph: '武器名稱 English' }), ' ',
-      editable(w.rules, (v) => { w.rules = v; }, { class: 'wrules', ph: '武器特規（例：能量彈、突擊）' }));
+      editable(w.rules, (v) => { w.rules = v; }, { class: 'wrules', ph: '武器特規' }));
     return [el('tr', null, nameCell,
       numCell(w, 'RNG', melee ? 'CC1' : '24'), numCell(w, 'STR', melee ? '+6' : '6'), numCell(w, 'D', '1'),
       numCell(w, 'AS', melee ? '+0' : '2'), numCell(w, 'RL', '-', ctrl()))];
@@ -380,7 +378,7 @@
   // 複合武器：問有幾種功能，照數字生成（名稱一列＋每個功能一列；2 種功能＝共 3 列）。已經是複合武器就是改列數
   function setModeCount(w) {
     const cur = isComposite(w) ? w.modes.length : 2;
-    const ans = prompt('這把武器有幾種功能（攻擊模式）？\n（例：卡爾加的極限雙拳＝射擊＋近戰，填 2；畫面上會是名稱一列＋2 列功能，共 3 列）', String(cur));
+    const ans = prompt('這把武器有幾種功能（攻擊模式）？', String(cur));
     if (ans == null) return false;
     const n = parseInt(String(ans).trim(), 10);
     if (!(n >= 1 && n <= 8)) { alert('請填 1 到 8 的數字'); return false; }
@@ -617,7 +615,6 @@
         catch (e) { moved = `（舊位置 ${oldPath} 沒刪掉：${e.message}，請手動處理）`; }
       }
       state.savedPath = path;
-      rememberSeries(state.series);
       knownKeys = null;
       saveDraft();
       msg.replaceChildren(`已${res.created ? '新增' : '更新'}到 repo：${path}${moved} `,
@@ -842,7 +839,7 @@
   // ---------- 共用武器庫：編輯頁 ----------
   // 格式和資料卡的武器列一樣；保存到 weapons/<系列>/<陣營>/<武器名稱>.json
   let wstate = null; // { series, faction, subfaction, category, w, editingPath }
-  const blankWState = () => ({ series: text(state.series) || lastSeries(), faction: '', subfaction: '', category: '', w: blankWeapon('ranged'), editingPath: null });
+  const blankWState = () => ({ series: '', faction: '', subfaction: '', category: '', w: blankWeapon('ranged'), editingPath: null });
   // 系列／陣營／子陣營輸入框的候選名稱（已存武器＋清單裡有的），避免打錯字（例：錘／鎚）就對不上
   function fillWDatalists() {
     const keys = [...(libItems || []).map((x) => [x.series, x.faction, x.subfaction]),
@@ -902,7 +899,6 @@
       }
       wstate.editingPath = path;
       wstate.w = copyWeapon(item, false);
-      rememberSeries(item.series);
       knownKeys = null;
       msg.replaceChildren(`已${res.created ? '新增' : '更新'}：${path}${moved} `,
         res.commitUrl ? el('a', { href: res.commitUrl, target: '_blank', rel: 'noopener' }, '看這次 commit') : '');
@@ -1045,25 +1041,47 @@
     document.getElementById('dl-kw-group').replaceChildren(...kwdb.groups.map((g) => el('option', { value: g })));
   }
   const kwIn = (k) => document.getElementById('kw-' + k);
+  // 一般關鍵字：分組、別名、說明；複合關鍵字：一列一個「包含的特規」（不寫說明）
+  let kwKind = 'rule';
+  const isCompItem = (it) => !!((it.includes && it.includes.length) || it.group === '複合關鍵字');
+  function incRow(v) {
+    const inp = el('input', { list: 'dl-kw-names', value: v || '', 'aria-label': '包含的特規' });
+    const st = el('span', { class: 'kw-inc-st' });
+    const check = () => {
+      const t = text(inp.value);
+      const hit = t && kwdb && KWX.lookup(KWX.buildIndex({ items: kwdb.items.filter((x) => !isCompItem(x)) }), t);
+      st.textContent = !t ? '' : hit ? `✓ ${hit.name}` : '⚠ 關鍵字資料庫裡沒有';
+      st.className = 'kw-inc-st ' + (!t ? '' : hit ? 'ok' : 'warn');
+    };
+    inp.addEventListener('input', check);
+    check();
+    const li = el('li', null, inp, el('button', { type: 'button', class: 'kw-inc-del', title: '刪掉這列', onclick: () => li.remove() }, '×'), st);
+    return li;
+  }
+  function setKwKind(kind) {
+    kwKind = kind;
+    const comp = kind === 'compound';
+    kwIn('rule-fields').hidden = comp;
+    kwIn('comp-fields').hidden = !comp;
+    kwIn('form').classList.toggle('is-compound', comp);
+    kwIn('badge').hidden = false;
+    kwIn('badge').textContent = comp ? '複合關鍵字' : '一般關鍵字';
+    kwIn('switch').textContent = comp ? '改成一般關鍵字' : '改成複合關鍵字';
+    if (comp && !kwIn('inc-list').children.length) kwIn('inc-list').append(incRow(''));
+  }
   function fillKwForm(it) {
-    kwIn('group').value = it.group || '';
+    kwIn('fields').hidden = false;
+    kwIn('group').value = it.group && it.group !== '複合關鍵字' ? it.group : ((kwdb && kwdb.groups[0]) || '通用關鍵字');
     kwIn('name').value = it.name || '';
     kwIn('en').value = it.en || '';
     kwIn('aliases').value = (it.aliases || []).filter((a) => a !== it.name && a !== it.en && a !== String(it.en || '').replace(/\s*\(X\)\s*$/i, '')).join('、');
     kwIn('text').value = it.text || '';
-    kwIn('kind').value = (it.includes && it.includes.length) || it.group === '複合關鍵字' ? 'compound' : 'rule';
-    kwIn('includes').value = (it.includes || []).join('、');
-    syncKwKind();
-    kwIn('form-title').textContent = kwSel === 'new' ? '新增關鍵字' : `編輯：${KWX.title(it)}`;
+    document.getElementById('dl-kw-names').replaceChildren(...(kwdb ? kwdb.items : []).filter((x) => !isCompItem(x)).map((x) => el('option', { value: x.name })));
+    kwIn('inc-list').replaceChildren(...(it.includes || []).map(incRow));
+    setKwKind(isCompItem(it) ? 'compound' : 'rule');
+    kwIn('form-title').textContent = kwSel === 'new' ? '新增' : KWX.title(it);
     kwIn('delete').disabled = kwSel === 'new';
     kwIn('msg').textContent = ''; kwIn('msg').className = 'save-msg';
-  }
-  function syncKwKind() {
-    const comp = kwIn('kind').value === 'compound';
-    kwIn('inc-wrap').hidden = !comp;
-    kwIn('text-label').textContent = comp
-      ? '說明（可留白；玩家端會先列出「包含」的特規，可以點開）'
-      : '說明（一行一段；「・」開頭是條列；[ ] 裡的字在玩家端會變成連結）';
   }
   // 算分用的複合關鍵字跟著資料庫走
   function applyCompound() { if (kwdb) C.setCompound(kwdb.items); }
@@ -1082,12 +1100,15 @@
   }
   function readKwForm() {
     const name = text(kwIn('name').value), en = text(kwIn('en').value);
+    const enBase = en.replace(/\s*\(X\)\s*$/i, '');
+    if (kwKind === 'compound') {
+      const includes = [...kwIn('inc-list').querySelectorAll('input')].map((i) => text(i.value)).filter(Boolean);
+      return { group: '複合關鍵字', name, en, includes, aliases: [...new Set([name, enBase].filter(Boolean))], text: '' };
+    }
     const extra = String(kwIn('aliases').value).split(/[、，,;；\n]/).map(text).filter(Boolean);
-    const comp = kwIn('kind').value === 'compound';
-    const includes = comp ? String(kwIn('includes').value).split(/[、，,;；\n]/).map(text).filter(Boolean) : [];
     return {
-      group: comp ? '複合關鍵字' : (text(kwIn('group').value) || '通用關鍵字'), name, en, ...(comp ? { includes } : {}),
-      aliases: [...new Set([name, ...extra, en.replace(/\s*\(X\)\s*$/i, '')].filter(Boolean))],
+      group: text(kwIn('group').value) || '通用關鍵字', name, en,
+      aliases: [...new Set([name, ...extra, enBase].filter(Boolean))],
       text: String(kwIn('text').value).replace(/\r/g, '').trim(),
     };
   }
@@ -1097,7 +1118,7 @@
     if (!kwSel) return fail('先從左邊選一個關鍵字，或按「＋ 新增關鍵字」。');
     const form = readKwForm();
     if (!remove && !form.name) return fail('名稱是空的。');
-    if (!remove && kwIn('kind').value === 'compound' && !(form.includes || []).length) return fail('複合關鍵字要填「包含的特規」。');
+    if (!remove && kwKind === 'compound' && !(form.includes || []).length) return fail('複合關鍵字至少要有一個包含的特規。');
     if (remove && !confirm(`刪除關鍵字「${form.name}」？\n（檔案歷史裡還找得到）`)) return;
     if (!(await pageIsCurrent())) return fail(STALE_MSG.replace('；你填的內容已存成草稿，重新整理後按上方「繼續上次草稿」就會回來', ''));
     msg.textContent = '保存中…'; msg.className = 'save-msg';
@@ -1119,8 +1140,8 @@
       applyCompound();
       kwSel = remove ? null : id;
       renderKwList();
-      if (remove) { kwIn('form-title').textContent = '已刪除，從左邊再選一個'; ['group', 'name', 'en', 'aliases', 'text'].forEach((k) => { kwIn(k).value = ''; }); }
-      else kwIn('form-title').textContent = `編輯：${KWX.title(form)}`;
+      if (remove) { kwIn('form-title').textContent = '已刪除，從左邊再選一個'; kwIn('fields').hidden = true; kwIn('badge').hidden = true; }
+      else kwIn('form-title').textContent = KWX.title(form);
       kwIn('delete').disabled = !kwSel || kwSel === 'new';
       msg.replaceChildren(`已${label}${remove ? '' : '：' + form.name}（玩家端約 1 分鐘後更新） `,
         res.commitUrl ? el('a', { href: res.commitUrl, target: '_blank', rel: 'noopener' }, '看這次 commit') : '');
@@ -1133,14 +1154,17 @@
   document.getElementById('btn-keywords').addEventListener('click', async () => { show('keywords'); if (!kwdb) await loadKwdb(); });
   document.getElementById('kw-q').addEventListener('input', () => kwdb && renderKwList());
   document.getElementById('kw-reload').addEventListener('click', loadKwdb);
-  kwIn('kind').addEventListener('change', () => { syncKwKind(); if (kwIn('kind').value === 'compound') kwIn('group').value = '複合關鍵字'; });
   ensureKwdb();
-  document.getElementById('kw-new').addEventListener('click', () => {
+  function newKw(comp) {
     kwSel = 'new';
-    fillKwForm({ group: (kwdb && kwdb.groups[0]) || '通用關鍵字' });
+    fillKwForm(comp ? { group: '複合關鍵字', includes: [] } : { group: (kwdb && kwdb.groups[0]) || '通用關鍵字' });
     if (kwdb) renderKwList();
     kwIn('name').focus();
-  });
+  }
+  document.getElementById('kw-new').addEventListener('click', () => newKw(false));
+  document.getElementById('kw-new-comp').addEventListener('click', () => newKw(true));
+  kwIn('inc-add').addEventListener('click', () => { const li = incRow(''); kwIn('inc-list').append(li); li.querySelector('input').focus(); });
+  kwIn('switch').addEventListener('click', () => setKwKind(kwKind === 'compound' ? 'rule' : 'compound'));
   document.getElementById('kw-form').addEventListener('submit', (e) => { e.preventDefault(); saveKw(false); });
   document.getElementById('kw-delete').addEventListener('click', () => saveKw(true));
 
