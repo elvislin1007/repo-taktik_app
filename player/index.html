@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#16181b">
+<meta name="theme-color" content="#0f1012">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Taktik 圖鑑">
-<title>Taktik 單位圖鑑</title>
+<meta name="apple-mobile-web-app-title" content="Taktik">
+<title>Taktik</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/app-192.png">
 <link rel="apple-touch-icon" href="icons/app-180.png">
@@ -20,54 +20,89 @@
 <link rel="stylesheet" href="player.css?v=__BUILD__">
 </head>
 <body>
-<!-- 列表 -->
-<section id="screen-list" class="screen" aria-labelledby="list-title">
-  <header class="appbar">
-    <h1 id="list-title">單位圖鑑</h1>
-    <div class="appbar-actions">
-      <button type="button" class="icon-btn" id="btn-refresh" aria-label="重新整理資料">
+<!-- 頂端列：左邊選單、中間標誌 -->
+<header class="topbar">
+  <button type="button" class="icon-btn" id="btn-menu" aria-label="開啟選單" aria-expanded="false" aria-controls="drawer">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <a class="brand" href="#/" aria-label="Taktik 首頁"><span class="b1">TAK</span><span class="b2">TIK</span></a>
+  <span class="topbar-end" aria-hidden="true"></span>
+</header>
+
+<!-- 側邊選單（從左邊滑出） -->
+<div class="scrim" id="scrim" hidden></div>
+<button type="button" class="drawer-close" id="btn-close" aria-label="關閉選單" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+</button>
+<nav class="drawer" id="drawer" aria-label="主選單" tabindex="-1" hidden>
+  <form class="drawer-search" id="drawer-search" role="search">
+    <label class="ds-cat">
+      <span class="visually-hidden">分類</span>
+      <select id="ds-series" aria-label="系列"><option value="">全部</option></select>
+    </label>
+    <input id="ds-q" type="search" placeholder="搜尋單位…" autocomplete="off" enterkeyhint="search" aria-label="搜尋單位">
+    <button type="submit" class="ds-go" aria-label="搜尋">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button>
+  </form>
+  <ul class="menu" id="menu"></ul>
+</nav>
+
+<main>
+  <!-- 首頁 -->
+  <section id="screen-home" class="screen" aria-labelledby="home-title">
+    <div class="hero">
+      <h1 id="home-title" class="hero-brand"><span class="b1">TAK</span><span class="b2">TIK</span></h1>
+      <p class="hero-sub">Taktik 戰棋單位資料庫</p>
+      <a class="cta" href="#/units">瀏覽單位圖鑑</a>
+    </div>
+    <div class="home-sections" id="home-sections"></div>
+  </section>
+
+  <!-- 單位圖鑑：列表 -->
+  <section id="screen-list" class="screen" hidden aria-labelledby="list-title">
+    <div class="pagehead">
+      <h2 id="list-title">單位圖鑑</h2>
+      <button type="button" class="icon-btn dark" id="btn-refresh" aria-label="重新整理資料">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5"/></svg>
       </button>
     </div>
-  </header>
-
-  <div class="toolbar">
-    <label class="search">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="q" type="search" placeholder="搜尋名稱、關鍵字、能力、武器…" autocomplete="off" enterkeyhint="search" aria-label="搜尋單位">
-    </label>
-    <nav class="crumbs" id="crumbs" aria-label="分類路徑"></nav>
-    <div class="chips" id="chips" role="list" aria-label="下一層分類"></div>
-    <div class="listhead">
-      <span id="count" role="status"></span>
-      <label class="sort">排序
-        <select id="sort">
-          <option value="name">名稱</option>
-          <option value="pts-desc">分數高→低</option>
-          <option value="pts-asc">分數低→高</option>
-        </select>
+    <div class="toolbar">
+      <label class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="搜尋名稱、關鍵字、能力、武器…" autocomplete="off" enterkeyhint="search" aria-label="搜尋單位">
       </label>
+      <nav class="crumbs" id="crumbs" aria-label="分類路徑"></nav>
+      <div class="chips" id="chips" role="list" aria-label="下一層分類"></div>
+      <div class="listhead">
+        <span id="count" role="status"></span>
+        <label class="sort">排序
+          <select id="sort">
+            <option value="name">名稱</option>
+            <option value="pts-desc">分數高→低</option>
+            <option value="pts-asc">分數低→高</option>
+          </select>
+        </label>
+      </div>
     </div>
-  </div>
+    <div class="list" id="list" aria-live="polite"></div>
+  </section>
 
-  <main class="list" id="list" aria-live="polite"></main>
-</section>
-
-<!-- 單位內容 -->
-<section id="screen-unit" class="screen" hidden aria-labelledby="unit-title">
-  <header class="appbar">
-    <button type="button" class="icon-btn" id="btn-back" aria-label="返回列表">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-    </button>
-    <h1 id="unit-title"></h1>
-  </header>
-  <main class="unit">
-    <p class="unit-path" id="unit-path"></p>
-    <div class="card-frame" id="card-frame"></div>
-    <p class="unit-meta" id="unit-meta"></p>
-  </main>
-</section>
-
+  <!-- 單位圖鑑：單位內容 -->
+  <section id="screen-unit" class="screen" hidden aria-labelledby="unit-title">
+    <div class="pagehead">
+      <button type="button" class="icon-btn dark" id="btn-back" aria-label="返回列表">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <h2 id="unit-title"></h2>
+    </div>
+    <div class="unit">
+      <p class="unit-path" id="unit-path"></p>
+      <div class="card-frame" id="card-frame"></div>
+      <p class="unit-meta" id="unit-meta"></p>
+    </div>
+  </section>
+</main>
 
 <script src="../calc.js?v=__BUILD__"></script>
 <script src="../repo.js?v=__BUILD__"></script>

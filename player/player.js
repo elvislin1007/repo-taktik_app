@@ -1,5 +1,7 @@
-// Taktik 單位圖鑑（玩家端）— 搜尋 units/ 的單位，照資料夾一層層篩選。不需要權杖：
+// Taktik 玩家端 App — 頂端列＋左側選單的外殼，裡面放各個功能（目前：單位圖鑑）。
+// 單位圖鑑：搜尋 units/ 的單位，照資料夾一層層篩選。不需要權杖：
 // 發布時 GitHub Actions 會把 units/ 打包成網站上的 units.json，這裡只讀那個檔案。
+// 玩家端只能看，不放任何編輯入口。
 (function () {
   'use strict';
   const R = window.TaktikRepo;
@@ -86,20 +88,25 @@
   }
 
   // ---------- 狀態（放在網址 # 後面，手機返回鍵可用） ----------
-  // #/?p=陣營/子陣營&q=關鍵字&s=排序    #/unit/<path>
+  // #/ 首頁    #/units?p=系列/陣營/子陣營&q=關鍵字&s=排序 單位圖鑑    #/unit/<path> 單位頁
   function parseHash() {
     const h = location.hash.replace(/^#/, '') || '/';
     if (h.startsWith('/unit/')) return { view: 'unit', path: decodeURIComponent(h.slice(6)) };
-    const qs = new URLSearchParams(h.split('?')[1] || '');
-    return { view: 'list', p: (qs.get('p') || '').split('/').filter(Boolean), q: qs.get('q') || '', s: qs.get('s') || 'name' };
+    const [route0, query] = h.split('?');
+    // 舊網址 #/?p=… 也當成單位圖鑑
+    if (route0 === '/units' || (route0 === '/' && query)) {
+      const qs = new URLSearchParams(query || '');
+      return { view: 'list', p: (qs.get('p') || '').split('/').filter(Boolean), q: qs.get('q') || '', s: qs.get('s') || 'name' };
+    }
+    return { view: 'home' };
   }
   function listHash(st) {
     const qs = new URLSearchParams();
-    if (st.p.length) qs.set('p', st.p.join('/'));
+    if (st.p && st.p.length) qs.set('p', st.p.join('/'));
     if (st.q) qs.set('q', st.q);
     if (st.s && st.s !== 'name') qs.set('s', st.s);
     const s = qs.toString();
-    return '#/' + (s ? '?' + s : '');
+    return '#/units' + (s ? '?' + s : '');
   }
   let listState = { p: [], q: '', s: 'name' };
   function go(hash, replace) {
@@ -121,6 +128,7 @@
   }
 
   function render() {
+    renderNav();
     const st = listState;
     $('q').value = st.q;
     $('sort').value = st.s;
@@ -211,20 +219,32 @@
   if ('ResizeObserver' in window) new ResizeObserver(fitCard).observe($('card-frame'));
 
   // ---------- 畫面切換 ----------
+  const SCREENS = ['home', 'list', 'unit'];
+  function showScreen(name) { SCREENS.forEach((x) => { $('screen-' + x).hidden = x !== name; }); }
   function route() {
+    closeDrawer(false);
     const r = parseHash();
     if (r.view === 'unit') {
       if (!$('screen-unit').hidden) { renderUnit(r.path); return; }
-      listScroll = window.scrollY;
-      $('screen-list').hidden = true; $('screen-unit').hidden = false;
+      if (!$('screen-list').hidden) listScroll = window.scrollY;
+      showScreen('unit');
       renderUnit(r.path);
+      document.title = `${$('unit-title').textContent}｜Taktik`;
       window.scrollTo(0, 0);
-    } else {
-      const back = !$('screen-list').hidden ? null : listScroll;
+    } else if (r.view === 'list') {
+      const back = $('screen-unit').hidden ? null : listScroll;
       listState = { p: r.p, q: r.q, s: r.s };
-      $('screen-unit').hidden = true; $('screen-list').hidden = false;
+      const wasList = !$('screen-list').hidden;
+      showScreen('list');
       render();
+      document.title = '單位圖鑑｜Taktik';
       if (back != null) window.scrollTo(0, back);
+      else if (!wasList) window.scrollTo(0, 0);
+    } else {
+      showScreen('home');
+      renderNav();
+      document.title = 'Taktik';
+      window.scrollTo(0, 0);
     }
   }
   let listScroll = 0;
@@ -254,6 +274,87 @@
   $('sort').addEventListener('change', (e) => go(listHash({ ...listState, s: e.target.value }), true));
   $('btn-refresh').addEventListener('click', sync);
 
+  // ---------- 側邊選單 ----------
+  // 之後新增功能（規則、武器圖鑑…）就在 MENU 加一項；children 會變成可展開的子選單
+  const seriesList = () => [...new Set(units.map((u) => u.segs[0]).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'zh-Hant'));
+  const MENU = [
+    { id: 'home', label: '首頁', href: '#/' },
+    { id: 'units', label: '單位圖鑑', href: '#/units', children: () => seriesList().map((x) => ({ label: x, href: listHash({ p: [x] }) })) },
+  ];
+  const openSub = new Set();
+  function renderNav() {
+    // 搜尋框的分類下拉：全部＋各系列
+    const sel = $('ds-series');
+    const cur = sel.value;
+    const list = seriesList();
+    sel.replaceChildren(el('option', { value: '' }, '全部'), ...list.map((x) => el('option', { value: x }, x)));
+    sel.value = list.includes(cur) ? cur : '';
+    // 選單
+    const r = parseHash();
+    const activeId = r.view === 'home' ? 'home' : 'units';
+    const ul = $('menu');
+    ul.replaceChildren(...MENU.map((m) => {
+      const kids = m.children ? m.children() : [];
+      const open = openSub.has(m.id);
+      const li = el('li', { class: 'menu-item' + (m.id === activeId ? ' active' : '') });
+      const row = el('div', { class: 'menu-row' },
+        el('a', { href: m.href, class: 'menu-link', 'aria-current': m.id === activeId ? 'page' : null }, m.label));
+      if (kids.length) {
+        const tog = el('button', { type: 'button', class: 'menu-toggle', 'aria-expanded': String(open), 'aria-label': `${open ? '收合' : '展開'}${m.label}`,
+          onclick: () => { if (openSub.has(m.id)) openSub.delete(m.id); else openSub.add(m.id); renderNav(); } });
+        tog.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+        row.append(tog);
+      }
+      li.append(row);
+      if (kids.length && open) {
+        li.append(el('ul', { class: 'submenu' }, kids.map((k) => el('li', null, el('a', { href: k.href }, k.label)))));
+      }
+      return li;
+    }));
+    renderHome();
+  }
+  // 首頁下方：各功能入口
+  function renderHome() {
+    const box = $('home-sections');
+    if (!box) return;
+    const n = units.length;
+    box.replaceChildren(el('a', { class: 'home-card', href: '#/units' },
+      el('div', { class: 'hc-title' }, '單位圖鑑'),
+      el('div', { class: 'hc-desc' }, status === 'loading' && !n ? '讀取中…' : `${n} 個單位・${seriesList().length} 個系列`),
+      el('div', { class: 'hc-go', 'aria-hidden': 'true' }, '›')));
+  }
+
+  let lastFocus = null;
+  function openDrawer() {
+    renderNav();
+    lastFocus = document.activeElement;
+    ['scrim', 'btn-close', 'drawer'].forEach((id) => { $(id).hidden = false; });
+    requestAnimationFrame(() => document.body.classList.add('drawer-open'));
+    $('btn-menu').setAttribute('aria-expanded', 'true');
+    // 焦點放在選單本身（不要直接進搜尋框，免得手機一打開選單就跳出鍵盤）
+    setTimeout(() => $('drawer').focus({ preventScroll: true }), 50);
+  }
+  function closeDrawer(restoreFocus = true) {
+    if ($('drawer').hidden) return;
+    document.body.classList.remove('drawer-open');
+    $('btn-menu').setAttribute('aria-expanded', 'false');
+    setTimeout(() => { if (!document.body.classList.contains('drawer-open')) ['scrim', 'btn-close', 'drawer'].forEach((id) => { $(id).hidden = true; }); }, 260);
+    if (restoreFocus && lastFocus) lastFocus.focus({ preventScroll: true });
+  }
+  $('btn-menu').addEventListener('click', openDrawer);
+  $('btn-close').addEventListener('click', () => closeDrawer());
+  $('scrim').addEventListener('click', () => closeDrawer());
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+  $('drawer').addEventListener('click', (e) => { if (e.target.closest('a')) closeDrawer(false); });
+  // 選單裡的搜尋：系列＋關鍵字 → 單位圖鑑
+  $('drawer-search').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const series = $('ds-series').value;
+    const q = $('ds-q').value.trim();
+    closeDrawer(false);
+    go(listHash({ p: series ? [series] : [], q, s: listState.s }));
+  });
+
   // ---------- 加到主畫面（離線也能開） ----------
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     navigator.serviceWorker.register('sw.js').catch((e) => console.warn('service worker', e));
@@ -262,6 +363,7 @@
   // ---------- 開始 ----------
   useBundle(store.get(BUNDLE_KEY, null));
   if (!location.hash) history.replaceState(null, '', '#/');
+  renderNav();
   route();
   sync().then(() => { if (parseHash().view === 'unit') route(); });
 

@@ -1,7 +1,7 @@
 {
-  "name": "Taktik 單位圖鑑",
-  "short_name": "Taktik 圖鑑",
-  "description": "搜尋 Taktik 單位資料庫",
+  "name": "Taktik",
+  "short_name": "Taktik",
+  "description": "Taktik 戰棋：單位圖鑑與更多功能",
   "lang": "zh-Hant",
   "start_url": "./",
   "scope": "./",
