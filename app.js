@@ -1101,6 +1101,92 @@
     applyCompound();
     renderKwList();
   }
+  // ---------- 關鍵字的分數（scores）：本體加乘、武器加乘、武器基數加、武器倍率、額外加成係數 ----------
+  const X_BODY = [['', '固定'], ['n', '×X'], ['7-', '×(7−X)']];
+  const X_WEAPON = [['', '固定'], ['n', '×X'], ['7-', '×(7−X)'], ['2-', '×(2−X)']];
+  const X_BASE = [['n', '×X'], ['7-', '×(7−X)']];
+  const EXTRA_INFO = {
+    '熱視線': ['額外加成 ＝ 係數 × (距離 − 6)', { k: '係數' }], '夜視': ['額外加成 ＝ 係數 × (距離 − 6)（有寫距離時）', { k: '係數' }],
+    '先進視覺': ['額外加成 ＝ 係數 × (距離 − 6)', { k: '係數' }],
+    '法術視覺': ['額外加成 ＝ 固定', { v: '固定加' }], '盲視': ['額外加成 ＝ 固定', { v: '固定加' }],
+    '領導': ['額外加成 ＝ 每級 × (Lv − 1)', { ind: '獨立每級', troop: '部隊每級' }],
+    '戰術家': ['額外加成 ＝ 每級 × X', { ind: '獨立每級', troop: '部隊每級' }],
+    '維修': ['額外加成 ＝ 每級 × X', { ind: '獨立每級', troop: '部隊每級' }], '醫療': ['額外加成 ＝ 每級 × X', { ind: '獨立每級', troop: '部隊每級' }],
+    '法術': ['額外加成 ＝ 每級 × X', { ind: '獨立每級', troop: '部隊每級' }],
+    '抗性': ['本體加乘 ＝ 每級 × X（小抗性：火、電、冰、精神、毒；大抗性：法術、能量）', { small: '小抗性每級', big: '大抗性每級' }],
+    '反-': ['武器基數 ＋ 係數 × (7 − X)', { k: '係數' }],
+  };
+  const fmtX = (x) => ({ '': '', n: '×X', '7-': '×(7−X)', '2-': '×(2−X)' }[x || ''] || '');
+  const sgn = (v) => (Number(v) >= 0 ? '+' : '') + v;
+  function scoreSummary(it) {
+    const parts = [];
+    (it.scores || []).forEach((s) => {
+      const p = [];
+      if (s.body) p.push(`本體${sgn(s.body.v)}${fmtX(s.body.x)}`);
+      if (s.bodyNoun != null) p.push(`本體(名詞)${sgn(s.bodyNoun)}`);
+      if (s.weapon) p.push(`武器${sgn(s.weapon.v)}${fmtX(s.weapon.x)}`);
+      if (s.wbase) p.push(`基數+${s.wbase.v}${fmtX(s.wbase.x)}`);
+      if (s.wmod != null) p.push(`×${s.wmod}`);
+      if (s.extra) p.push('公式 ' + Object.values(s.extra).join('／'));
+      if (p.length) parts.push(((it.scores.length > 1 || s.key !== it.name) ? s.key + ' ' : '') + p.join(' '));
+    });
+    return parts.join('；');
+  }
+  const numIn = (v, label) => el('input', { type: 'number', step: 'any', class: 'sc-num', value: v == null ? '' : String(v), 'aria-label': label });
+  const xSel = (opts, v, label) => { const s = el('select', { class: 'sc-x', 'aria-label': label }, opts.map(([k, t]) => el('option', { value: k }, t))); s.value = v || opts[0][0]; return s; };
+  function scRow(sc) {
+    sc = sc || {};
+    const row = el('div', { class: 'sc-row' });
+    const key = el('input', { class: 'sc-key', value: sc.key || '', 'aria-label': '寫法', placeholder: '寫法' });
+    row.append(el('div', { class: 'sc-top' }, el('span', { class: 'sc-lbl' }, '寫法'), key,
+      el('button', { type: 'button', class: 'sc-del', title: '刪掉這種寫法的分數', onclick: () => row.remove() }, '×')));
+    const info = EXTRA_INFO[sc.key];
+    if (sc.extra && info) {
+      row.dataset.extra = '1';
+      key.readOnly = true;
+      const grid = el('div', { class: 'sc-grid' }, el('span', { class: 'sc-formula' }, info[0]));
+      Object.entries(info[1]).forEach(([f, lbl]) => {
+        const inp = numIn(sc.extra[f], lbl); inp.dataset.f = f;
+        grid.append(el('label', { class: 'sc-cell' }, lbl, inp));
+      });
+      row.append(grid);
+      return row;
+    }
+    const cell = (lbl, field, opts, v) => {
+      const n = numIn(v && v.v, lbl); n.dataset.f = field;
+      const c = el('label', { class: 'sc-cell' }, lbl, n);
+      if (opts) { const s = xSel(opts, v && v.x, lbl + ' X'); s.dataset.f = field + 'X'; c.append(s); }
+      return c;
+    };
+    const grid = el('div', { class: 'sc-grid' },
+      cell('本體加乘', 'body', X_BODY, sc.body), cell('武器加乘', 'weapon', X_WEAPON, sc.weapon),
+      cell('武器基數加', 'wbase', X_BASE, sc.wbase), cell('武器倍率 ×', 'wmod', null, sc.wmod != null ? { v: sc.wmod } : null));
+    if (sc.bodyNoun != null) grid.append(cell('本體（寫名詞時）', 'bodyNoun', null, { v: sc.bodyNoun }));
+    row.append(grid);
+    return row;
+  }
+  function readScores() {
+    const out = [];
+    kwIn('sc-list').querySelectorAll('.sc-row').forEach((row) => {
+      const key = text(row.querySelector('.sc-key').value);
+      if (!key) return;
+      const val = (f) => { const i = row.querySelector(`input[data-f="${f}"]`); return i && i.value !== '' && !isNaN(Number(i.value)) ? Number(i.value) : null; };
+      const xv = (f) => { const s = row.querySelector(`select[data-f="${f}X"]`); return s ? s.value : ''; };
+      if (row.dataset.extra) {
+        const extra = {};
+        row.querySelectorAll('input[data-f]').forEach((i) => { if (i.value !== '' && !isNaN(Number(i.value))) extra[i.dataset.f] = Number(i.value); });
+        out.push({ key, extra }); return;
+      }
+      const sc = { key };
+      if (val('body') != null) sc.body = { v: val('body'), x: xv('body') };
+      if (val('bodyNoun') != null) sc.bodyNoun = val('bodyNoun');
+      if (val('weapon') != null) sc.weapon = { v: val('weapon'), x: xv('weapon') };
+      if (val('wbase') != null) sc.wbase = { v: val('wbase'), x: xv('wbase') || 'n' };
+      if (val('wmod') != null) sc.wmod = val('wmod');
+      out.push(sc);
+    });
+    return out;
+  }
   function renderKwList() {
     const q = document.getElementById('kw-q').value;
     const hits = kwdb.items.filter((it) => KWX.matches(it, q))
@@ -1109,7 +1195,8 @@
     const ul = document.getElementById('kw-list');
     ul.replaceChildren(...hits.map((it) => el('li', null, el('button', { type: 'button', class: 'kw-item' + (it.id === kwSel ? ' current' : ''), onclick: () => editKw(it.id) },
       el('span', { class: 'kw-item-name' }, it.name || '（未命名）'), ' ', el('span', { class: 'kw-item-en' }, it.en || ''),
-      el('span', { class: 'kw-item-group' }, it.group || '')))));
+      el('span', { class: 'kw-item-group' }, it.group || ''),
+      scoreSummary(it) ? el('span', { class: 'kw-item-score' }, scoreSummary(it)) : null))));
     document.getElementById('dl-kw-group').replaceChildren(...kwdb.groups.map((g) => el('option', { value: g })));
   }
   const kwIn = (k) => document.getElementById('kw-' + k);
@@ -1148,6 +1235,7 @@
     kwIn('en').value = it.en || '';
     kwIn('aliases').value = (it.aliases || []).filter((a) => a !== it.name && a !== it.en && a !== String(it.en || '').replace(/\s*\(X\)\s*$/i, '')).join('、');
     kwIn('text').value = it.text || '';
+    kwIn('sc-list').replaceChildren(...(it.scores || []).map(scRow));
     document.getElementById('dl-kw-names').replaceChildren(...(kwdb ? kwdb.items : []).filter((x) => !isCompItem(x)).map((x) => el('option', { value: x.name })));
     kwIn('inc-list').replaceChildren(...(it.includes || []).map(incRow));
     setKwKind(isCompItem(it) ? 'compound' : 'rule');
@@ -1156,7 +1244,7 @@
     kwIn('msg').textContent = ''; kwIn('msg').className = 'save-msg';
   }
   // 算分用的複合關鍵字跟著資料庫走
-  function applyCompound() { if (kwdb) C.setCompound(kwdb.items); }
+  function applyCompound() { if (kwdb) { C.setCompound(kwdb.items); C.setScores(kwdb.items); } }
   let kwReady = null;
   function ensureKwdb() {
     if (kwdb) return Promise.resolve();
@@ -1182,6 +1270,7 @@
       group: text(kwIn('group').value) || '通用關鍵字', name, en,
       aliases: [...new Set([name, ...extra, enBase].filter(Boolean))],
       text: String(kwIn('text').value).replace(/\r/g, '').trim(),
+      scores: readScores(),
     };
   }
   async function saveKw(remove) {
@@ -1226,6 +1315,43 @@
   document.getElementById('btn-keywords').addEventListener('click', async () => { show('keywords'); if (!kwdb) await loadKwdb(); });
   document.getElementById('kw-q').addEventListener('input', () => kwdb && renderKwList());
   document.getElementById('kw-reload').addEventListener('click', loadKwdb);
+  kwIn('sc-add').addEventListener('click', () => {
+    const used = new Set([...kwIn('sc-list').querySelectorAll('.sc-key')].map((i) => i.value));
+    const r = scRow({ key: used.has(text(kwIn('name').value)) ? '' : text(kwIn('name').value) });
+    kwIn('sc-list').append(r); r.querySelector('.sc-key').focus();
+  });
+  // 重算全部單位：用目前的關鍵字分數重算，列出會變的，確認後一個一個存回 GitHub
+  kwIn('recalc').addEventListener('click', async () => {
+    const msg = kwIn('msg');
+    const btn = kwIn('recalc');
+    if (!(await pageIsCurrent())) { msg.textContent = STALE_MSG.replace('；你填的內容已存成草稿，重新整理後按上方「繼續上次草稿」就會回來', ''); msg.className = 'save-msg err'; return; }
+    btn.disabled = true; msg.className = 'save-msg'; msg.textContent = '讀取所有單位…';
+    try {
+      await ensureKwdb(); applyCompound();
+      let list;
+      try { list = await R.loadBundle('units', 'units.json', true); } catch (e) { list = await R.loadBundle('units', 'units.json', false); }
+      const changes = [];
+      list.filter((x) => x && x.path && x.data).forEach((x) => {
+        const r = C.scoreUnit(JSON.parse(JSON.stringify(x.data)));
+        const old = x.data.result ? x.data.result.total : null;
+        if (old !== r.total) changes.push({ x, r, old });
+      });
+      if (!changes.length) { msg.textContent = `全部 ${list.length} 個單位的分數都沒有變。`; msg.className = 'save-msg ok'; return; }
+      const lines = changes.map((c) => `${c.x.data.name}：${c.old == null ? '—' : c.old} → ${c.r.total}`);
+      if (!confirm(`${changes.length} 個單位的分數會變：\n\n${lines.slice(0, 40).join('\n')}${lines.length > 40 ? `\n…還有 ${lines.length - 40} 個` : ''}\n\n確定要存回 GitHub？`)) { msg.textContent = '沒有存。'; return; }
+      let done = 0;
+      for (const c of changes) {
+        msg.textContent = `存回中… ${done}/${changes.length}`;
+        const data = Object.assign({}, c.x.data, { result: { total: c.r.total, steps: c.r.steps, warnings: c.r.warnings } });
+        await R.saveFile(c.x.path, data, `重算分數：${c.x.data.name}（${c.old == null ? '—' : c.old} → ${c.r.total}）`);
+        done++;
+      }
+      msg.textContent = `已重算並存回 ${done} 個單位（玩家端約 1 分鐘後更新）。`; msg.className = 'save-msg ok';
+    } catch (e) {
+      msg.textContent = `重算失敗：${e.message}`; msg.className = 'save-msg err';
+      if (e.status === 0 || e.status === 401 || e.status === 403) openSettings();
+    } finally { btn.disabled = false; }
+  });
   ensureKwdb();
   function newKw(comp) {
     kwSel = 'new';

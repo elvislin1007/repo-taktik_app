@@ -33,13 +33,15 @@
   const KW = window.TaktikKW;
   const KW_KEY = 'taktik-keywords-v1';
   let kwdb = store.get(KW_KEY, null);
-  let kwIndex = KW.buildIndex(kwdb);
+  // 沒有說明的（例：只為了算分建的「算分特規」）不在玩家端顯示、不變成連結
+  const kwVisible = (d) => ({ items: ((d && d.items) || []).filter((it) => String(it.text || '').trim() || (it.includes && it.includes.length)) });
+  let kwIndex = KW.buildIndex(kwVisible(kwdb));
   async function loadKeywords() {
     try {
       const r = await fetch('../keywords.json', { cache: 'no-cache' });
       if (!r.ok) throw new Error(r.status);
       kwdb = await r.json();
-      kwIndex = KW.buildIndex(kwdb);
+      kwIndex = KW.buildIndex(kwVisible(kwdb));
       store.set(KW_KEY, kwdb);
     } catch (e) { /* 沒網路就用上次的 */ }
   }
@@ -135,7 +137,7 @@
   // 關鍵字頁：搜尋＋列表（點了一樣跳出說明）
   function renderKeywords(q) {
     $('kw-q').value = q || '';
-    const items = (kwdb && kwdb.items) || [];
+    const items = kwVisible(kwdb).items;
     const hits = items.filter((it) => KW.matches(it, q)).map((it, i) => [KW.rank(it, q), i, it])
       .sort((a, b) => a[0] - b[0] || a[1] - b[1]).map((x) => x[2]);
     $('kw-count').textContent = items.length ? `共 ${hits.length} 個關鍵字` : '讀取中…';
@@ -480,7 +482,7 @@
       el('div', { class: 'hc-go', 'aria-hidden': 'true' }, '›')),
     el('a', { class: 'home-card', href: '#/keywords' },
       el('div', { class: 'hc-title' }, '關鍵字'),
-      el('div', { class: 'hc-desc' }, kwdb && kwdb.items ? `${kwdb.items.length} 個關鍵字・可搜尋` : '讀取中…'),
+      el('div', { class: 'hc-desc' }, kwdb && kwdb.items ? `${kwVisible(kwdb).items.length} 個關鍵字・可搜尋` : '讀取中…'),
       el('div', { class: 'hc-go', 'aria-hidden': 'true' }, '›')),
     el('a', { class: 'home-card', href: '#/armies' },
       el('div', { class: 'hc-title' }, '組軍表'),

@@ -167,6 +167,7 @@
           <button type="button" id="kw-new">＋ 新增一般關鍵字</button>
           <button type="button" id="kw-new-comp" class="kw-comp-btn">＋ 新增複合關鍵字</button>
           <button type="button" id="kw-reload" title="讀 repo 上最新的">重新讀取</button>
+          <button type="button" id="kw-recalc" title="用目前的關鍵字分數重算所有已存單位，確認後存回 GitHub">重算全部單位</button>
         </div>
         <p id="kw-count" class="hint" role="status"></p>
         <ul id="kw-list" class="kw-list"></ul>
@@ -187,6 +188,11 @@
             <datalist id="dl-kw-group"></datalist>
             <label>別名（用「、」分開；資料卡上寫成這些也會對到這個關鍵字）<input id="kw-aliases"></label>
             <label>說明（一行一段；「・」開頭是條列；[ ] 裡的字在玩家端會變成連結）<textarea id="kw-text" rows="12"></textarea></label>
+            <div class="kw-score">
+              <div class="kw-score-head"><b>算分</b><button type="button" id="kw-sc-add">＋ 加一種寫法</button></div>
+              <p class="kw-score-hint">資料卡上寫成「寫法」那樣時照這裡算分；沒填的欄位＝那一類不算分。X＝資料卡上寫的數字（例：免傷5+ 選「×(7−X)」→ X＝2）。</p>
+              <div id="kw-sc-list"></div>
+            </div>
           </div>
           <!-- 複合關鍵字 -->
           <div id="kw-comp-fields" class="kw-fields" hidden>

@@ -87,6 +87,45 @@
   };
   const DIRECT_ONLY = ['能量', 'HEAT', 'APHE'];
 
+  // 04 額外加成的係數（公式形狀寫在程式裡，係數可以從關鍵字資料庫改）
+  const EXTRA_DEF = {
+    '熱視線': { k: 0.3 }, '夜視': { k: 0.3 }, '先進視覺': { k: 0.6 },       // k × (距離 − 6)
+    '法術視覺': { v: 10 }, '盲視': { v: 10 },                               // 固定
+    '領導': { ind: 30, troop: 6 },                                         // 每級（Lv1 不算）：獨立／部隊
+    '戰術家': { ind: 30, troop: 6 },                                       // × X
+    '維修': { ind: 15, troop: 3 }, '醫療': { ind: 15, troop: 3 }, '法術': { ind: 15, troop: 3 },
+    '抗性': { small: 0.1, big: 0.2 },                                      // 小抗性／大抗性 每級（本體加乘）
+    '反-': { k: 5 },                                                       // 武器基數 + k × (7 − X)
+  };
+  let EXTRA = JSON.parse(JSON.stringify(EXTRA_DEF));
+  const ex = (name, f) => (EXTRA[name] && EXTRA[name][f] != null ? EXTRA[name][f] : EXTRA_DEF[name][f]);
+
+  // 預設表（程式內建）；編輯器讀到關鍵字資料庫後用 setScores() 換成資料庫的分數
+  const TABLES = { BODY_FIXED, BODY_NOUN, BODY_TIER, W_RULE, W_TIER, W_BASEADD, W_MOD };
+  const TABLE_DEF = JSON.parse(JSON.stringify(TABLES));
+  // items[].scores = [{ key, body:{v,x}, bodyNoun, weapon:{v,x}, wbase:{v,x}, wmod, extra:{...} }]
+  //   x：'' 固定、'n' ×X、'7-' ×(7−X)、'2-' ×(2−X)；資料庫有寫到的 key 以資料庫為準（沒填的部分＝不算分）
+  function setScores(items) {
+    Object.entries(TABLES).forEach(([n, t]) => { Object.keys(t).forEach((k) => delete t[k]); Object.assign(t, JSON.parse(JSON.stringify(TABLE_DEF[n]))); });
+    EXTRA = JSON.parse(JSON.stringify(EXTRA_DEF));
+    const num0 = (v) => (v === '' || v == null ? NaN : Number(v));
+    (items || []).forEach((it) => (it.scores || []).forEach((sc) => {
+      const k = String(sc.key || '').trim();
+      if (!k) return;
+      if (sc.extra && EXTRA_DEF[k]) {
+        Object.entries(sc.extra).forEach(([f, v]) => { if (!isNaN(num0(v))) EXTRA[k][f] = num0(v); });
+        return;
+      }
+      Object.values(TABLES).forEach((t) => { delete t[k]; });
+      if (sc.body && !isNaN(num0(sc.body.v))) { if (sc.body.x) BODY_TIER[k] = [num0(sc.body.v), sc.body.x]; else BODY_FIXED[k] = num0(sc.body.v); }
+      if (!isNaN(num0(sc.bodyNoun))) BODY_NOUN[k] = num0(sc.bodyNoun);
+      if (sc.weapon && !isNaN(num0(sc.weapon.v))) { if (sc.weapon.x) W_TIER[k] = [num0(sc.weapon.v), sc.weapon.x]; else W_RULE[k] = num0(sc.weapon.v); }
+      if (sc.wbase && !isNaN(num0(sc.wbase.v))) W_BASEADD[k] = [num0(sc.wbase.v), sc.wbase.x || 'n'];
+      if (!isNaN(num0(sc.wmod))) W_MOD[k] = num0(sc.wmod);
+    }));
+  }
+  const getScoreTables = () => JSON.parse(JSON.stringify({ ...TABLE_DEF, EXTRA: EXTRA_DEF }));
+
   // ---------- 工具 ----------
   const round5 = (x) => Math.floor(x / 5 + 0.5) * 5;
   const r2 = (x) => Math.round(x * 100) / 100;
@@ -180,24 +219,24 @@
       if (TYPE_KEYS.includes(r.name) && (r.arg == null || r.name === '人物')) { ignored.push(tok + '（類型）'); return; }
       // 額外加成（04）
       if (['熱視線', '夜視', '先進視覺'].includes(r.name) && r.arg != null) {
-        const n = dist(r.arg); const x = n - 6; const k = r.name === '先進視覺' ? 0.6 : 0.3;
+        const n = dist(r.arg); const x = n - 6; const k = ex(r.name, 'k');
         extras.push({ name: tok + tag, calc: `X = ${n} − 6 = ${x}；${k} × ${x}`, value: k * x });
         return;
       }
-      if (['法術視覺', '盲視'].includes(r.name) && r.arg == null) { extras.push({ name: tok + tag, calc: '固定', value: 10 }); return; }
+      if (['法術視覺', '盲視'].includes(r.name) && r.arg == null) { extras.push({ name: tok + tag, calc: '固定', value: ex(r.name, 'v') }); return; }
       if (r.name === '領導') {
         const lv = num(r.arg);
-        const per = independent ? 30 : 6;
+        const per = independent ? ex('領導', 'ind') : ex('領導', 'troop');
         extras.push({ name: tok, calc: `Lv1 不算，${per} × (${lv} − 1)`, value: Math.max(0, per * (lv - 1)) });
         return;
       }
       if (r.name === '戰術家') {
-        const x = num(r.arg); const per = independent ? 30 : 6;
+        const x = num(r.arg); const per = independent ? ex('戰術家', 'ind') : ex('戰術家', 'troop');
         extras.push({ name: tok, calc: `${per} × ${x}`, value: per * x });
         return;
       }
       if (['維修', '醫療', '法術'].includes(r.name) && r.arg != null) {
-        const x = num(r.arg); const per = independent ? 15 : 3;
+        const x = num(r.arg); const per = independent ? ex(r.name, 'ind') : ex(r.name, 'troop');
         extras.push({ name: tok, calc: `${per} × ${x}`, value: per * x });
         return;
       }
@@ -220,8 +259,9 @@
       const res = r.name.match(/^(.+)抗性$/);
       if (res && r.arg != null) {
         const x = num(r.arg);
-        if (SMALL_RES.includes(res[1])) { mult += 0.1 * x; multParts.push(`${tok} 小抗性 +0.1×${x}`); return; }
-        if (BIG_RES.includes(res[1])) { mult += 0.2 * x; multParts.push(`${tok} 大抗性 +0.2×${x}`); return; }
+        const ks = ex('抗性', 'small'), kb = ex('抗性', 'big');
+        if (SMALL_RES.includes(res[1])) { mult += ks * x; multParts.push(`${tok} 小抗性 +${ks}×${x}`); return; }
+        if (BIG_RES.includes(res[1])) { mult += kb * x; multParts.push(`${tok} 大抗性 +${kb}×${x}`); return; }
         warn.push(`「${tok}」：${res[1]} 不在小抗性／大抗性清單，要歸哪一類？這次沒算`); return;
       }
       ignored.push(tok);
@@ -307,7 +347,7 @@
         baseAdd += k * x; baseP.push(`${tok} +${k}×${x}`); return;
       }
       const anti = r.name.match(/^反-/);
-      if (anti && r.arg != null) { const x = solveX(r.arg, '7-'); baseAdd += 5 * x; baseP.push(`${tok} +5×${x}`); return; }
+      if (anti && r.arg != null) { const x = solveX(r.arg, '7-'); const ka = ex('反-', 'k'); baseAdd += ka * x; baseP.push(`${tok} +${ka}×${x}`); return; }
       warn.push(`${name}：武器特規「${tok}」資料庫查不到，這次沒算`);
     });
     if (type === 'shield') addP.push('盾牌（類型） +0');
@@ -512,5 +552,5 @@
     COMPOUND = map;
   }
   const getCompound = () => COMPOUND;
-  global.TaktikCalc = { weaponScore, scoreEquipment, setCompound, getCompound, scoreUnit, parseAbility, meleeX, modeType, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
+  global.TaktikCalc = { setScores, getScoreTables, weaponScore, scoreEquipment, setCompound, getCompound, scoreUnit, parseAbility, meleeX, modeType, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
 })(typeof window !== 'undefined' ? window : globalThis);
