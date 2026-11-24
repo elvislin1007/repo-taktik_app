@@ -1,0 +1,15 @@
+{
+  "type": "grenade",
+  "name": "破片手榴彈Frag grenade",
+  "rules": "[HE3”]",
+  "RNG": "8",
+  "STR": "7/7",
+  "D": "3/1",
+  "AS": "1",
+  "RL": "-",
+  "series": "星海爭霸",
+  "faction": "人族",
+  "subfaction": "勢力",
+  "category": "勢力",
+  "savedAt": "2026-11-24T09:33:47.044Z"
+}
