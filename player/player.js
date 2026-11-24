@@ -239,6 +239,8 @@
   function parseHash() {
     const h = location.hash.replace(/^#/, '') || '/';
     if (h.startsWith('/unit/')) return { view: 'unit', path: decodeURIComponent(h.slice(6)) };
+    if (h === '/armies') return { view: 'armies' };
+    if (h.startsWith('/army/')) return { view: 'army', id: decodeURIComponent(h.slice(6)) };
     if (h.startsWith('/keywords')) return { view: 'keywords', q: new URLSearchParams(h.split('?')[1] || '').get('q') || '' };
     const [route0, query] = h.split('?');
     // 舊網址 #/?p=… 也當成單位圖鑑
@@ -358,7 +360,7 @@
   if ('ResizeObserver' in window) new ResizeObserver(fitCard).observe($('card-frame'));
 
   // ---------- 畫面切換 ----------
-  const SCREENS = ['home', 'list', 'unit', 'keywords'];
+  const SCREENS = ['home', 'list', 'unit', 'keywords', 'armies', 'army'];
   function showScreen(name) { SCREENS.forEach((x) => { $('screen-' + x).hidden = x !== name; }); }
   function route() {
     closeDrawer(false);
@@ -370,6 +372,14 @@
       renderUnit(r.path);
       document.title = `${$('unit-title').textContent}｜Taktik`;
       window.scrollTo(0, 0);
+    } else if (r.view === 'armies' || r.view === 'army') {
+      const A = window.TaktikArmy;
+      const same = r.view === 'army' && !$('screen-army').hidden && $('screen-army').dataset.id === r.id;
+      showScreen(r.view);
+      if (r.view === 'armies') { if (A) A.renderList(); document.title = '組軍表｜Taktik'; }
+      else { $('screen-army').dataset.id = r.id; if (A) A.renderArmy(r.id); document.title = `${$('army-name').value || '軍表'}｜Taktik`; }
+      renderNav();
+      if (!same) window.scrollTo(0, 0);
     } else if (r.view === 'keywords') {
       const wasKw = !$('screen-keywords').hidden;
       showScreen('keywords');
@@ -431,6 +441,7 @@
     { id: 'home', label: '首頁', href: '#/' },
     { id: 'units', label: '單位圖鑑', href: '#/units', children: () => folderTree([]) },
     { id: 'keywords', label: '關鍵字', href: '#/keywords' },
+    { id: 'armies', label: '組軍表', href: '#/armies' },
   ];
   const openSub = new Set();
   function menuItems(items, level, activeId) {
@@ -454,7 +465,7 @@
   function renderNav() {
     const r = parseHash();
     // 目前所在的資料夾也標示出來
-    const activeId = r.view === 'home' ? 'home' : r.view === 'keywords' ? 'keywords' : (r.view === 'list' && r.p.length && !r.q ? 'units/' + r.p.join('/') : 'units');
+    const activeId = r.view === 'home' ? 'home' : r.view === 'keywords' ? 'keywords' : (r.view === 'armies' || r.view === 'army') ? 'armies' : (r.view === 'list' && r.p.length && !r.q ? 'units/' + r.p.join('/') : 'units');
     $('menu').replaceChildren(...menuItems(MENU, 0, activeId));
     renderHome();
   }
@@ -470,6 +481,10 @@
     el('a', { class: 'home-card', href: '#/keywords' },
       el('div', { class: 'hc-title' }, '關鍵字'),
       el('div', { class: 'hc-desc' }, kwdb && kwdb.items ? `${kwdb.items.length} 個關鍵字・可搜尋` : '讀取中…'),
+      el('div', { class: 'hc-go', 'aria-hidden': 'true' }, '›')),
+    el('a', { class: 'home-card', href: '#/armies' },
+      el('div', { class: 'hc-title' }, '組軍表'),
+      el('div', { class: 'hc-desc' }, window.TaktikArmy && window.TaktikArmy.count() ? `${window.TaktikArmy.count()} 份軍表・存在這台裝置` : '挑單位組軍、算總分、匯出 PDF'),
       el('div', { class: 'hc-go', 'aria-hidden': 'true' }, '›')));
   }
 
@@ -510,13 +525,17 @@
     navigator.serviceWorker.register('sw.js').catch((e) => console.warn('service worker', e));
   }
 
+  // 組軍表（army.js）用的共用工具
+  window.__playerAPI = { el, store, CARD, catIndex, go, get units() { return units; }, get catList() { return catList; } };
+
   // ---------- 開始 ----------
   useBundle(store.get(BUNDLE_KEY, null));
   if (!location.hash) history.replaceState(null, '', '#/');
   renderNav();
   route();
-  sync().then(() => { if (parseHash().view === 'unit') route(); });
+  sync().then(() => { const v = parseHash().view; if (v === 'unit' || v === 'army' || v === 'armies') route(); });
   loadKeywords().then(() => { renderHome(); const v = parseHash().view; if (v === 'unit' || v === 'keywords') route(); });
 
   window.__player = { get units() { return units; }, sync, route };
+  window.addEventListener('load', () => { const v = parseHash().view; if (v === 'army' || v === 'armies') route(); renderHome(); });
 })();

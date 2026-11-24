@@ -109,7 +109,67 @@
     </div>
     <div class="list" id="kw-list"></div>
   </section>
+
+  <!-- 組軍表：清單 -->
+  <section id="screen-armies" class="screen" hidden aria-labelledby="armies-title">
+    <div class="pagehead">
+      <h2 id="armies-title">組軍表</h2>
+    </div>
+    <div class="toolbar">
+      <p class="scope">軍表只存在這台裝置（換手機或清除瀏覽器資料就會不見；要保存請匯出 PDF）。</p>
+      <button type="button" class="primary" id="army-new">＋ 新增軍表</button>
+    </div>
+    <div class="list" id="armies-list"></div>
+  </section>
+
+  <!-- 組軍表：編輯一份 -->
+  <section id="screen-army" class="screen" hidden aria-labelledby="army-name">
+    <div class="pagehead">
+      <a class="icon-btn dark" href="#/armies" aria-label="返回軍表清單">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </a>
+      <input id="army-name" class="army-name" aria-label="軍表名稱" autocomplete="off">
+    </div>
+    <div class="army-bar">
+      <div class="army-total" id="army-total" role="status"></div>
+      <div class="army-btns">
+        <button type="button" class="primary" id="army-add">＋ 加入單位</button>
+        <button type="button" id="army-pdf">匯出 PDF</button>
+      </div>
+    </div>
+    <details class="army-rules">
+      <summary>規則設定（分數上限、類別數量）</summary>
+      <label class="cap-row">分數上限 <input id="army-cap" type="number" inputmode="numeric" min="0" step="50" placeholder="不限"> pts</label>
+      <div class="lim-box">
+        <div class="lim-title">類別數量限制 <button type="button" id="army-limits-reset">全部改回不限</button></div>
+        <div id="army-limits"></div>
+      </div>
+      <p class="hint">同一個「人物(獨特)」只能放 1 個，會自動檢查。</p>
+    </details>
+    <div class="notice army-warn" id="army-warn" role="alert" hidden></div>
+    <div id="army-body"></div>
+  </section>
 </main>
+
+<!-- 組軍表：加入單位（從資料庫挑，可以連續加） -->
+<div class="kw-sheet-wrap pick-wrap" id="pick-wrap" hidden>
+  <div class="kw-scrim" id="pick-scrim"></div>
+  <section class="kw-sheet pick-sheet" role="dialog" aria-modal="true" aria-labelledby="pick-title">
+    <div class="pick-head">
+      <h3 id="pick-title">加入單位</h3>
+      <button type="button" class="primary" id="pick-done">完成</button>
+    </div>
+    <div class="pick-tools">
+      <input id="pick-q" type="search" placeholder="搜尋單位名稱、關鍵字、武器…" autocomplete="off" aria-label="搜尋單位">
+      <select id="pick-scope" aria-label="系列／陣營"></select>
+    </div>
+    <p class="pick-status"><span id="pick-total"></span>　<span id="pick-msg" role="status"></span></p>
+    <div class="pick-body" id="pick-body"></div>
+  </section>
+</div>
+
+<!-- 匯出 PDF 用的列印內容（平常隱藏） -->
+<div id="print-root" class="print-root" aria-hidden="true"></div>
 
 <!-- 關鍵字說明（點資料卡上的藍色虛線字跳出來；按返回回上一個） -->
 <div class="kw-sheet-wrap" id="kw-sheet-wrap" hidden>
@@ -132,5 +192,6 @@
 <script src="../repo.js?v=__BUILD__"></script>
 <script src="../cardview.js?v=__BUILD__"></script>
 <script src="player.js?v=__BUILD__"></script>
+<script src="army.js?v=__BUILD__"></script>
 </body>
 </html>
