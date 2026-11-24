@@ -131,7 +131,8 @@
           const melee = C.modeType(m) === 'melee';
           const n = (k) => el('td', { class: 'n' }, el('span', null, k === 'STR' && melee ? meleeStr(m.STR, multi ? NaN : strValue) : text(m[k])));
           tbl.append(el('tr', { class: 'mode' },
-            el('td', null, el('img', { class: 'icon mode-icon', src: iconBase + 'mode.png', alt: '▶' }),
+            el('td', null, WTYPES[m.icon] ? el('img', { class: 'icon', src: iconBase + WTYPES[m.icon].icon, alt: WTYPES[m.icon].label })
+                : el('img', { class: 'icon mode-icon', src: iconBase + 'mode.png', alt: '▶' }),
               el('span', { class: 'wname' }, text(m.name)), ' ', el('span', { class: 'wrules' }, strip(m.rules))),
             n('RNG'), n('STR'), n('D'), n('AS'), n('RL')));
         });

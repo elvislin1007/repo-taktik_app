@@ -281,7 +281,29 @@
 
   // 一把武器的編輯列：一般武器 1 列；複合武器＝名稱 1 列＋每個模式 1 列（▶）
   // opts：{ rerender, onSaveLib, onDelete }（武器庫頁不需要後兩個）
-  const blankMode = () => ({ name: '', rules: '', RNG: '', STR: '', D: '', AS: '', RL: '-' });
+  const blankMode = () => ({ icon: 'mode', name: '', rules: '', RNG: '', STR: '', D: '', AS: '', RL: '-' });
+  // 功能列的圖示：▶（看 RNG 判斷射擊／近戰）或直接選射擊、近戰、手榴彈（計分照圖示）
+  const MODE_ICONS = { mode: { label: '▶ 箭頭（看 RNG）', icon: 'icons/mode.png' }, ranged: WTYPES.ranged, melee: WTYPES.melee, grenade: WTYPES.grenade };
+  function modeIconPicker(m, onPick) {
+    const box = el('span', { class: 'icon-pick' });
+    const key = MODE_ICONS[m.icon] ? m.icon : 'mode';
+    const cur = MODE_ICONS[key];
+    const btn = el('button', { type: 'button', title: '選擇這個功能的圖示', 'aria-haspopup': 'listbox', 'aria-label': `功能圖示：${cur.label}` },
+      el('img', { class: 'icon' + (key === 'mode' ? ' mode-icon' : ''), src: cur.icon, alt: cur.label }));
+    let menu = null;
+    const close = () => { if (menu) { menu.remove(); menu = null; document.removeEventListener('mousedown', outside); } };
+    const outside = (e) => { if (!box.contains(e.target)) close(); };
+    btn.addEventListener('click', () => {
+      if (menu) return close();
+      menu = el('div', { class: 'icon-menu', role: 'listbox' }, Object.entries(MODE_ICONS).map(([k, t]) =>
+        el('button', { type: 'button', role: 'option', 'aria-selected': String(k === key), onclick: () => { close(); if (k !== key) { m.icon = k; saveDraft(); onPick(); } } },
+          el('img', { class: 'icon', src: t.icon, alt: '' }), t.label)));
+      box.append(menu);
+      document.addEventListener('mousedown', outside);
+    });
+    box.append(btn);
+    return box;
+  }
   function weaponRows(w, opts) {
     const type = WTYPES[w.type] ? w.type : 'ranged';
     const ctrl = (extra) => {
@@ -307,7 +329,7 @@
           ? el('span', { class: 'ctrl' }, el('button', { type: 'button', title: '刪除這個模式', 'aria-label': '刪除這個模式', onclick: () => { w.modes.splice(mi, 1); opts.rerender(); } }, '×'))
           : null;
         return el('tr', { class: 'mode' },
-          el('td', null, el('img', { class: 'icon mode-icon', src: 'icons/mode.png', alt: '▶' }),
+          el('td', null, modeIconPicker(m, opts.rerender), ' ',
             editable(m.name, (v) => { m.name = v; }, { class: 'wname', ph: '模式名稱（例：射擊 Range）' }), ' ',
             editable(m.rules, (v) => { m.rules = v; }, { class: 'wrules', ph: '特規' })),
           numCell(m, 'RNG', '24／CC1'), numCell(m, 'STR', melee ? '+6' : '6'), numCell(m, 'D', '1'),
@@ -552,7 +574,8 @@
     if (isComposite(src)) {
       w.modes = (src.modes || []).map((m) => {
         const o = {};
-        ['name', 'rules', 'RNG', 'STR', 'D', 'AS', 'RL'].forEach((k) => { o[k] = m[k] == null ? '' : String(m[k]); });
+        ['icon', 'name', 'rules', 'RNG', 'STR', 'D', 'AS', 'RL'].forEach((k) => { o[k] = m[k] == null ? '' : String(m[k]); });
+        if (!o.icon) o.icon = 'mode';
         plusX(o, C.modeType(o) === 'melee');
         return o;
       });
