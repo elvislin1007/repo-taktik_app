@@ -50,5 +50,15 @@ jobs:
       - uses: actions/upload-pages-artifact@v4
         with:
           path: .
+      # GitHub 偶爾在上傳後馬上發布會找不到檔案（No artifacts named "github-pages"），先等一下，失敗再自動重試
+      - name: 等 GitHub 登記上傳的檔案
+        run: sleep 20
       - id: deployment
+        uses: actions/deploy-pages@v5
+        continue-on-error: true
+      - name: 發布失敗，等一下再試
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 60
+      - id: deployment-retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v5
