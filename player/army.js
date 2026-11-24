@@ -127,12 +127,18 @@
     warn.hidden = !probs.length;
     const body = $('army-body');
     body.replaceChildren();
-    if (!a.entries.length) { body.append(el('div', { class: 'empty' }, el('p', null, '按「＋ 加入單位」從資料庫挑單位。'))); return; }
+    // 所有類別都列出來（照類別清單順序，同 New Recruit）；每個類別旁邊「＋」只挑那個類別的單位
     const groups = {};
     a.entries.forEach((e) => { const u = unitOf(e.path); const c = (u && u.category) || '未分類'; (groups[c] = groups[c] || []).push(e); });
-    Object.keys(groups).sort((x, y) => P.catIndex(x) - P.catIndex(y)).forEach((c) => {
-      body.append(el('h3', { class: 'army-cat' }, `${c}（${groups[c].length}）`));
-      groups[c].forEach((e) => body.append(entryView(e)));
+    const cats = [...new Set([...P.catList, ...Object.keys(groups)])].sort((x, y) => P.catIndex(x) - P.catIndex(y));
+    cats.forEach((c) => {
+      const list = groups[c] || [];
+      const lim = (a.limits || {})[c];
+      const limTxt = lim ? `　${lim.min != null ? '至少 ' + lim.min : ''}${lim.min != null && lim.max != null ? '、' : ''}${lim.max != null ? '最多 ' + lim.max : ''}` : '';
+      body.append(el('div', { class: 'army-cat' + (list.length ? '' : ' empty-cat') },
+        el('h3', null, c, el('span', { class: 'cat-n' }, `（${list.length}）${limTxt}`)),
+        el('button', { type: 'button', class: 'cat-add', 'aria-label': `加入${c}單位`, onclick: () => openPicker(c) }, '＋')));
+      list.forEach((e) => body.append(entryView(e)));
     });
   }
   function entryView(e) {
@@ -222,7 +228,9 @@
   // ---------- 加入單位（從資料庫挑） ----------
   // 一層層點：系列 › 陣營 › 子陣營（跟單位圖鑑的選單一樣），到子陣營才列出單位；有輸入搜尋時直接列出目前範圍內符合的單位
   let pickPath = [];
-  function openPicker() {
+  let pickCat = null; // 從類別旁的「＋」打開時只看那個類別
+  function openPicker(cat) {
+    pickCat = typeof cat === 'string' ? cat : null;
     $('pick-wrap').hidden = false;
     document.body.classList.add('kw-open');
     $('pick-msg').textContent = '';
@@ -250,7 +258,10 @@
       ...pickPath.flatMap((g, i) => [el('span', { class: 'crumb-sep', 'aria-hidden': 'true' }, '›'),
         el('button', { type: 'button', class: 'crumb' + (i === pickPath.length - 1 ? ' on' : ''), onclick: () => { pickPath = pickPath.slice(0, i + 1); drawPicker(); } }, g)]));
     const body = $('pick-body');
-    const inScope = P.units.filter((u) => inPath(u, pickPath));
+    const inScope = P.units.filter((u) => inPath(u, pickPath) && (!pickCat || (u.category || '未分類') === pickCat));
+    $('pick-title').textContent = pickCat ? `加入單位：${pickCat}` : '加入單位';
+    $('pick-catbar').replaceChildren(...(pickCat ? [el('span', null, `只顯示「${pickCat}」`), el('button', { type: 'button', onclick: () => { pickCat = null; drawPicker(); } }, '顯示全部類別')] : []));
+    $('pick-catbar').hidden = !pickCat;
     const LEVEL = ['系列', '陣營', '子陣營'];
     if (!q.length && pickPath.length < 3) {
       // 還沒到子陣營：列出下一層的資料夾
@@ -277,7 +288,7 @@
     }
     $('pick-total').textContent = `目前 ${fmt(armyPts(cur))}${cur.cap ? ` / ${cur.cap}` : ''} pts`;
   }
-  $('army-add').addEventListener('click', openPicker);
+  $('army-add').addEventListener('click', () => openPicker());
   $('pick-done').addEventListener('click', closePicker);
   $('pick-scrim').addEventListener('click', closePicker);
   $('pick-q').addEventListener('input', drawPicker);
