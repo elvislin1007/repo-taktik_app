@@ -2,7 +2,7 @@
   "type": "melee",
   "name": "凱索蘭長柄斧Carsoran Power Tabar",
   "rules": "能量力場、雙手、✶穿甲2",
-  "RNG": "2",
+  "RNG": "CC2",
   "STR": "+7",
   "D": "1",
   "AS": "+0",

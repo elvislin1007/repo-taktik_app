@@ -229,3 +229,7 @@ button.mini { padding: 1px 10px; font-size: 12.5px; }
 .wl-pts.warn { color: #b35c00; cursor: help; }
 .card .wg tr.eq-desc td { text-align: left; }
 .card .wg .eq-text { min-height: 1.2em; }
+
+/* 選項武器（替換用） */
+.card .wg.opt-wg { margin-top: 6px; opacity: .85; }
+.card .wg.opt-wg tr.h td:first-child { background: #d9c8a0; }

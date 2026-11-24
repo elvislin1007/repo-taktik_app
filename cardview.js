@@ -171,6 +171,7 @@
         el('td', null, el('img', { class: 'icon', src: iconBase + WTYPES[type].icon, alt: WTYPES[type].label }),
           el('span', { class: 'wname' }, text(w.name)), ' ', el('span', { class: 'wrules' }, kwText(w.rules))),
         n('RNG'), n('STR'), n('D'), n('AS'), n('RL')));
+      if (text(w.text)) tbl.append(el('tr', { class: 'eq-desc' }, el('td', { colspan: '6' }, abilityView(C.parseAbility({ text: w.text }).text))));
     });
     root.append(tbl);
 

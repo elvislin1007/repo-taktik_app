@@ -2,7 +2,7 @@
   "type": "melee",
   "name": "腐化戰錘Tainted Maul",
   "rules": "後攻1、✶致命",
-  "RNG": "1",
+  "RNG": "CC1",
   "STR": "+6",
   "D": "2",
   "AS": "+0",

@@ -264,9 +264,24 @@
         rerender,
         onSaveLib: () => saveWeaponToLib(w),
         onDelete: () => { card.weapons.splice(i, 1); rerender(); },
+        extra: edit ? [el('button', { type: 'button', title: '從卡上拿下來，放到「選項武器」（不算分）', onclick: () => {
+          card.optionWeapons = card.optionWeapons || []; card.optionWeapons.push(card.weapons.splice(i, 1)[0]); rerender(); } }, '移到選項')] : null,
       }));
     });
     wrap.append(tbl);
+    // 選項武器：替換用，不在卡上、不算分；按「換上卡片」就移到上面的武器表
+    const optW = card.optionWeapons || [];
+    if (edit && optW.length) {
+      const ot = el('table', { class: 'wg opt-wg' },
+        el('colgroup', null, ['name', 'rng', 'str', 'd', 'as', 'rl'].map((c) => el('col', { class: 'c-' + c }))),
+        el('tr', { class: 'h' }, el('td', null, '選項武器（替換用，不在卡上、不算分）'), ['RNG(”)', 'STR', 'D', 'AS', 'RL'].map((h) => el('td', { class: 'n' }, h))));
+      optW.forEach((w, i) => ot.append(...weaponRows(w, {
+        rerender,
+        onDelete: () => { optW.splice(i, 1); rerender(); },
+        extra: [el('button', { type: 'button', title: '放到卡上（會算分）', onclick: () => { card.weapons.push(optW.splice(i, 1)[0]); rerender(); } }, '換上卡片')],
+      })));
+      wrap.append(ot);
+    }
     if (edit) {
       wrap.append(el('div', { class: 'add-row' },
         el('button', { type: 'button', onclick: () => { card.weapons.push(blankWeapon('ranged')); rerender(); focusLast('.ed-wname'); } }, '＋ 新增武器'),
@@ -323,7 +338,7 @@
   function weaponRows(w, opts) {
     const type = WTYPES[w.type] ? w.type : 'ranged';
     const ctrl = (extra) => {
-      const btns = [...(extra || [])];
+      const btns = [...(extra || []), ...(opts.extra || [])];
       if (opts.onSaveLib) btns.push(el('button', { type: 'button', title: '把這把武器存進共用武器庫（依卡片的系列、陣營、子陣營分類）', onclick: opts.onSaveLib }, '存入武器庫'));
       if (opts.onDelete) btns.push(el('button', { type: 'button', title: '刪除這把武器', 'aria-label': '刪除這把武器', onclick: opts.onDelete }, '×'));
       return btns.length ? el('span', { class: 'ctrl' }, btns) : null;
@@ -368,9 +383,13 @@
     const nameCell = el('td', { class: 'row-ctrl-anchor' }, iconPicker(w, opts.rerender), ' ',
       editable(w.name, (v) => { w.name = v; }, { class: 'wname ed-wname', ph: '武器名稱 English' }), ' ',
       editable(w.rules, (v) => { w.rules = v; }, { class: 'wrules', ph: '武器特規' }));
-    return [el('tr', null, nameCell,
+    const row = el('tr', null, nameCell,
       numCell(w, 'RNG', melee ? 'CC1' : '24'), numCell(w, 'STR', melee ? '+6' : '6'), numCell(w, 'D', '1'),
-      numCell(w, 'AS', melee ? '+0' : '2'), numCell(w, 'RL', '-', ctrl()))];
+      numCell(w, 'AS', melee ? '+0' : '2'), numCell(w, 'RL', '-', ctrl()));
+    // 有說明的武器（例：西瑟隆聖盾）下面多一列說明
+    if (text(w.text)) return [row, el('tr', { class: 'eq-desc' }, el('td', { colspan: '6' },
+      editable(w.text, (v) => { w.text = v; }, { tag: 'div', class: 'eq-text', ph: '武器說明' })))];
+    return [row];
   }
   // 近戰 STR 顯示成 合計(+X)
   function meleeStr(s, result) {

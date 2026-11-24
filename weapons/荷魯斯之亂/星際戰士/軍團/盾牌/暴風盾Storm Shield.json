@@ -2,7 +2,7 @@
   "type": "shield",
   "name": "暴風盾Storm Shield",
   "rules": "能量力場、重裝、盾牆",
-  "RNG": "1",
+  "RNG": "CC1",
   "STR": "+8",
   "D": "1",
   "AS": "+0",

@@ -1,0 +1,332 @@
+{
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "黑暗天使",
+  "category": "菁英",
+  "name": "恐翼謀殺者小隊Dreadwing Interemptor Squad",
+  "profiles": [
+    {
+      "name": "",
+      "keywords": "人類帝國(30K)、阿斯塔特、黑暗天使、恐翼、步兵、生物、堅毅、反擊1、獨行",
+      "stats": {
+        "M": "7",
+        "STR": "6",
+        "FS": "4",
+        "BS": "4",
+        "CON": "4",
+        "AGI": "4",
+        "PER": "4",
+        "INT": "4",
+        "WP": "5(6)",
+        "DEF": "11",
+        "HP": "2",
+        "WT": "3"
+      }
+    }
+  ],
+  "composition": [
+    "1個謀殺者指揮[領導(Lv1)]配備：電漿灼燒槍、爆彈手槍、近戰武器、破片手榴彈、穿甲手榴彈",
+    "4個謀殺者配備：電漿灼燒槍、爆彈手槍、近戰武器、破片手榴彈、穿甲手榴彈"
+  ],
+  "abilities": [
+    {
+      "text": "爆彈訓練、戰爭準則、六翼星芒"
+    }
+  ],
+  "weapons": [
+    {
+      "type": "ranged",
+      "name": "電漿灼燒槍Plasma burner",
+      "rules": "噴射、能量、突擊",
+      "RNG": "",
+      "STR": "",
+      "D": "",
+      "AS": "",
+      "RL": "",
+      "modes": [
+        {
+          "icon": "mode",
+          "name": "標準火力Standard Fire",
+          "rules": "燃燒1",
+          "RNG": "12",
+          "STR": "12",
+          "D": "1",
+          "AS": "D6",
+          "RL": "-"
+        },
+        {
+          "icon": "mode",
+          "name": "最大火力Maximal Fire",
+          "rules": "燃燒1、過熱2",
+          "RNG": "12",
+          "STR": "14",
+          "D": "2",
+          "AS": "D6",
+          "RL": "1"
+        }
+      ]
+    },
+    {
+      "type": "ranged",
+      "name": "爆彈手槍Bolt Pistol",
+      "rules": "爆彈、手槍、半自動",
+      "RNG": "12",
+      "STR": "8",
+      "D": "1",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "近戰武器Melee Weapon",
+      "rules": "",
+      "RNG": "CC1",
+      "STR": "+2",
+      "D": "1",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "grenade",
+      "name": "破片手榴彈Frag grenade",
+      "rules": "HE3”",
+      "RNG": "8",
+      "STR": "7/7",
+      "D": "2/1",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "grenade",
+      "name": "穿甲手榴彈Krak grenade",
+      "rules": "HEAT 2”",
+      "RNG": "8",
+      "STR": "12/4",
+      "D": "2",
+      "AS": "1",
+      "RL": "-"
+    }
+  ],
+  "optionWeapons": [],
+  "options": [
+    {
+      "text": "此單位可以最多增加5個[謀殺者]",
+      "pts": "每個210pts",
+      "sub": false
+    },
+    {
+      "text": "最多1個[死翼伴衛]可以配備一個以下選項：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "軍團戰旗",
+      "pts": "50pts",
+      "sub": true
+    },
+    {
+      "text": "每個配備[爆彈槍]的模型可以選擇一個以下選項：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "刺刀",
+      "pts": "每個10pts",
+      "sub": true
+    },
+    {
+      "text": "鏈鋸刺刀",
+      "pts": "每個20pts",
+      "sub": true
+    },
+    {
+      "text": "此單位內每個模型都可以配備[熱熔炸彈]",
+      "pts": "每個50pts",
+      "sub": false
+    },
+    {
+      "text": "此單位內每個模型都可以將[爆彈槍]替換成一個以下選項：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "組合爆燃突擊銃",
+      "pts": "30pts",
+      "sub": true
+    },
+    {
+      "text": "組合火焰槍",
+      "pts": "50pts",
+      "sub": true
+    },
+    {
+      "text": "組合電漿槍",
+      "pts": "100pts",
+      "sub": true
+    },
+    {
+      "text": "組合熱熔槍",
+      "pts": "100pts",
+      "sub": true
+    },
+    {
+      "text": "[士官]可以將[爆彈手槍]替換成一個以下選項：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "手持火焰槍",
+      "pts": "20pts",
+      "sub": true
+    },
+    {
+      "text": "爆燃手槍",
+      "pts": "30pts",
+      "sub": true
+    },
+    {
+      "text": "電漿手槍",
+      "pts": "50pts",
+      "sub": true
+    },
+    {
+      "text": "[士官]可以配備一個以下選項：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "鏈鋸劍",
+      "pts": "25pts",
+      "sub": true
+    },
+    {
+      "text": "動力武器",
+      "pts": "50pts",
+      "sub": true
+    },
+    {
+      "text": "閃電爪",
+      "pts": "30pts",
+      "sub": true
+    }
+  ],
+  "result": {
+    "total": 1075,
+    "steps": [
+      {
+        "label": "武器：電漿灼燒槍Plasma burner ▶標準火力Standard Fire",
+        "calc": "RNG 12、STR 12、D 1、AS 6 × 0.8、無須裝填 ×1；規則 燃燒1 +0.2×1",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(26.8 + 0) × 1 × 0.6 × 1.2 × 4.8 × 1 × 1 = 92.62 → 取整",
+        "value": 95
+      },
+      {
+        "label": "武器：電漿灼燒槍Plasma burner ▶最大火力Maximal Fire",
+        "calc": "RNG 12、STR 14、D 2、AS 6 × 0.8、正常裝填 ×0.8；規則 燃燒1 +0.2×1、過熱2 −0.1×2",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(36.8 + 0) × 1.3 × 0.6 × 1 × 4.8 × 0.8 × 1 = 110.22 → 取整",
+        "value": 110
+      },
+      {
+        "label": "　電漿灼燒槍Plasma burner 合計",
+        "calc": "射擊取最高 110",
+        "value": 110
+      },
+      {
+        "label": "武器：爆彈手槍Bolt Pistol",
+        "calc": "RNG 12、STR 8、D 1、AS ×1、無須裝填 ×1；規則 爆彈 +0.1、手槍 +0.5、半自動 +0.2",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(11.6 + 0) × 1 × 0.6 × 1.8 × 1 × 1 × 1 = 12.53 → 取整",
+        "value": 15
+      },
+      {
+        "label": "武器：近戰武器Melee Weapon（近戰）",
+        "calc": "CC1、STR +2（查 STR 3）、D 1、AS 一般 ×1；規則 無",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(1.6 + 0) × 2 × 1 × 1 × 1 × 1 × 1 = 3.2 → 取整",
+        "value": 5
+      },
+      {
+        "label": "武器：破片手榴彈Frag grenade（手榴彈）",
+        "calc": "RNG 8、STR 7/7、D 2/1、AS ×1、無須裝填 ×1；規則 無；修正 手榴彈（類型） ×0.2",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(8.8 + 0) × 1.3 × 0.4 × 1 × 1 × 1 × 0.2；爆炸 (8.8 + 0) × 1 × 0.4 × 1 × 3\" × 1 × 1 × 0.2 = 2.11，×0.5 = 1.97 → 取整",
+        "value": 0
+      },
+      {
+        "label": "武器：穿甲手榴彈Krak grenade（手榴彈）",
+        "calc": "RNG 8、STR 12/4、D 2、AS ×1、無須裝填 ×1；規則 無；修正 手榴彈（類型） ×0.2",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(26.8 + 0) × 1.3 × 0.4 × 1 × 1 × 1 × 0.2 = 2.79 → 取整",
+        "value": 5
+      },
+      {
+        "label": "本體基數總和",
+        "calc": "STR6=6.4 + FS4=1.6 + BS4=1.6 + CON4=1.6 + AGI4=1.6 + PER4=1.6 + INT4=1.6 + WP5=3.2 + DEF11=11.6",
+        "value": 30.8
+      },
+      {
+        "label": "血量加乘",
+        "calc": "1 + (2 − 1) × 0.3",
+        "value": 1.3
+      },
+      {
+        "label": "速度加乘",
+        "calc": "1 + 7 × 0.05",
+        "value": 1.35
+      },
+      {
+        "label": "本體特規加成",
+        "calc": "1 + (英勇（阿斯塔特） +0.2、反擊1 +0.1×1)",
+        "value": 1.3
+      },
+      {
+        "label": "本體分數",
+        "calc": "30.8 × 1.3 × 1.35 × 1.3",
+        "value": 70.27
+      },
+      {
+        "label": "額外加成：先進視覺(24\")（阿斯塔特）",
+        "calc": "X = 24 − 6 = 18；0.6 × 18（部隊）",
+        "value": 10.8
+      },
+      {
+        "label": "每個模型",
+        "calc": "本體 70.27 + 額外 10.8 + 武器 135",
+        "value": "216.07 → 215"
+      },
+      {
+        "label": "模型數",
+        "calc": "依單位構成：5 個；215 × 5",
+        "value": 1075
+      },
+      {
+        "label": "總分",
+        "calc": "1075",
+        "value": 1075
+      }
+    ],
+    "warnings": [
+      "穿甲手榴彈Krak grenade：STR 有兩個值但沒有 HE／HEAT 半徑"
+    ]
+  },
+  "savedAt": "2026-11-24T16:00:00.000Z"
+}

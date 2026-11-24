@@ -1,0 +1,301 @@
+{
+  "series": "戰鎚40000",
+  "faction": "星際戰士",
+  "subfaction": "戰團",
+  "category": "戰線",
+  "name": "重型仲裁者小隊 Heavy Intercessor Squad",
+  "profiles": [
+    {
+      "name": "",
+      "keywords": "人類帝國(40k)、阿斯塔特、戰團、步兵、生物、戰線",
+      "stats": {
+        "M": "6",
+        "STR": "7",
+        "FS": "4",
+        "BS": "4",
+        "CON": "5",
+        "AGI": "4",
+        "PER": "4",
+        "INT": "4",
+        "WP": "4(5)",
+        "DEF": "13",
+        "HP": "3",
+        "WT": "4"
+      }
+    }
+  ],
+  "composition": [
+    "1個士官[領導(Lv1)]配備：重型爆彈步槍、爆彈手槍、戰鬥刀、破片手榴彈、穿甲手榴彈",
+    "4個重型仲裁者配備：重型爆彈步槍、爆彈手槍、戰鬥刀、破片手榴彈、穿甲手榴彈"
+  ],
+  "abilities": [
+    {
+      "text": "爆彈訓練、戰鬥教條"
+    }
+  ],
+  "weapons": [
+    {
+      "type": "ranged",
+      "name": "重型爆彈步槍Heavy Bolt Rifle",
+      "rules": "爆彈、速射",
+      "RNG": "36",
+      "STR": "10",
+      "D": "1",
+      "AS": "1/2",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "爆彈手槍Bolt Pistol",
+      "rules": "爆彈、手槍、半自動",
+      "RNG": "12",
+      "STR": "8",
+      "D": "1",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "戰鬥刀Combat Knife",
+      "rules": "",
+      "RNG": "CC1",
+      "STR": "+2",
+      "D": "1",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "grenade",
+      "name": "破片手榴彈Frag grenade",
+      "rules": "HE3”",
+      "RNG": "8",
+      "STR": "7/7",
+      "D": "2/1",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "grenade",
+      "name": "穿甲手榴彈Krak grenade",
+      "rules": "HEAT 2”",
+      "RNG": "8",
+      "STR": "12/4",
+      "D": "2",
+      "AS": "1",
+      "RL": "-"
+    }
+  ],
+  "optionWeapons": [
+    {
+      "type": "ranged",
+      "name": "地獄風暴爆彈步槍Hellstorm Bolt Rifle",
+      "rules": "爆彈、突擊",
+      "RNG": "30",
+      "STR": "9",
+      "D": "1",
+      "AS": "3",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "處決者爆彈步槍Executor Bolt Rifle",
+      "rules": "爆彈、重刑、光學",
+      "RNG": "36(6-42)",
+      "STR": "11",
+      "D": "2",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "重型爆彈槍Heavy Bolter",
+      "rules": "爆彈、重型",
+      "RNG": "36",
+      "STR": "10",
+      "D": "2",
+      "AS": "4",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "處決者重型爆彈槍Executor Heavy Bolter",
+      "rules": "爆彈、重型",
+      "RNG": "42",
+      "STR": "11",
+      "D": "3",
+      "AS": "2",
+      "RL": "-"
+    }
+  ],
+  "options": [
+    {
+      "text": "此單位可以最多增加5個[仲裁者]",
+      "pts": "每個200pts",
+      "sub": false
+    },
+    {
+      "text": "[士官]可以將[爆彈手槍]替換成一個以下選項：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "手持火焰槍",
+      "pts": "20pts",
+      "sub": true
+    },
+    {
+      "text": "電漿手槍",
+      "pts": "50pts",
+      "sub": true
+    },
+    {
+      "text": "重力手槍",
+      "pts": "50pts",
+      "sub": true
+    },
+    {
+      "text": "[士官]可以配備一個以下選項：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "鏈鋸劍",
+      "pts": "25pts",
+      "sub": true
+    },
+    {
+      "text": "動力武器",
+      "pts": "50pts",
+      "sub": true
+    },
+    {
+      "text": "閃電爪",
+      "pts": "50pts",
+      "sub": true
+    },
+    {
+      "text": "動力拳套",
+      "pts": "100pts",
+      "sub": true
+    },
+    {
+      "text": "[士官]可以配備[熱熔炸彈]",
+      "pts": "50pts",
+      "sub": false
+    },
+    {
+      "text": "此單位每有5個模型，1個[仲裁者]可以選擇一個以下選項：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "阿斯塔特榴彈發射器",
+      "pts": "50pts",
+      "sub": true
+    }
+  ],
+  "result": {
+    "total": 925,
+    "steps": [
+      {
+        "label": "武器：重型爆彈步槍Heavy Bolt Rifle",
+        "calc": "RNG 36、STR 10、D 1、AS ×1.5、無須裝填 ×1；規則 爆彈 +0.1、速射 −0.1",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(18.4 + 0) × 1 × 1.8 × 1 × 1.5 × 1 × 1 = 49.68 → 取整",
+        "value": 50
+      },
+      {
+        "label": "武器：爆彈手槍Bolt Pistol",
+        "calc": "RNG 12、STR 8、D 1、AS ×1、無須裝填 ×1；規則 爆彈 +0.1、手槍 +0.5、半自動 +0.2",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(11.6 + 0) × 1 × 0.6 × 1.8 × 1 × 1 × 1 = 12.53 → 取整",
+        "value": 15
+      },
+      {
+        "label": "武器：戰鬥刀Combat Knife（近戰）",
+        "calc": "CC1、STR +2（查 STR 3）、D 1、AS 一般 ×1；規則 無",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(1.6 + 0) × 2 × 1 × 1 × 1 × 1 × 1 = 3.2 → 取整",
+        "value": 5
+      },
+      {
+        "label": "武器：破片手榴彈Frag grenade（手榴彈）",
+        "calc": "RNG 8、STR 7/7、D 2/1、AS ×1、無須裝填 ×1；規則 無；修正 手榴彈（類型） ×0.2",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(8.8 + 0) × 1.3 × 0.4 × 1 × 1 × 1 × 0.2；爆炸 (8.8 + 0) × 1 × 0.4 × 1 × 3\" × 1 × 1 × 0.2 = 2.11，×0.5 = 1.97 → 取整",
+        "value": 0
+      },
+      {
+        "label": "武器：穿甲手榴彈Krak grenade（手榴彈）",
+        "calc": "RNG 8、STR 12/4、D 2、AS ×1、無須裝填 ×1；規則 無；修正 手榴彈（類型） ×0.2",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(26.8 + 0) × 1.3 × 0.4 × 1 × 1 × 1 × 0.2 = 2.79 → 取整",
+        "value": 5
+      },
+      {
+        "label": "本體基數總和",
+        "calc": "STR7=8.8 + FS4=1.6 + BS4=1.6 + CON5=3.2 + AGI4=1.6 + PER4=1.6 + INT4=1.6 + WP4=1.6 + DEF13=18.4",
+        "value": 40
+      },
+      {
+        "label": "血量加乘",
+        "calc": "1 + (3 − 1) × 0.3",
+        "value": 1.6
+      },
+      {
+        "label": "速度加乘",
+        "calc": "1 + 6 × 0.05",
+        "value": 1.3
+      },
+      {
+        "label": "本體特規加成",
+        "calc": "1 + (英勇（阿斯塔特） +0.2)",
+        "value": 1.2
+      },
+      {
+        "label": "本體分數",
+        "calc": "40 × 1.6 × 1.3 × 1.2",
+        "value": 99.84
+      },
+      {
+        "label": "額外加成：先進視覺(24\")（阿斯塔特）",
+        "calc": "X = 24 − 6 = 18；0.6 × 18（部隊）",
+        "value": 10.8
+      },
+      {
+        "label": "每個模型",
+        "calc": "本體 99.84 + 額外 10.8 + 武器 75",
+        "value": "185.64 → 185"
+      },
+      {
+        "label": "模型數",
+        "calc": "依單位構成：5 個；185 × 5",
+        "value": 925
+      },
+      {
+        "label": "總分",
+        "calc": "925",
+        "value": 925
+      }
+    ],
+    "warnings": [
+      "穿甲手榴彈Krak grenade：STR 有兩個值但沒有 HE／HEAT 半徑"
+    ]
+  },
+  "savedAt": "2026-11-24T16:00:00.000Z"
+}

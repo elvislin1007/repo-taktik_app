@@ -2,7 +2,7 @@
   "type": "melee",
   "name": "凱索蘭動力斧Carsoran Power Axe",
   "rules": "能量力場、✶穿甲1",
-  "RNG": "1",
+  "RNG": "CC1",
   "STR": "+6",
   "D": "1",
   "AS": "+0",

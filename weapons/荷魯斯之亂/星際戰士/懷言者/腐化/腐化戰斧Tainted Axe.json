@@ -2,7 +2,7 @@
   "type": "melee",
   "name": "腐化戰斧Tainted Axe",
   "rules": "後攻1、✶致命",
-  "RNG": "1",
+  "RNG": "CC1",
   "STR": "+7",
   "D": "1",
   "AS": "+0",
