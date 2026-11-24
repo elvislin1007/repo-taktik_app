@@ -53,6 +53,6 @@
 .card .wg .mode-icon { height: calc(6px * var(--s)); vertical-align: 0; margin-right: 1px; }
 
 /* 玩家端：查得到的關鍵字＝藍字＋虛線底線，點了跳出說明 */
-.card .kwlink { all: unset; color: #1F6FC5; text-decoration: underline dashed #1F6FC5; text-decoration-thickness: 2px; text-underline-offset: 3px; text-decoration-skip-ink: none; cursor: pointer; }
-.card .kwlink:hover { text-decoration-style: solid; background: rgba(31,111,197,.12); }
+.card .kwlink { all: unset; display: inline; color: #1F6FC5; border-bottom: 1.5px dashed #1F6FC5; padding-bottom: 0; line-height: inherit; cursor: pointer; -webkit-tap-highlight-color: rgba(31,111,197,.2); }
+.card .kwlink:hover { border-bottom-style: solid; background: rgba(31,111,197,.12); }
 .card .kwlink:focus-visible { outline: 2px solid var(--c-blue); outline-offset: 1px; border-radius: 2px; }
