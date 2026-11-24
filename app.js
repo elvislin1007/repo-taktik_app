@@ -617,6 +617,7 @@
       }
       state.savedPath = path;
       rememberSeries(state.series);
+      knownKeys = null;
       saveDraft();
       msg.replaceChildren(`已${res.created ? '新增' : '更新'}到 repo：${path}${moved} `,
         res.commitUrl ? el('a', { href: res.commitUrl, target: '_blank', rel: 'noopener' }, '看這次 commit') : '');
@@ -731,6 +732,7 @@
     try {
       const res = await R.saveFile(path, item, `武器庫：${text(w.name)}（${item.series}／${item.faction}／${item.subfaction}）`);
       libItems = null; // 下次開啟重新讀
+      knownKeys = null;
       libMsg(`已${res.created ? '存入' : '更新'}武器庫：${item.series} › ${item.faction} › ${item.subfaction} › ${category} › ${text(w.name)}`, 'ok');
     } catch (e) {
       libMsg(`存入失敗：${e.message}`, 'err');
@@ -900,6 +902,7 @@
       wstate.editingPath = path;
       wstate.w = copyWeapon(item, false);
       rememberSeries(item.series);
+      knownKeys = null;
       msg.replaceChildren(`已${res.created ? '新增' : '更新'}：${path}${moved} `,
         res.commitUrl ? el('a', { href: res.commitUrl, target: '_blank', rel: 'noopener' }, '看這次 commit') : '');
       msg.className = 'save-msg ok';
@@ -959,6 +962,54 @@
   document.getElementById('wl-cat').addEventListener('change', (e) => { wlCat = e.target.value; renderWList(); });
   document.getElementById('wl-q').addEventListener('input', renderWList);
   document.getElementById('wl-reload').addEventListener('click', async () => { await loadLib(true, 'wl-status'); renderWList(); });
+
+
+  // ---------- 系列／陣營／子陣營：可以打字，也可以按 ▾ 從已有的選（避免錯字）----------
+  let knownKeys = null; // [[系列, 陣營, 子陣營]]：已存單位＋已存武器＋武器種類清單
+  async function loadKnownKeys() {
+    if (!cats) await loadCats();
+    if (!libItems) await loadLib(false);
+    let us = [];
+    try { us = await R.loadBundle('units', 'units.json', false); } catch (e) { /* 讀不到就只用武器的 */ }
+    const fromUnits = (us || []).filter((u) => u && u.path).map((u) => {
+      const segs = u.path.replace(/^units\//, '').split('/'); const d = u.data || {};
+      return [d.series || segs[0], d.faction || segs[1], d.subfaction || segs[2]];
+    });
+    knownKeys = [...fromUnits, ...(libItems || []).map((x) => [x.series, x.faction, x.subfaction]),
+      ...Object.keys((cats && cats.weapons) || {}).map((k) => k.split('/'))].map((a) => a.map(text));
+  }
+  function comboValues(level, parents) {
+    const vals = (knownKeys || []).filter((k) => parents.every((p, i) => !text(p) || k[i] === text(p))).map((k) => k[level]).filter(Boolean);
+    return [...new Set(vals)].sort((a, b) => a.localeCompare(b, 'zh-Hant'));
+  }
+  function attachCombo(id, level, getParents) {
+    const input = document.getElementById(id);
+    const box = el('span', { class: 'combo' });
+    input.replaceWith(box);
+    const btn = el('button', { type: 'button', class: 'combo-btn', title: '從已有的選', 'aria-label': '從已有的選', 'aria-haspopup': 'listbox' }, '▾');
+    box.append(input, btn);
+    let menu = null;
+    const close = () => { if (menu) { menu.remove(); menu = null; document.removeEventListener('mousedown', outside); } };
+    const outside = (e) => { if (!box.contains(e.target)) close(); };
+    btn.addEventListener('click', async () => {
+      if (menu) return close();
+      if (!knownKeys) { btn.disabled = true; try { await loadKnownKeys(); } finally { btn.disabled = false; } }
+      const vals = comboValues(level, getParents());
+      const cur = text(input.value);
+      menu = el('div', { class: 'icon-menu combo-menu', role: 'listbox' },
+        vals.length ? vals.map((v) => el('button', { type: 'button', role: 'option', 'aria-selected': String(v === cur),
+          onclick: () => { input.value = v; input.dispatchEvent(new Event('input')); close(); input.focus(); } }, v))
+          : el('div', { class: 'combo-empty' }, '還沒有已存的，直接輸入'));
+      box.append(menu);
+      document.addEventListener('mousedown', outside);
+    });
+  }
+  attachCombo('in-series', 0, () => []);
+  attachCombo('in-faction', 1, () => [state.series]);
+  attachCombo('in-subfaction', 2, () => [state.series, state.faction]);
+  attachCombo('w-series', 0, () => []);
+  attachCombo('w-faction', 1, () => [wstate && wstate.series]);
+  attachCombo('w-sub', 2, () => [wstate && wstate.series, wstate && wstate.faction]);
 
   // ---------- GitHub 設定 ----------
   const dlg = document.getElementById('dlg-settings');
