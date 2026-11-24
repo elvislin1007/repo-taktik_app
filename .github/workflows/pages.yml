@@ -21,7 +21,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: 打包 units.json（單位）和 weapons.json（共用武器庫），網頁讀這兩個檔，不用權杖
         run: |
           python3 - <<'PY'
@@ -47,7 +47,7 @@ jobs:
           sed -i "s/__BUILD__/${GITHUB_SHA}/g" app.js index.html player/index.html
           grep -c "${GITHUB_SHA}" app.js index.html player/index.html
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: .
       - id: deployment
