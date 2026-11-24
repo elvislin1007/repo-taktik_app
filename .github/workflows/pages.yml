@@ -46,9 +46,9 @@ jobs:
           echo "{\"build\": \"${GITHUB_SHA}\"}" > version.json
           sed -i "s/__BUILD__/${GITHUB_SHA}/g" app.js index.html player/index.html
           grep -c "${GITHUB_SHA}" app.js index.html player/index.html
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v4
         with:
           path: .
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
