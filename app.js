@@ -458,7 +458,13 @@
   }
   const subKey = (s, f, sf) => [s, f, sf].map(text).join('/');
   const unitCats = () => (cats ? cats.units : CAT_DEFAULT.units);
-  const weaponCats = (s, f, sf) => (cats && cats.weapons[subKey(s, f, sf)]) || [];
+  // 武器種類清單＝categories.json 裡的＋已存武器實際用到的（下面清單有的，上面一定有）
+  const weaponCats = (s, f, sf) => {
+    const key = subKey(s, f, sf);
+    const base = (cats && cats.weapons[key]) || [];
+    const used = (libItems || []).filter((x) => x.category && subKey(x.series, x.faction, x.subfaction) === key).map((x) => x.category);
+    return [...base, ...[...new Set(used)].filter((c) => !base.includes(c)).sort((a, b) => a.localeCompare(b, 'zh-Hant'))];
+  };
   // 依清單順序排（不在清單的排後面，照筆畫）
   const catOrder = (list) => (a, b) => {
     const i = list.indexOf(a), j = list.indexOf(b);
@@ -834,7 +840,18 @@
   // 格式和資料卡的武器列一樣；保存到 weapons/<系列>/<陣營>/<武器名稱>.json
   let wstate = null; // { series, faction, subfaction, category, w, editingPath }
   const blankWState = () => ({ series: text(state.series) || lastSeries(), faction: '', subfaction: '', category: '', w: blankWeapon('ranged'), editingPath: null });
+  // 系列／陣營／子陣營輸入框的候選名稱（已存武器＋清單裡有的），避免打錯字（例：錘／鎚）就對不上
+  function fillWDatalists() {
+    const keys = [...(libItems || []).map((x) => [x.series, x.faction, x.subfaction]),
+      ...Object.keys((cats && cats.weapons) || {}).map((k) => k.split('/'))].map((a) => a.map(text));
+    const put = (id, vals) => { const dl = document.getElementById(id); if (dl) dl.replaceChildren(...[...new Set(vals.filter(Boolean))].sort((a, b) => a.localeCompare(b, 'zh-Hant')).map((v) => el('option', { value: v }))); };
+    put('dl-w-series', keys.map((k) => k[0]));
+    put('dl-w-faction', keys.filter((k) => !text(wstate.series) || k[0] === text(wstate.series)).map((k) => k[1]));
+    put('dl-w-sub', keys.filter((k) => (!text(wstate.series) || k[0] === text(wstate.series)) && (!text(wstate.faction) || k[1] === text(wstate.faction))).map((k) => k[2]));
+  }
   function renderWCat() {
+    if (!wstate) return;
+    fillWDatalists();
     fillCatSelect(document.getElementById('w-cat'), weaponCatOpt(wstate.series, wstate.faction, wstate.subfaction, wstate.category,
       (v) => { wstate.category = v; }, () => wstate.category));
   }
@@ -897,6 +914,7 @@
   // 已存的武器：系列／陣營篩選＋搜尋，每把都能「編輯」
   let wlSeries = '', wlFaction = '', wlSub = '', wlCat = '';
   function renderWList() {
+    renderWCat(); // 武器庫讀進來後，上面的武器種類也要更新
     const items = libItems || [];
     const uniq = (a) => [...new Set(a)].sort((x, y) => x.localeCompare(y, 'zh-Hant'));
     wlSeries = fillSelect(document.getElementById('wl-series'), uniq(items.map((x) => x.series).filter(Boolean)), wlSeries);
