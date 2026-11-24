@@ -282,6 +282,22 @@
   const blankMode = () => ({ icon: 'mode', name: '', rules: '', RNG: '', STR: '', D: '', AS: '', RL: '-' });
   // 功能列的圖示：▶（看 RNG 判斷射擊／近戰）或直接選射擊、近戰、手榴彈（計分照圖示）
   const MODE_ICONS = { mode: { label: '▶ 箭頭（看 RNG）', icon: 'icons/mode.png' }, ranged: WTYPES.ranged, melee: WTYPES.melee, grenade: WTYPES.grenade };
+  // 圖示選單浮在整個畫面上（手機上卡片區是可以左右捲的框，放在框裡會被切掉）
+  function floatMenu(menu, btn, close) {
+    const r = btn.getBoundingClientRect();
+    Object.assign(menu.style, { position: 'fixed', top: '0px', left: '0px', zIndex: 1000, maxHeight: '70vh', overflowY: 'auto' });
+    const mw = menu.offsetWidth, mh = menu.offsetHeight;
+    const vw = document.documentElement.clientWidth, vh = window.innerHeight;
+    let left = Math.min(Math.max(8, r.left), vw - mw - 8);
+    let top = r.bottom + 2;
+    if (top + mh > vh - 8 && r.top - mh - 2 > 8) top = r.top - mh - 2;
+    menu.style.left = Math.max(8, left) + 'px';
+    menu.style.top = Math.max(8, top) + 'px';
+    const onMove = (e) => { if (!menu.contains(e.target)) close(); };
+    window.addEventListener('scroll', onMove, true);
+    window.addEventListener('resize', close);
+    menu._unfloat = () => { window.removeEventListener('scroll', onMove, true); window.removeEventListener('resize', close); };
+  }
   function modeIconPicker(m, onPick) {
     const box = el('span', { class: 'icon-pick' });
     const key = MODE_ICONS[m.icon] ? m.icon : 'mode';
@@ -289,7 +305,7 @@
     const btn = el('button', { type: 'button', title: '選擇這個功能的圖示', 'aria-haspopup': 'listbox', 'aria-label': `功能圖示：${cur.label}` },
       el('img', { class: 'icon' + (key === 'mode' ? ' mode-icon' : ''), src: cur.icon, alt: cur.label }));
     let menu = null;
-    const close = () => { if (menu) { menu.remove(); menu = null; document.removeEventListener('mousedown', outside); } };
+    const close = () => { if (menu) { if (menu._unfloat) menu._unfloat(); menu.remove(); menu = null; document.removeEventListener('pointerdown', outside); } };
     const outside = (e) => { if (!box.contains(e.target)) close(); };
     btn.addEventListener('click', () => {
       if (menu) return close();
@@ -297,7 +313,8 @@
         el('button', { type: 'button', role: 'option', 'aria-selected': String(k === key), onclick: () => { close(); if (k !== key) { m.icon = k; saveDraft(); onPick(); } } },
           el('img', { class: 'icon', src: t.icon, alt: '' }), t.label)));
       box.append(menu);
-      document.addEventListener('mousedown', outside);
+      floatMenu(menu, btn, close);
+      document.addEventListener('pointerdown', outside);
     });
     box.append(btn);
     return box;
@@ -358,7 +375,7 @@
     const btn = el('button', { type: 'button', title: '選擇武器類型', 'aria-haspopup': 'listbox', 'aria-label': `武器類型：${cur.label}` },
       el('img', { class: 'icon', src: cur.icon, alt: cur.label }));
     let menu = null;
-    const close = () => { if (menu) { menu.remove(); menu = null; document.removeEventListener('mousedown', outside); } };
+    const close = () => { if (menu) { if (menu._unfloat) menu._unfloat(); menu.remove(); menu = null; document.removeEventListener('pointerdown', outside); } };
     const outside = (e) => { if (!box.contains(e.target)) close(); };
     btn.addEventListener('click', () => {
       if (menu) return close();
@@ -370,7 +387,8 @@
           isComposite(w) ? `複合武器：改功能數（目前 ${w.modes.length}）…` : '複合武器：設定幾種功能…'),
         isComposite(w) ? el('button', { type: 'button', class: 'icon-menu-extra', onclick: () => { close(); if (makeSingle(w)) onPick(); } }, '改回單一武器') : null);
       box.append(menu);
-      document.addEventListener('mousedown', outside);
+      floatMenu(menu, btn, close);
+      document.addEventListener('pointerdown', outside);
     });
     box.append(btn);
     return box;
@@ -987,7 +1005,7 @@
     const btn = el('button', { type: 'button', class: 'combo-btn', title: '從已有的選', 'aria-label': '從已有的選', 'aria-haspopup': 'listbox' }, '▾');
     box.append(input, btn);
     let menu = null;
-    const close = () => { if (menu) { menu.remove(); menu = null; document.removeEventListener('mousedown', outside); } };
+    const close = () => { if (menu) { if (menu._unfloat) menu._unfloat(); menu.remove(); menu = null; document.removeEventListener('pointerdown', outside); } };
     const outside = (e) => { if (!box.contains(e.target)) close(); };
     btn.addEventListener('click', async () => {
       if (menu) return close();
@@ -999,7 +1017,7 @@
           onclick: () => { input.value = v; input.dispatchEvent(new Event('input')); close(); input.focus(); } }, v))
           : el('div', { class: 'combo-empty' }, '還沒有已存的，直接輸入'));
       box.append(menu);
-      document.addEventListener('mousedown', outside);
+      document.addEventListener('pointerdown', outside);
     });
   }
   attachCombo('in-series', 0, () => []);
