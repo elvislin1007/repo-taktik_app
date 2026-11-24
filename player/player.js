@@ -39,6 +39,7 @@
     const card = CARD.normalize(data);
     const name = text(card.name) || file;
     const total = data && data.result && data.result.total != null ? data.result.total : null;
+    const category = text(data && data.category) || (segs.length > 3 ? segs[3] : '');
     const hay = [
       name, segs.join(' '),
       ...card.profiles.map((p) => `${p.name} ${p.keywords}`),
@@ -47,7 +48,7 @@
       ...card.weapons.map((w) => `${w.name} ${w.rules} ${(w.modes || []).map((m) => `${m.name} ${m.rules}`).join(' ')}`),
     ].join(' ').toLowerCase();
     const keywords = [...new Set(card.profiles.map((p) => C.clean(p.keywords)).filter(Boolean))].join('／');
-    return { path, segs, data, name, total, hay, keywords };
+    return { path, segs, data, name, total, hay, keywords, category };
   }
   function useBundle(b) {
     units = (b && Array.isArray(b.units) ? b.units : []).filter((u) => u && u.path && u.data).map((u) => toUnit(u.path, u.data));
@@ -69,8 +70,20 @@
     return { generatedAt: new Date().toISOString(), units: out };
   }
 
+  // 類別（HQ、戰線、菁英…）的順序：編輯器存在 categories.json，玩家端照這個順序排
+  const CAT_FALLBACK = ['HQ', '戰線', '菁英', '快攻', '重火力', '專用運輸', '飛行器', '領主級', '工事'];
+  let catList = store.get('taktik-cats-v1', CAT_FALLBACK);
+  async function loadCats() {
+    try {
+      const r = await fetch('../categories.json', { cache: 'no-cache' });
+      if (r.ok) { const j = await r.json(); if (Array.isArray(j.units)) { catList = j.units; store.set('taktik-cats-v1', catList); } }
+    } catch (e) { /* 用上次的或預設 */ }
+  }
+  const catIndex = (c) => { const i = catList.indexOf(c); return i < 0 ? catList.length + (c ? 0 : 1) : i; };
+
   async function sync() {
     status = 'loading'; statusMsg = '讀取單位資料…'; render();
+    loadCats().then(() => { if (status !== 'loading') render(); });
     try {
       let bundle;
       const r = await fetch('../units.json', { cache: 'no-cache' });
@@ -96,7 +109,7 @@
     // 舊網址 #/?p=… 也當成單位圖鑑
     if (route0 === '/units' || (route0 === '/' && query)) {
       const qs = new URLSearchParams(query || '');
-      return { view: 'list', p: (qs.get('p') || '').split('/').filter(Boolean), q: qs.get('q') || '', s: qs.get('s') || 'name' };
+      return { view: 'list', p: (qs.get('p') || '').split('/').filter(Boolean), q: qs.get('q') || '', s: qs.get('s') || 'cat' };
     }
     return { view: 'home' };
   }
@@ -104,11 +117,11 @@
     const qs = new URLSearchParams();
     if (st.p && st.p.length) qs.set('p', st.p.join('/'));
     if (st.q) qs.set('q', st.q);
-    if (st.s && st.s !== 'name') qs.set('s', st.s);
+    if (st.s && st.s !== 'cat') qs.set('s', st.s);
     const s = qs.toString();
     return '#/units' + (s ? '?' + s : '');
   }
-  let listState = { p: [], q: '', s: 'name' };
+  let listState = { p: [], q: '', s: 'cat' };
   function go(hash, replace) {
     if (replace) history.replaceState(null, '', hash);
     else history.pushState(null, '', hash);
@@ -145,6 +158,7 @@
     const sorted = hits.slice();
     if (st.s === 'pts-desc') sorted.sort((a, b) => (b.total ?? -1) - (a.total ?? -1));
     else if (st.s === 'pts-asc') sorted.sort((a, b) => (a.total ?? 1e9) - (b.total ?? 1e9));
+    else if (st.s === 'cat') sorted.sort((a, b) => catIndex(a.category) - catIndex(b.category) || a.category.localeCompare(b.category, 'zh-Hant') || a.name.localeCompare(b.name, 'zh-Hant'));
     else sorted.sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant'));
 
     // 數量／狀態
@@ -162,7 +176,10 @@
       return;
     }
     const ul = el('ul', { class: 'units' });
+    let lastCat = null;
     sorted.forEach((u) => {
+      // 照類別排時，每個類別前面一個小標題（HQ、戰線、菁英…）
+      if (st.s === 'cat' && u.category !== lastCat) { lastCat = u.category; ul.append(el('li', { class: 'cat-head' }, u.category || '未分類')); }
       ul.append(el('li', null, el('a', { class: 'unit-row', href: '#/unit/' + encodeURIComponent(u.path) },
         el('div', { class: 'row-main' },
           el('div', { class: 'row-name' }, u.name),

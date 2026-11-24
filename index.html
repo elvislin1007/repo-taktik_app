@@ -29,6 +29,7 @@
     <label>系列 <select id="wlib-series"></select></label>
     <label>陣營 <select id="wlib-faction"></select></label>
     <label>子陣營 <select id="wlib-sub"></select></label>
+    <label>武器種類 <select id="wlib-cat"></select></label>
     <label class="wlib-q">搜尋 <input id="wlib-q" type="search" placeholder="武器名稱、特規…" autocomplete="off"></label>
   </div>
   <p id="wlib-status" class="dlg-status" role="status"></p>
@@ -39,10 +40,22 @@
   </div>
 </dialog>
 
+<dialog id="dlg-cats" class="cats" aria-labelledby="cats-title">
+  <h2 id="cats-title">管理清單</h2>
+  <p class="dlg-note"><span id="cats-scope"></span>。順序就是圖鑑和武器庫排列的順序。改名或刪除<b>不會</b>搬動已存的檔案：要搬就把單位／武器打開、改選後重新保存。</p>
+  <ul id="cats-list" class="cats-list"></ul>
+  <p id="cats-status" class="dlg-status" role="status"></p>
+  <div class="dlg-actions">
+    <button type="button" id="cats-add">＋ 新增一項</button>
+    <button type="button" id="cats-close">關閉</button>
+    <button type="button" id="cats-save" class="primary">保存清單</button>
+  </div>
+</dialog>
+
 <dialog id="dlg-settings" aria-labelledby="dlg-title">
   <form method="dialog" id="form-settings">
     <h2 id="dlg-title">GitHub 設定</h2>
-    <p class="dlg-note">保存的單位會直接 commit 到這個 repo 的 <code>units/陣營/子陣營/</code>。
+    <p class="dlg-note">保存的單位會直接 commit 到這個 repo 的 <code>units/系列/陣營/子陣營/類別/</code>。
       單位資料是公開的（玩家用「單位圖鑑」不用權杖就能看）；<b>保存</b>需要權杖，權杖只存在這台電腦的瀏覽器裡，只會送給 GitHub。</p>
     <p class="dlg-note">保存位置固定是 <b>elvislin1007/repo-taktik_app</b>（單位在 units/、武器在 weapons/），不用設定。</p>
     <div class="dlg-grid">
@@ -81,7 +94,8 @@
       <label>系列 <input id="in-series" placeholder="例：戰錘40K"></label>
       <label>陣營 <input id="in-faction" placeholder="例：人類帝國(40K)"></label>
       <label>子陣營 <input id="in-subfaction" placeholder="例：極限戰士"></label>
-      <span class="hint">保存時照這三欄分資料夾（必填）：系列／陣營／子陣營。系列會記住上次填的；陣營、子陣營空白時先帶入關鍵字列的前兩個詞</span>
+      <label>類別 <select id="in-category"></select></label>
+      <span class="hint">保存時照這四欄分資料夾（必填）：系列／陣營／子陣營／類別。系列會記住上次填的；陣營、子陣營空白時先帶入關鍵字列的前兩個詞；類別（HQ、戰線…）所有系列共用，下拉最後可以新增或管理清單</span>
     </div>
     <div class="card-zone"><div id="card-edit"></div></div>
     <div class="actions">
@@ -119,7 +133,8 @@
       <label>系列 <input id="w-series" placeholder="例：戰錘40K"></label>
       <label>陣營 <input id="w-faction" placeholder="例：星際戰士"></label>
       <label>子陣營 <input id="w-sub" placeholder="例：戰團"></label>
-      <span class="hint">存到 weapons/系列/陣營/子陣營/武器名稱.json（三欄必填）。近戰 STR 填 +X。</span>
+      <label>武器種類 <select id="w-cat"></select></label>
+      <span class="hint">存到 weapons/系列/陣營/子陣營/武器種類/武器名稱.json（四欄必填）。武器種類每個子陣營各自一份，下拉最後可以新增或管理清單。近戰 STR 填 +X。</span>
     </div>
     <div class="card-zone"><div id="w-edit"></div></div>
     <div class="actions">
@@ -133,6 +148,7 @@
       <label>系列 <select id="wl-series"></select></label>
       <label>陣營 <select id="wl-faction"></select></label>
       <label>子陣營 <select id="wl-sub"></select></label>
+      <label>武器種類 <select id="wl-cat"></select></label>
       <label class="wlib-q">搜尋 <input id="wl-q" type="search" placeholder="武器名稱、特規…" autocomplete="off"></label>
       <button type="button" id="wl-reload" title="包含剛保存、還沒發布的武器">重新讀取</button>
     </div>

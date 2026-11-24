@@ -23,13 +23,13 @@
     s = String(s || '').trim().replace(BAD, '_').replace(/^[ .]+|[ .]+$/g, '');
     return s.slice(0, 80) || fallback;
   }
-  // 單位：units/<系列>/<陣營>/<子陣營>/<單位名稱>.json
+  // 單位：units/<系列>/<陣營>/<子陣營>/<類別>/<單位名稱>.json（類別＝HQ、戰線、菁英…）
   function unitPath(card) {
-    return `units/${safePart(card.series, '未分類')}/${safePart(card.faction, '未分類')}/${safePart(card.subfaction, '未分類')}/${safePart(card.name, '未命名')}.json`;
+    return `units/${safePart(card.series, '未分類')}/${safePart(card.faction, '未分類')}/${safePart(card.subfaction, '未分類')}/${safePart(card.category, '未分類')}/${safePart(card.name, '未命名')}.json`;
   }
-  // 共用武器庫：weapons/<系列>/<陣營>/<子陣營>/<武器名稱>.json
-  function weaponPath(series, faction, subfaction, name) {
-    return `weapons/${safePart(series, '未分類')}/${safePart(faction, '未分類')}/${safePart(subfaction, '未分類')}/${safePart(name, '未命名')}.json`;
+  // 共用武器庫：weapons/<系列>/<陣營>/<子陣營>/<武器種類>/<武器名稱>.json（武器種類＝爆彈、電漿…，每個子陣營自己一份）
+  function weaponPath(series, faction, subfaction, category, name) {
+    return `weapons/${safePart(series, '未分類')}/${safePart(faction, '未分類')}/${safePart(subfaction, '未分類')}/${safePart(category, '未分類')}/${safePart(name, '未命名')}.json`;
   }
   const encPath = (p) => p.split('/').map(encodeURIComponent).join('/');
 

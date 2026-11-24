@@ -164,3 +164,10 @@ button.mini { padding: 1px 10px; font-size: 12.5px; }
 .wlib-list li.current { background: rgba(91, 155, 213, .14); }
 .wlib-list .wl-btns { display: flex; gap: 6px; flex: none; }
 .w-page-list { max-height: none; }
+
+/* 第 4 層分類：類別／武器種類 下拉與管理清單 */
+.classify select { font: inherit; padding: 4px 6px; border: 1px solid var(--panel-border); border-radius: 4px; background: var(--panel-bg); color: var(--page-fg); min-width: 9em; }
+.cats-list { list-style: none; margin: 6px 0; padding: 0; max-height: 50vh; overflow: auto; }
+.cats-list li { display: flex; gap: 6px; align-items: center; padding: 3px 0; }
+.cats-list input { flex: 1; font: inherit; padding: 4px 8px; border: 1px solid var(--panel-border); border-radius: 4px; }
+.cats-list button { min-width: 30px; }

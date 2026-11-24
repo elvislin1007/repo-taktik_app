@@ -36,7 +36,7 @@
   const blankStats = () => Object.fromEntries(STAT_KEYS.map((k) => [k, '']));
   const blankProfile = () => ({ name: '', keywords: '', stats: blankStats() });
   const blankCard = () => ({
-    series: lastSeries(), faction: '', subfaction: '', name: '',
+    series: lastSeries(), faction: '', subfaction: '', category: '', name: '',
     profiles: [blankProfile()],
     composition: [''], abilities: [{ text: '' }],
     weapons: [blankWeapon('ranged')], options: [],
@@ -440,6 +440,127 @@
     if (res.notes.length) box.append(el('div', { class: 'notes' }, el('ul', null, res.notes.map((n) => el('li', null, n)))));
   }
 
+
+  // ---------- 第 4 層分類 ----------
+  // 單位：類別（HQ、戰線、菁英…）所有系列共用一份；武器：武器種類（爆彈、電漿…）每個子陣營各自一份。
+  // 清單存在 repo 根目錄的 categories.json，順序就是玩家端排列的順序；可新增、改名、刪除、調順序。
+  const CAT_PATH = 'categories.json';
+  const CAT_DEFAULT = { units: ['HQ', '戰線', '菁英', '快攻', '重火力', '專用運輸', '飛行器', '領主級', '工事'], weapons: {} };
+  let cats = null;
+  async function loadCats() {
+    let c = null;
+    try { c = await R.loadUnit(CAT_PATH); } catch (e) { // 讀 repo 不行（例如次數用完）就讀網站上發布的
+      try { const r = await fetch(CAT_PATH, { cache: 'no-cache' }); if (r.ok) c = await r.json(); } catch (e2) { /* 用預設 */ }
+    }
+    c = c || JSON.parse(JSON.stringify(CAT_DEFAULT));
+    cats = { units: Array.isArray(c.units) ? c.units : [], weapons: c.weapons && typeof c.weapons === 'object' ? c.weapons : {} };
+    return cats;
+  }
+  const subKey = (s, f, sf) => [s, f, sf].map(text).join('/');
+  const unitCats = () => (cats ? cats.units : CAT_DEFAULT.units);
+  const weaponCats = (s, f, sf) => (cats && cats.weapons[subKey(s, f, sf)]) || [];
+  // 依清單順序排（不在清單的排後面，照筆畫）
+  const catOrder = (list) => (a, b) => {
+    const i = list.indexOf(a), j = list.indexOf(b);
+    if (i >= 0 && j >= 0) return i - j;
+    if (i >= 0) return -1;
+    if (j >= 0) return 1;
+    return a.localeCompare(b, 'zh-Hant');
+  };
+  async function saveCats(message) {
+    if (!(await pageIsCurrent())) throw new Error(STALE_MSG);
+    await R.saveFile(CAT_PATH, cats, message);
+  }
+  // 類別下拉：清單＋「新增…」「管理清單…」
+  // getList()：目前的清單；setList(list)：寫回 cats；cur：目前選的；onSet(v)：選了之後
+  function fillCatSelect(sel, opt) {
+    const list = opt.getList();
+    const cur = text(opt.cur);
+    const items = [el('option', { value: '' }, opt.disabledMsg || '（請選）'), ...list.map((c) => el('option', { value: c }, c))];
+    if (cur && !list.includes(cur)) items.push(el('option', { value: cur }, `${cur}（不在清單）`));
+    if (!opt.disabledMsg) items.push(el('option', { value: '__add' }, '＋ 新增…'), el('option', { value: '__manage' }, '管理清單（改名、刪除、排序）…'));
+    sel.replaceChildren(...items);
+    sel.disabled = !!opt.disabledMsg;
+    sel.value = cur;
+    sel.onchange = async () => {
+      const v = sel.value;
+      if (v === '__add') {
+        sel.value = cur;
+        const name = await addCat(opt);
+        if (name) { opt.onSet(name); fillCatSelect(sel, Object.assign({}, opt, { cur: name })); }
+      } else if (v === '__manage') {
+        sel.value = cur;
+        openCatDialog(opt, () => fillCatSelect(sel, Object.assign({}, opt, { cur: opt.getCur ? opt.getCur() : cur })));
+      } else opt.onSet(v);
+    };
+  }
+  async function addCat(opt, preset) {
+    const name = text(preset != null ? preset : prompt(`新增${opt.what}名稱：`, ''));
+    if (!name) return null;
+    const list = opt.getList().slice();
+    if (!list.includes(name)) {
+      list.push(name);
+      opt.setList(list);
+      try { await saveCats(`${opt.what}清單：新增「${name}」（${opt.scope}）`); }
+      catch (e) { alert(`清單沒存進 repo：${e.message}\n（這次還是可以先選它）`); }
+    }
+    return name;
+  }
+  const cdlg = document.getElementById('dlg-cats');
+  function openCatDialog(opt, after) {
+    let work = opt.getList().slice();
+    const st = document.getElementById('cats-status');
+    const draw = () => {
+      document.getElementById('cats-title').textContent = `管理${opt.what}清單`;
+      document.getElementById('cats-scope').textContent = opt.scope;
+      const ul = document.getElementById('cats-list');
+      ul.replaceChildren(...work.map((c, i) => el('li', null,
+        (() => { const inp = el('input', { value: c, 'aria-label': `${opt.what} ${i + 1}` }); inp.addEventListener('input', () => { work[i] = inp.value; }); return inp; })(),
+        el('button', { type: 'button', title: '往上', 'aria-label': '往上', disabled: i === 0, onclick: () => { [work[i - 1], work[i]] = [work[i], work[i - 1]]; draw(); } }, '↑'),
+        el('button', { type: 'button', title: '往下', 'aria-label': '往下', disabled: i === work.length - 1, onclick: () => { [work[i + 1], work[i]] = [work[i], work[i + 1]]; draw(); } }, '↓'),
+        el('button', { type: 'button', title: '刪除', 'aria-label': `刪除 ${c}`, onclick: () => { work.splice(i, 1); draw(); } }, '×'))));
+    };
+    document.getElementById('cats-add').onclick = () => { work.push(''); draw(); const ins = document.querySelectorAll('#cats-list input'); ins[ins.length - 1].focus(); };
+    document.getElementById('cats-save').onclick = async () => {
+      const clean = [...new Set(work.map(text).filter(Boolean))];
+      st.textContent = '保存中…'; st.className = 'dlg-status';
+      const before = opt.getList().slice();
+      opt.setList(clean);
+      try {
+        await saveCats(`${opt.what}清單更新（${opt.scope}）`);
+        work = clean.slice(); draw();
+        st.textContent = '已保存。'; st.className = 'dlg-status ok';
+        after && after();
+      } catch (e) {
+        opt.setList(before);
+        st.textContent = `保存失敗：${e.message}`; st.className = 'dlg-status err';
+        if (e.status === 0 || e.status === 401 || e.status === 403) openSettings();
+      }
+    };
+    st.textContent = ''; st.className = 'dlg-status';
+    draw();
+    if (!cdlg.open) cdlg.showModal();
+  }
+  document.getElementById('cats-close').addEventListener('click', () => cdlg.close());
+  // 單位卡片上方的「類別」
+  const unitCatOpt = () => ({
+    what: '類別', scope: '所有系列共用', cur: state.category,
+    getCur: () => state.category,
+    getList: unitCats, setList: (l) => { cats.units = l; },
+    onSet: (v) => { state.category = v; saveDraft(); },
+  });
+  // 武器的「武器種類」：跟著系列／陣營／子陣營
+  function weaponCatOpt(s, f, sf, cur, onSet, getCur) {
+    const ok = text(s) && text(f) && text(sf);
+    return {
+      what: '武器種類', scope: `只用在 ${[s, f, sf].map(text).join(' › ')}`, cur,
+      getCur, onSet,
+      disabledMsg: ok ? '' : '（先填系列、陣營、子陣營）',
+      getList: () => weaponCats(s, f, sf),
+      setList: (l) => { cats.weapons[subKey(s, f, sf)] = l; },
+    };
+  }
+
   // ---------- 畫面切換 ----------
   const views = ['edit', 'result', 'list', 'weapons'];
   function show(v) { views.forEach((x) => { document.getElementById('view-' + x).hidden = x !== v; }); window.scrollTo(0, 0); }
@@ -450,6 +571,7 @@
     document.getElementById('in-series').value = state.series || '';
     document.getElementById('in-faction').value = state.faction || '';
     document.getElementById('in-subfaction').value = state.subfaction || '';
+    fillCatSelect(document.getElementById('in-category'), unitCatOpt());
     saveDraft();
   }
 
@@ -467,9 +589,9 @@
   async function save() {
     const msg = document.getElementById('save-msg');
     if (!text(state.name)) { msg.textContent = '單位名稱是空的，回上頁填好再保存。'; msg.className = 'save-msg err'; return; }
-    // 一定要照分類存：units/<系列>/<陣營>/<子陣營>/
-    if (!text(state.series) || !text(state.faction) || !text(state.subfaction)) {
-      msg.textContent = '系列、陣營、子陣營都要填，才能照分類保存。請回上頁填卡片上方的三個欄位。'; msg.className = 'save-msg err'; return;
+    // 一定要照分類存：units/<系列>/<陣營>/<子陣營>/<類別>/
+    if (!text(state.series) || !text(state.faction) || !text(state.subfaction) || !text(state.category)) {
+      msg.textContent = '系列、陣營、子陣營、類別都要填，才能照分類保存。請回上頁填卡片上方的四個欄位。'; msg.className = 'save-msg err'; return;
     }
     if (!(await pageIsCurrent())) { saveDraft(); msg.textContent = STALE_MSG; msg.className = 'save-msg err'; return; }
     const payload = { ...state, result: { total: lastResult.total, steps: lastResult.steps, warnings: lastResult.warnings }, savedAt: new Date().toISOString() };
@@ -519,7 +641,7 @@
     });
     const build = (node) => {
       const out = [];
-      Object.keys(node.dirs).sort((x, y) => x.localeCompare(y, 'zh-Hant')).forEach((g) => {
+      Object.keys(node.dirs).sort(catOrder(unitCats())).forEach((g) => {
         out.push(el('details', { open: true }, el('summary', null, g), build(node.dirs[g])));
       });
       node.units.sort((x, y) => x.name.localeCompare(y.name, 'zh-Hant')).forEach((u) =>
@@ -592,19 +714,34 @@
     if (!text(w.name)) { libMsg('武器名稱是空的，不能存入武器庫', 'err'); return; }
     if (!text(state.series) || !text(state.faction) || !text(state.subfaction)) { libMsg('要先填卡片上方的「系列」「陣營」「子陣營」，武器才知道存在哪個分類', 'err'); return; }
     if (!(await pageIsCurrent())) { saveDraft(); libMsg(STALE_MSG, 'err'); return; }
-    const path = R.weaponPath(state.series, state.faction, state.subfaction, w.name);
+    if (!cats) await loadCats();
+    const category = await pickWeaponCat(state.series, state.faction, state.subfaction);
+    if (!category) return;
+    const path = R.weaponPath(state.series, state.faction, state.subfaction, category, w.name);
     if (!confirm(`存入共用武器庫：\n${path}\n\n同名的武器會被覆蓋。`)) return;
     const item = copyWeapon(w, true);
-    Object.assign(item, { series: text(state.series), faction: text(state.faction), subfaction: text(state.subfaction), savedAt: new Date().toISOString() });
+    Object.assign(item, { series: text(state.series), faction: text(state.faction), subfaction: text(state.subfaction), category, savedAt: new Date().toISOString() });
     libMsg('存入中…');
     try {
       const res = await R.saveFile(path, item, `武器庫：${text(w.name)}（${item.series}／${item.faction}／${item.subfaction}）`);
       libItems = null; // 下次開啟重新讀
-      libMsg(`已${res.created ? '存入' : '更新'}武器庫：${item.series} › ${item.faction} › ${item.subfaction} › ${text(w.name)}`, 'ok');
+      libMsg(`已${res.created ? '存入' : '更新'}武器庫：${item.series} › ${item.faction} › ${item.subfaction} › ${category} › ${text(w.name)}`, 'ok');
     } catch (e) {
       libMsg(`存入失敗：${e.message}`, 'err');
       if (e.status === 0 || e.status === 401 || e.status === 403) openSettings();
     }
+  }
+
+  // 存入武器庫時選武器種類（這個子陣營自己的清單）；直接打新名稱會加進清單
+  async function pickWeaponCat(s, f, sf) {
+    const list = weaponCats(s, f, sf);
+    const ans = prompt(`這把武器放在哪個武器種類？（${[s, f, sf].map(text).join(' › ')}）\n`
+      + (list.length ? list.map((c, i) => `${i + 1}. ${c}`).join('\n') : '（這個子陣營還沒有武器種類）')
+      + '\n\n填編號；或直接打新的種類名稱（會加進這個子陣營的清單）', '');
+    const t = text(ans);
+    if (!t) return null;
+    if (/^\d+$/.test(t)) { const c = list[parseInt(t, 10) - 1]; if (!c) alert('沒有這個編號'); return c || null; }
+    return addCat(weaponCatOpt(s, f, sf), t);
   }
 
   const wdlg = document.getElementById('dlg-weapons');
@@ -617,7 +754,7 @@
       libItems = raw.filter((x) => x && x.path && x.data).map((x) => {
         const segs = x.path.replace(/^weapons\//, '').replace(/\.json$/, '').split('/');
         segs.pop(); // 檔名
-        return { path: x.path, series: x.data.series || segs[0] || '', faction: x.data.faction || segs[1] || '', subfaction: x.data.subfaction || segs[2] || '', w: x.data };
+        return { path: x.path, series: x.data.series || segs[0] || '', faction: x.data.faction || segs[1] || '', subfaction: x.data.subfaction || segs[2] || '', category: x.data.category || (segs.length > 3 ? segs[3] : ''), w: x.data };
       });
       st.textContent = libItems.length ? '' : '武器庫是空的。在武器那一列按「存入武器庫」就會加進來。';
     } catch (e) {
@@ -626,7 +763,12 @@
     }
   }
   // 篩選條件：開啟時預設是卡片的系列、陣營，之後由使用者自己選
-  let libSeries = '', libFaction = '', libSub = '';
+  let libSeries = '', libFaction = '', libSub = '', libCat = '';
+  // 武器排序：同一個子陣營照武器種類清單順序，再照名稱
+  const sortWeapons = (a, b) => [a.series, a.faction, a.subfaction].join('/').localeCompare([b.series, b.faction, b.subfaction].join('/'), 'zh-Hant')
+    || catOrder(weaponCats(a.series, a.faction, a.subfaction))(a.category, b.category)
+    || text(a.w.name).localeCompare(text(b.w.name), 'zh-Hant');
+  const catsIn = (xs) => { const l = [...new Set(xs.map((x) => x.category).filter(Boolean))]; const k = xs[0]; return k ? l.sort(catOrder(weaponCats(k.series, k.faction, k.subfaction))) : l; };
   function fillSelect(sel, values, cur) {
     sel.replaceChildren(el('option', { value: '' }, '全部'), ...values.map((v) => el('option', { value: v }, v)));
     sel.value = values.includes(cur) ? cur : '';
@@ -643,9 +785,11 @@
     libFaction = fillSelect(fSel, uniq(inSeries.map((x) => x.faction).filter(Boolean)), libFaction);
     const inFaction = inSeries.filter((x) => !libFaction || x.faction === libFaction);
     libSub = fillSelect(document.getElementById('wlib-sub'), uniq(inFaction.map((x) => x.subfaction).filter(Boolean)), libSub);
-    const hits = inFaction.filter((x) => !libSub || x.subfaction === libSub)
+    const inSub = inFaction.filter((x) => !libSub || x.subfaction === libSub);
+    libCat = fillSelect(document.getElementById('wlib-cat'), libSub ? catsIn(inSub) : [], libCat);
+    const hits = inSub.filter((x) => !libCat || x.category === libCat)
       .filter((x) => q.every((t) => `${x.w.name} ${x.w.rules}`.toLowerCase().includes(t)))
-      .sort((a, b) => text(a.w.name).localeCompare(text(b.w.name), 'zh-Hant'));
+      .sort(sortWeapons);
     const list = document.getElementById('wlib-list');
     list.replaceChildren();
     if (items.length && !hits.length) list.append(el('li', { class: 'empty' }, '沒有符合的武器'));
@@ -656,7 +800,7 @@
         el('div', { class: 'wl-main' },
           el('div', { class: 'wl-name' }, text(x.w.name), ' ', el('span', { class: 'wl-rules' }, C.clean(x.w.rules))),
           el('div', { class: 'wl-stats' }, weaponSummary(x.w)),
-          el('div', { class: 'wl-where' }, [x.series, x.faction, x.subfaction].filter(Boolean).join(' › '))),
+          el('div', { class: 'wl-where' }, [x.series, x.faction, x.subfaction, x.category].filter(Boolean).join(' › '))),
         el('div', { class: 'wl-btns' },
           el('button', { type: 'button', onclick: () => { wdlg.close(); openWeaponEditor(x); } }, '編輯'),
           el('button', { type: 'button', class: 'primary', onclick: () => addFromLib(x) }, '加入'))));
@@ -673,26 +817,33 @@
   }
   async function openWeaponLib() {
     if (!wdlg.open) wdlg.showModal();
-    libSeries = text(state.series); libFaction = text(state.faction); libSub = '';
+    libSeries = text(state.series); libFaction = text(state.faction); libSub = ''; libCat = '';
+    if (!cats) await loadCats();
     if (!libItems) await loadLib(false);
     renderLib();
   }
-  document.getElementById('wlib-series').addEventListener('change', (e) => { libSeries = e.target.value; libFaction = ''; libSub = ''; renderLib(); });
-  document.getElementById('wlib-faction').addEventListener('change', (e) => { libFaction = e.target.value; libSub = ''; renderLib(); });
-  document.getElementById('wlib-sub').addEventListener('change', (e) => { libSub = e.target.value; renderLib(); });
+  document.getElementById('wlib-series').addEventListener('change', (e) => { libSeries = e.target.value; libFaction = ''; libSub = ''; libCat = ''; renderLib(); });
+  document.getElementById('wlib-faction').addEventListener('change', (e) => { libFaction = e.target.value; libSub = ''; libCat = ''; renderLib(); });
+  document.getElementById('wlib-sub').addEventListener('change', (e) => { libSub = e.target.value; libCat = ''; renderLib(); });
+  document.getElementById('wlib-cat').addEventListener('change', (e) => { libCat = e.target.value; renderLib(); });
   document.getElementById('wlib-q').addEventListener('input', renderLib);
   document.getElementById('wlib-close').addEventListener('click', () => wdlg.close());
   document.getElementById('wlib-reload').addEventListener('click', async () => { await loadLib(true); renderLib(); });
 
   // ---------- 共用武器庫：編輯頁 ----------
   // 格式和資料卡的武器列一樣；保存到 weapons/<系列>/<陣營>/<武器名稱>.json
-  let wstate = null; // { series, faction, subfaction, w, editingPath }
-  const blankWState = () => ({ series: text(state.series) || lastSeries(), faction: '', subfaction: '', w: blankWeapon('ranged'), editingPath: null });
+  let wstate = null; // { series, faction, subfaction, category, w, editingPath }
+  const blankWState = () => ({ series: text(state.series) || lastSeries(), faction: '', subfaction: '', category: '', w: blankWeapon('ranged'), editingPath: null });
+  function renderWCat() {
+    fillCatSelect(document.getElementById('w-cat'), weaponCatOpt(wstate.series, wstate.faction, wstate.subfaction, wstate.category,
+      (v) => { wstate.category = v; }, () => wstate.category));
+  }
   function renderWeaponEditor() {
     const w = wstate.w;
     document.getElementById('w-series').value = wstate.series || '';
     document.getElementById('w-faction').value = wstate.faction || '';
     document.getElementById('w-sub').value = wstate.subfaction || '';
+    renderWCat();
     document.getElementById('w-title').textContent = wstate.editingPath ? `共用武器庫：編輯 ${wstate.editingPath}` : '共用武器庫：新增武器';
     const card = el('div', { class: 'card' }, el('table', { class: 'wg' },
       el('colgroup', null, ['name', 'rng', 'str', 'd', 'as', 'rl'].map((c) => el('col', { class: 'c-' + c }))),
@@ -702,11 +853,12 @@
   }
   function openWeaponEditor(item) {
     if (item) {
-      wstate = { series: item.series, faction: item.faction, subfaction: item.subfaction, w: copyWeapon(item.w, false), editingPath: item.path };
+      wstate = { series: item.series, faction: item.faction, subfaction: item.subfaction, category: item.category || '', w: copyWeapon(item.w, false), editingPath: item.path };
     } else if (!wstate) wstate = blankWState();
     const msg = document.getElementById('w-msg'); msg.textContent = ''; msg.className = 'save-msg';
     renderWeaponEditor();
     show('weapons');
+    if (!cats) loadCats().then(renderWCat);
     if (!libItems) loadLib(false, 'wl-status').then(renderWList); else renderWList();
   }
   async function saveWeaponEditor() {
@@ -714,11 +866,11 @@
     const w = wstate.w;
     const fail = (t) => { msg.textContent = t; msg.className = 'save-msg err'; };
     if (!text(w.name)) return fail('武器名稱是空的。');
-    if (!text(wstate.series) || !text(wstate.faction) || !text(wstate.subfaction)) return fail('系列、陣營、子陣營都要填。');
+    if (!text(wstate.series) || !text(wstate.faction) || !text(wstate.subfaction) || !text(wstate.category)) return fail('系列、陣營、子陣營、武器種類都要填。');
     if (!(await pageIsCurrent())) return fail(STALE_MSG.replace('；你填的內容已存成草稿，重新整理後按上方「繼續上次草稿」就會回來', '（武器欄位要重新填）'));
-    const path = R.weaponPath(wstate.series, wstate.faction, wstate.subfaction, w.name);
+    const path = R.weaponPath(wstate.series, wstate.faction, wstate.subfaction, wstate.category, w.name);
     const item = copyWeapon(w, true);
-    Object.assign(item, { series: text(wstate.series), faction: text(wstate.faction), subfaction: text(wstate.subfaction), savedAt: new Date().toISOString() });
+    Object.assign(item, { series: text(wstate.series), faction: text(wstate.faction), subfaction: text(wstate.subfaction), category: text(wstate.category), savedAt: new Date().toISOString() });
     const btn = document.getElementById('w-save');
     btn.disabled = true; msg.textContent = '保存中…'; msg.className = 'save-msg';
     try {
@@ -743,7 +895,7 @@
     } finally { btn.disabled = false; }
   }
   // 已存的武器：系列／陣營篩選＋搜尋，每把都能「編輯」
-  let wlSeries = '', wlFaction = '', wlSub = '';
+  let wlSeries = '', wlFaction = '', wlSub = '', wlCat = '';
   function renderWList() {
     const items = libItems || [];
     const uniq = (a) => [...new Set(a)].sort((x, y) => x.localeCompare(y, 'zh-Hant'));
@@ -753,9 +905,11 @@
     const inFaction = inSeries.filter((x) => !wlFaction || x.faction === wlFaction);
     wlSub = fillSelect(document.getElementById('wl-sub'), uniq(inFaction.map((x) => x.subfaction).filter(Boolean)), wlSub);
     const q = document.getElementById('wl-q').value.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    const hits = inFaction.filter((x) => !wlSub || x.subfaction === wlSub)
+    const inSub = inFaction.filter((x) => !wlSub || x.subfaction === wlSub);
+    wlCat = fillSelect(document.getElementById('wl-cat'), wlSub ? catsIn(inSub) : [], wlCat);
+    const hits = inSub.filter((x) => !wlCat || x.category === wlCat)
       .filter((x) => q.every((t) => `${x.w.name} ${x.w.rules}`.toLowerCase().includes(t)))
-      .sort((a, b) => text(a.w.name).localeCompare(text(b.w.name), 'zh-Hant'));
+      .sort(sortWeapons);
     const list = document.getElementById('wl-list');
     list.replaceChildren();
     if (items.length && !hits.length) list.append(el('li', { class: 'empty' }, '沒有符合的武器'));
@@ -766,7 +920,7 @@
         el('div', { class: 'wl-main' },
           el('div', { class: 'wl-name' }, text(x.w.name), ' ', el('span', { class: 'wl-rules' }, C.clean(x.w.rules))),
           el('div', { class: 'wl-stats' }, weaponSummary(x.w)),
-          el('div', { class: 'wl-where' }, [x.series, x.faction, x.subfaction].filter(Boolean).join(' › '))),
+          el('div', { class: 'wl-where' }, [x.series, x.faction, x.subfaction, x.category].filter(Boolean).join(' › '))),
         el('button', { type: 'button', onclick: () => { openWeaponEditor(x); window.scrollTo(0, 0); } }, '編輯')));
     });
   }
@@ -777,13 +931,14 @@
     wstate.subfaction = document.getElementById('w-sub').value;
     openWeaponEditor(null);
   });
-  document.getElementById('w-sub').addEventListener('input', (e) => { wstate.subfaction = e.target.value; });
+  document.getElementById('w-sub').addEventListener('input', (e) => { wstate.subfaction = e.target.value; renderWCat(); });
   document.getElementById('w-save').addEventListener('click', saveWeaponEditor);
-  document.getElementById('w-series').addEventListener('input', (e) => { wstate.series = e.target.value; });
-  document.getElementById('w-faction').addEventListener('input', (e) => { wstate.faction = e.target.value; });
-  document.getElementById('wl-series').addEventListener('change', (e) => { wlSeries = e.target.value; wlFaction = ''; wlSub = ''; renderWList(); });
-  document.getElementById('wl-faction').addEventListener('change', (e) => { wlFaction = e.target.value; wlSub = ''; renderWList(); });
-  document.getElementById('wl-sub').addEventListener('change', (e) => { wlSub = e.target.value; renderWList(); });
+  document.getElementById('w-series').addEventListener('input', (e) => { wstate.series = e.target.value; renderWCat(); });
+  document.getElementById('w-faction').addEventListener('input', (e) => { wstate.faction = e.target.value; renderWCat(); });
+  document.getElementById('wl-series').addEventListener('change', (e) => { wlSeries = e.target.value; wlFaction = ''; wlSub = ''; wlCat = ''; renderWList(); });
+  document.getElementById('wl-faction').addEventListener('change', (e) => { wlFaction = e.target.value; wlSub = ''; wlCat = ''; renderWList(); });
+  document.getElementById('wl-sub').addEventListener('change', (e) => { wlSub = e.target.value; wlCat = ''; renderWList(); });
+  document.getElementById('wl-cat').addEventListener('change', (e) => { wlCat = e.target.value; renderWList(); });
   document.getElementById('wl-q').addEventListener('input', renderWList);
   document.getElementById('wl-reload').addEventListener('click', async () => { await loadLib(true, 'wl-status'); renderWList(); });
 
@@ -841,6 +996,7 @@
   rerender();
   show('edit');
   booted = true;
+  loadCats().then(() => fillCatSelect(document.getElementById('in-category'), unitCatOpt()));
 
   // 網址 ?load=units/…json 直接打開已存單位；加 &view=result 直接顯示計分結果
   const qs = new URLSearchParams(location.search);
@@ -848,5 +1004,5 @@
     loadUnit(qs.get('load')).then(() => { if (qs.get('view') === 'result') confirmScore(); });
   }
 
-  window.__taktik = { get state() { return state; }, set state(v) { state = normalize(v); rerender(); }, confirmScore };
+  window.__taktik = { get state() { return state; }, set state(v) { state = normalize(v); rerender(); }, confirmScore, get cats() { return cats; }, loadCats, openWeaponEditor, save };
 })();
