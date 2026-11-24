@@ -179,3 +179,25 @@ button.mini { padding: 1px 10px; font-size: 12.5px; }
 .combo-menu { min-width: 100%; max-height: 260px; overflow: auto; }
 .combo-menu button { white-space: nowrap; }
 .combo-empty { padding: 4px 8px; font-size: 13px; color: #666; white-space: nowrap; }
+
+/* 關鍵字資料庫 */
+.kw-layout { display: grid; grid-template-columns: minmax(220px, 320px) 1fr; gap: 18px; max-width: 1100px; margin: 0 auto; align-items: start; }
+@media (max-width: 760px) { .kw-layout { grid-template-columns: 1fr; } }
+.kw-side input[type=search] { width: 100%; box-sizing: border-box; font: inherit; padding: 6px 10px; border: 1px solid var(--panel-border); border-radius: 6px; background: var(--panel-bg); color: var(--page-fg); }
+.kw-side-actions { display: flex; gap: 8px; margin: 8px 0 4px; flex-wrap: wrap; }
+.kw-list { list-style: none; margin: 0; padding: 0; max-height: 70vh; overflow: auto; border: 1px solid var(--panel-border); border-radius: 6px; background: var(--panel-bg); }
+.kw-list li + li { border-top: 1px solid var(--panel-border); }
+.kw-item { display: flex; flex-wrap: wrap; gap: 2px 6px; align-items: baseline; width: 100%; text-align: left; border: none; background: none; color: var(--page-fg); padding: 7px 10px; cursor: pointer; font: inherit; }
+.kw-item:hover { background: rgba(91,155,213,.12); }
+.kw-item.current { background: rgba(91,155,213,.25); }
+.kw-item-name { font-weight: 700; }
+.kw-item-en { color: var(--muted); font-size: 13px; }
+.kw-item-group { margin-left: auto; color: var(--muted); font-size: 12px; }
+.kw-form { display: flex; flex-direction: column; gap: 10px; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 8px; padding: 14px 16px; }
+.kw-form h3 { margin: 0; font-size: 16px; }
+.kw-form label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
+.kw-form input, .kw-form textarea { font: inherit; font-size: 15px; color: var(--page-fg); background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 4px; padding: 6px 8px; }
+.kw-form textarea { resize: vertical; line-height: 1.5; }
+.kw-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 560px) { .kw-row { grid-template-columns: 1fr; } }
+.kw-actions { justify-content: flex-start; }

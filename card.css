@@ -51,3 +51,8 @@
 .card .wg .wrules { color: var(--c-blue); font-size: calc(7pt * var(--s)); }
 .card .wg .icon { height: calc(9px * var(--s)); width: auto; vertical-align: -1px; margin-right: 2px; }
 .card .wg .mode-icon { height: calc(6px * var(--s)); vertical-align: 0; margin-right: 1px; }
+
+/* 玩家端：查得到的關鍵字＝藍字＋虛線底線，點了跳出說明 */
+.card .kwlink { all: unset; color: var(--c-blue); text-decoration: underline dashed; text-decoration-thickness: 1px; text-underline-offset: 2px; cursor: pointer; }
+.card .kwlink:hover { text-decoration-style: solid; }
+.card .kwlink:focus-visible { outline: 2px solid var(--c-blue); outline-offset: 1px; border-radius: 2px; }

@@ -1,10 +1,10 @@
 // 圖鑑 App 的 service worker：有網路時一律拿最新檔案（改版刷新就生效），沒網路時用上次的檔案。
 // 不快取 GitHub API（單位資料由頁面自己存在這台裝置）。
-const CACHE = 'taktik-player-v3';
+const CACHE = 'taktik-player-v4';
 const SHELL = [
   './', './index.html', './player.css', './player.js', './manifest.webmanifest',
   './icons/app-192.png', './icons/app-512.png',
-  '../card.css', '../calc.js', '../repo.js', '../cardview.js',
+  '../card.css', '../calc.js', '../repo.js', '../cardview.js', '../keywords.js',
   '../icons/ranged.png', '../icons/melee.png', '../icons/shield.png', '../icons/grenade.png',
 ];
 

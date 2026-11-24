@@ -27,6 +27,130 @@
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 空間不足或封鎖時略過 */ } },
   };
 
+
+  // ---------- 關鍵字 ----------
+  // keywords.json（編輯器維護）。資料卡上查得到的特規變成藍字虛線，點了跳出說明；說明裡的 [ ] 也能再點，返回一層層回去
+  const KW = window.TaktikKW;
+  const KW_KEY = 'taktik-keywords-v1';
+  let kwdb = store.get(KW_KEY, null);
+  let kwIndex = KW.buildIndex(kwdb);
+  async function loadKeywords() {
+    try {
+      const r = await fetch('../keywords.json', { cache: 'no-cache' });
+      if (!r.ok) throw new Error(r.status);
+      kwdb = await r.json();
+      kwIndex = KW.buildIndex(kwdb);
+      store.set(KW_KEY, kwdb);
+    } catch (e) { /* 沒網路就用上次的 */ }
+  }
+  const kwById = (id) => (kwIndex.items || []).find((x) => x.id === id);
+  const cardKeywords = () => ({ lookup: (t) => KW.lookup(kwIndex, t) });
+
+  // 說明文字：一行一段、「・」開頭是條列、[ ] 裡查得到的變成連結
+  function kwRich(s) {
+    const frag = document.createDocumentFragment();
+    let ul = null;
+    String(s || '').split('\n').forEach((line) => {
+      const bullet = /^\s*[・•]/.test(line);
+      const body = line.replace(/^\s*[・•]\s*/, '');
+      const host = el(bullet ? 'li' : 'p');
+      body.split(/(\[[^\]]+\])/).forEach((part) => {
+        const m = part.match(/^\[([^\]]+)\]$/);
+        if (!m) { if (part) host.append(part); return; }
+        const it = KW.lookup(kwIndex, m[1]);
+        host.append(it ? el('button', { type: 'button', class: 'kwlink', 'data-kw': it.id }, m[1]) : el('span', { class: 'kwref' }, m[1]));
+      });
+      if (bullet) { if (!ul) { ul = el('ul'); frag.append(ul); } ul.append(host); }
+      else { ul = null; if (line.trim()) frag.append(host); }
+    });
+    return frag;
+  }
+
+  // 說明視窗：一個堆疊。打開一個就 push 一筆瀏覽紀錄，所以手機的返回鍵／返回按鈕都是回上一個
+  const kwStack = [];
+  function drawSheet() {
+    const it = kwById(kwStack[kwStack.length - 1]);
+    if (!it) return;
+    $('kws-name').textContent = it.name;
+    $('kws-en').textContent = it.en || '';
+    $('kws-en').hidden = !it.en;
+    $('kws-body').replaceChildren(kwRich(it.text));
+    $('kws-group').textContent = it.group || '';
+    const prev = kwStack.length > 1 ? kwById(kwStack[kwStack.length - 2]) : null;
+    $('kws-back-label').textContent = prev ? `返回「${prev.name}」` : '返回';
+    $('kw-sheet').scrollTop = 0;
+  }
+  function openKeyword(id) {
+    if (!kwById(id)) return;
+    const wasOpen = kwStack.length > 0;
+    kwStack.push(id);
+    history.pushState({ kw: kwStack.slice() }, '', location.href);
+    drawSheet();
+    if (!wasOpen) {
+      kwLastFocus = document.activeElement;
+      $('kw-sheet-wrap').hidden = false;
+      document.body.classList.add('kw-open');
+    }
+    $('kw-sheet').focus({ preventScroll: true });
+  }
+  let kwLastFocus = null;
+  function closeSheetUI() {
+    $('kw-sheet-wrap').hidden = true;
+    document.body.classList.remove('kw-open');
+    if (kwLastFocus) kwLastFocus.focus({ preventScroll: true });
+  }
+  // 瀏覽器返回：照紀錄裡的堆疊顯示；回到沒有堆疊的紀錄就關掉
+  function kwOnPop(e) {
+    const st = e.state && Array.isArray(e.state.kw) ? e.state.kw : null;
+    if (st && st.length) {
+      kwStack.splice(0, kwStack.length, ...st);
+      if ($('kw-sheet-wrap').hidden) { $('kw-sheet-wrap').hidden = false; document.body.classList.add('kw-open'); }
+      drawSheet();
+      return true;
+    }
+    if (kwStack.length) { kwStack.length = 0; closeSheetUI(); return true; }
+    return false;
+  }
+  $('kws-back').addEventListener('click', () => history.back());
+  $('kw-scrim').addEventListener('click', () => history.go(-kwStack.length));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && kwStack.length) history.back(); });
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.kwlink');
+    if (!b) return;
+    e.preventDefault();
+    e.stopPropagation();
+    openKeyword(b.dataset.kw);
+  });
+
+  // 關鍵字頁：搜尋＋列表（點了一樣跳出說明）
+  function renderKeywords(q) {
+    $('kw-q').value = q || '';
+    const items = (kwdb && kwdb.items) || [];
+    const hits = items.filter((it) => KW.matches(it, q)).map((it, i) => [KW.rank(it, q), i, it])
+      .sort((a, b) => a[0] - b[0] || a[1] - b[1]).map((x) => x[2]);
+    $('kw-count').textContent = items.length ? `共 ${hits.length} 個關鍵字` : '讀取中…';
+    const box = $('kw-list');
+    box.replaceChildren();
+    if (items.length && !hits.length) { box.append(el('div', { class: 'empty' }, el('p', null, '找不到符合的關鍵字。'))); return; }
+    const ul = el('ul', { class: 'units kw-units' });
+    let lastGroup = null;
+    hits.forEach((it) => {
+      if (!q && it.group !== lastGroup) { lastGroup = it.group; ul.append(el('li', { class: 'cat-head' }, it.group || '')); }
+      const first = String(it.text || '').split('\n')[0].replace(/[[\]]/g, '');
+      ul.append(el('li', null, el('button', { type: 'button', class: 'unit-row kw-row', onclick: () => openKeyword(it.id) },
+        el('div', { class: 'row-main' },
+          el('div', { class: 'row-name' }, it.name, it.en ? el('span', { class: 'kw-en' }, ' ' + it.en) : null),
+          el('div', { class: 'row-kw kw-snip' }, first)))));
+    });
+    box.append(ul);
+  }
+  $('kw-search').addEventListener('submit', (e) => { e.preventDefault(); $('kw-q').blur(); });
+  $('kw-q').addEventListener('input', () => {
+    const q = $('kw-q').value;
+    history.replaceState(null, '', '#/keywords' + (q.trim() ? '?q=' + encodeURIComponent(q.trim()) : ''));
+    renderKeywords(q);
+  });
+
   // ---------- 資料 ----------
   let units = [];          // [{ path, segs, data, name, total, hay, keywords }]
   let status = 'idle';     // idle | loading | ready | error
@@ -105,6 +229,7 @@
   function parseHash() {
     const h = location.hash.replace(/^#/, '') || '/';
     if (h.startsWith('/unit/')) return { view: 'unit', path: decodeURIComponent(h.slice(6)) };
+    if (h.startsWith('/keywords')) return { view: 'keywords', q: new URLSearchParams(h.split('?')[1] || '').get('q') || '' };
     const [route0, query] = h.split('?');
     // 舊網址 #/?p=… 也當成單位圖鑑
     if (route0 === '/units' || (route0 === '/' && query)) {
@@ -202,7 +327,7 @@
       frame.append(el('p', { class: 'empty' }, status === 'loading' ? '讀取中…' : '這個單位不在資料庫裡（可能被改名或刪除）。'));
       return;
     }
-    const inner = el('div', { class: 'card-scale' }, CARD.render(u.data, null, { iconBase: '../icons/', total: u.total }));
+    const inner = el('div', { class: 'card-scale' }, CARD.render(u.data, null, { iconBase: '../icons/', total: u.total, keywords: cardKeywords() }));
     frame.append(inner);
     fitCard();
     const saved = u.data.savedAt ? new Date(u.data.savedAt) : null;
@@ -223,7 +348,7 @@
   if ('ResizeObserver' in window) new ResizeObserver(fitCard).observe($('card-frame'));
 
   // ---------- 畫面切換 ----------
-  const SCREENS = ['home', 'list', 'unit'];
+  const SCREENS = ['home', 'list', 'unit', 'keywords'];
   function showScreen(name) { SCREENS.forEach((x) => { $('screen-' + x).hidden = x !== name; }); }
   function route() {
     closeDrawer(false);
@@ -235,6 +360,12 @@
       renderUnit(r.path);
       document.title = `${$('unit-title').textContent}｜Taktik`;
       window.scrollTo(0, 0);
+    } else if (r.view === 'keywords') {
+      const wasKw = !$('screen-keywords').hidden;
+      showScreen('keywords');
+      renderKeywords(r.q);
+      document.title = '關鍵字｜Taktik';
+      if (!wasKw) window.scrollTo(0, 0);
     } else if (r.view === 'list') {
       const back = $('screen-unit').hidden ? null : listScroll;
       listState = { p: r.p, q: r.q, s: r.s };
@@ -252,7 +383,7 @@
     }
   }
   let listScroll = 0;
-  window.addEventListener('popstate', route);
+  window.addEventListener('popstate', (e) => { if (kwOnPop(e)) return; route(); });
   window.addEventListener('hashchange', route);
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a.unit-row');
@@ -289,6 +420,7 @@
   const MENU = [
     { id: 'home', label: '首頁', href: '#/' },
     { id: 'units', label: '單位圖鑑', href: '#/units', children: () => folderTree([]) },
+    { id: 'keywords', label: '關鍵字', href: '#/keywords' },
   ];
   const openSub = new Set();
   function menuItems(items, level, activeId) {
@@ -312,7 +444,7 @@
   function renderNav() {
     const r = parseHash();
     // 目前所在的資料夾也標示出來
-    const activeId = r.view === 'home' ? 'home' : (r.view === 'list' && r.p.length && !r.q ? 'units/' + r.p.join('/') : 'units');
+    const activeId = r.view === 'home' ? 'home' : r.view === 'keywords' ? 'keywords' : (r.view === 'list' && r.p.length && !r.q ? 'units/' + r.p.join('/') : 'units');
     $('menu').replaceChildren(...menuItems(MENU, 0, activeId));
     renderHome();
   }
@@ -324,6 +456,10 @@
     box.replaceChildren(el('a', { class: 'home-card', href: '#/units' },
       el('div', { class: 'hc-title' }, '單位圖鑑'),
       el('div', { class: 'hc-desc' }, status === 'loading' && !n ? '讀取中…' : `${n} 個單位・${seriesList().length} 個系列`),
+      el('div', { class: 'hc-go', 'aria-hidden': 'true' }, '›')),
+    el('a', { class: 'home-card', href: '#/keywords' },
+      el('div', { class: 'hc-title' }, '關鍵字'),
+      el('div', { class: 'hc-desc' }, kwdb && kwdb.items ? `${kwdb.items.length} 個關鍵字・可搜尋` : '讀取中…'),
       el('div', { class: 'hc-go', 'aria-hidden': 'true' }, '›')));
   }
 
@@ -370,6 +506,7 @@
   renderNav();
   route();
   sync().then(() => { if (parseHash().view === 'unit') route(); });
+  loadKeywords().then(() => { renderHome(); const v = parseHash().view; if (v === 'unit' || v === 'keywords') route(); });
 
   window.__player = { get units() { return units; }, sync, route };
 })();

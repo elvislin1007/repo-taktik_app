@@ -568,7 +568,7 @@
   }
 
   // ---------- 畫面切換 ----------
-  const views = ['edit', 'result', 'list', 'weapons'];
+  const views = ['edit', 'result', 'list', 'weapons', 'keywords'];
   function show(v) { views.forEach((x) => { document.getElementById('view-' + x).hidden = x !== v; }); window.scrollTo(0, 0); }
 
   function rerender() {
@@ -1011,6 +1011,113 @@
   attachCombo('w-faction', 1, () => [wstate && wstate.series]);
   attachCombo('w-sub', 2, () => [wstate && wstate.series, wstate && wstate.faction]);
 
+
+  // ---------- 關鍵字資料庫（keywords.json）：搜尋、編輯、新增、刪除 ----------
+  // 保存時先讀 repo 上最新的檔案，只改這一筆再存回去（別人同時改別的關鍵字不會被蓋掉）
+  const KW_PATH = 'keywords.json';
+  const KWX = window.TaktikKW;
+  let kwdb = null;
+  let kwSel = null; // 目前編輯的 id；'new' = 新增中
+  async function fetchKwdb() {
+    let d = null;
+    try { d = await R.loadUnit(KW_PATH); } catch (e) {
+      if (e.status !== 404) { try { const r = await fetch(KW_PATH, { cache: 'no-cache' }); if (r.ok) d = await r.json(); } catch (e2) { /* 用空的 */ } }
+    }
+    d = d || {};
+    return { version: d.version || 1, groups: Array.isArray(d.groups) ? d.groups : [], items: Array.isArray(d.items) ? d.items : [] };
+  }
+  async function loadKwdb() {
+    document.getElementById('kw-count').textContent = '讀取中…';
+    kwdb = await fetchKwdb();
+    renderKwList();
+  }
+  function renderKwList() {
+    const q = document.getElementById('kw-q').value;
+    const hits = kwdb.items.filter((it) => KWX.matches(it, q))
+      .map((it, i) => [KWX.rank(it, q), i, it]).sort((a, b) => a[0] - b[0] || a[1] - b[1]).map((x) => x[2]);
+    document.getElementById('kw-count').textContent = `${hits.length} / ${kwdb.items.length} 個關鍵字`;
+    const ul = document.getElementById('kw-list');
+    ul.replaceChildren(...hits.map((it) => el('li', null, el('button', { type: 'button', class: 'kw-item' + (it.id === kwSel ? ' current' : ''), onclick: () => editKw(it.id) },
+      el('span', { class: 'kw-item-name' }, it.name || '（未命名）'), ' ', el('span', { class: 'kw-item-en' }, it.en || ''),
+      el('span', { class: 'kw-item-group' }, it.group || '')))));
+    document.getElementById('dl-kw-group').replaceChildren(...kwdb.groups.map((g) => el('option', { value: g })));
+  }
+  const kwIn = (k) => document.getElementById('kw-' + k);
+  function fillKwForm(it) {
+    kwIn('group').value = it.group || '';
+    kwIn('name').value = it.name || '';
+    kwIn('en').value = it.en || '';
+    kwIn('aliases').value = (it.aliases || []).filter((a) => a !== it.name && a !== it.en && a !== String(it.en || '').replace(/\s*\(X\)\s*$/i, '')).join('、');
+    kwIn('text').value = it.text || '';
+    kwIn('form-title').textContent = kwSel === 'new' ? '新增關鍵字' : `編輯：${KWX.title(it)}`;
+    kwIn('delete').disabled = kwSel === 'new';
+    kwIn('msg').textContent = ''; kwIn('msg').className = 'save-msg';
+  }
+  function editKw(id) {
+    const it = kwdb.items.find((x) => x.id === id);
+    if (!it) return;
+    kwSel = id;
+    fillKwForm(it);
+    renderKwList();
+  }
+  function readKwForm() {
+    const name = text(kwIn('name').value), en = text(kwIn('en').value);
+    const extra = String(kwIn('aliases').value).split(/[、，,;；\n]/).map(text).filter(Boolean);
+    return {
+      group: text(kwIn('group').value) || '通用關鍵字', name, en,
+      aliases: [...new Set([name, ...extra, en.replace(/\s*\(X\)\s*$/i, '')].filter(Boolean))],
+      text: String(kwIn('text').value).replace(/\r/g, '').trim(),
+    };
+  }
+  async function saveKw(remove) {
+    const msg = kwIn('msg');
+    const fail = (t) => { msg.textContent = t; msg.className = 'save-msg err'; };
+    if (!kwSel) return fail('先從左邊選一個關鍵字，或按「＋ 新增關鍵字」。');
+    const form = readKwForm();
+    if (!remove && !form.name) return fail('名稱是空的。');
+    if (remove && !confirm(`刪除關鍵字「${form.name}」？\n（檔案歷史裡還找得到）`)) return;
+    if (!(await pageIsCurrent())) return fail(STALE_MSG.replace('；你填的內容已存成草稿，重新整理後按上方「繼續上次草稿」就會回來', ''));
+    msg.textContent = '保存中…'; msg.className = 'save-msg';
+    try {
+      const latest = await fetchKwdb();
+      const id = kwSel === 'new' ? 'kw' + Date.now().toString(36) : kwSel;
+      const i = latest.items.findIndex((x) => x.id === id);
+      if (!remove) {
+        const dup = latest.items.find((x) => x.id !== id && x.name === form.name && x.group === form.group);
+        if (dup && !confirm(`「${form.group}」裡已經有一個「${form.name}」（${dup.en || '無英文'}），還是要保存？`)) { msg.textContent = ''; return; }
+      }
+      if (remove) { if (i >= 0) latest.items.splice(i, 1); }
+      else if (i >= 0) latest.items[i] = Object.assign({ id }, form);
+      else latest.items.push(Object.assign({ id }, form));
+      if (!remove && !latest.groups.includes(form.group)) latest.groups.push(form.group);
+      const label = remove ? '刪除' : (kwSel === 'new' ? '新增' : '更新');
+      const res = await R.saveFile(KW_PATH, latest, `關鍵字${label}：${form.name}`);
+      kwdb = latest;
+      kwSel = remove ? null : id;
+      renderKwList();
+      if (remove) { kwIn('form-title').textContent = '已刪除，從左邊再選一個'; ['group', 'name', 'en', 'aliases', 'text'].forEach((k) => { kwIn(k).value = ''; }); }
+      else kwIn('form-title').textContent = `編輯：${KWX.title(form)}`;
+      kwIn('delete').disabled = !kwSel || kwSel === 'new';
+      msg.replaceChildren(`已${label}${remove ? '' : '：' + form.name}（玩家端約 1 分鐘後更新） `,
+        res.commitUrl ? el('a', { href: res.commitUrl, target: '_blank', rel: 'noopener' }, '看這次 commit') : '');
+      msg.className = 'save-msg ok';
+    } catch (e) {
+      fail(`保存失敗：${e.message}`);
+      if (e.status === 0 || e.status === 401 || e.status === 403) openSettings();
+    }
+  }
+  document.getElementById('btn-keywords').addEventListener('click', async () => { show('keywords'); if (!kwdb) await loadKwdb(); });
+  document.getElementById('kw-q').addEventListener('input', () => kwdb && renderKwList());
+  document.getElementById('kw-reload').addEventListener('click', loadKwdb);
+  document.getElementById('kw-new').addEventListener('click', () => {
+    kwSel = 'new';
+    fillKwForm({ group: (kwdb && kwdb.groups[0]) || '通用關鍵字' });
+    if (kwdb) renderKwList();
+    kwIn('name').focus();
+  });
+  document.getElementById('kw-form').addEventListener('submit', (e) => { e.preventDefault(); saveKw(false); });
+  document.getElementById('kw-delete').addEventListener('click', () => saveKw(true));
+
   // ---------- GitHub 設定 ----------
   const dlg = document.getElementById('dlg-settings');
   const cfgIn = (k) => document.getElementById('cfg-' + k);
@@ -1073,5 +1180,5 @@
     loadUnit(qs.get('load')).then(() => { if (qs.get('view') === 'result') confirmScore(); });
   }
 
-  window.__taktik = { get state() { return state; }, set state(v) { state = normalize(v); rerender(); }, confirmScore, get cats() { return cats; }, loadCats, openWeaponEditor, save };
+  window.__taktik = { get state() { return state; }, set state(v) { state = normalize(v); rerender(); }, confirmScore, get cats() { return cats; }, loadCats, openWeaponEditor, save, get kwdb() { return kwdb; } };
 })();

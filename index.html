@@ -18,6 +18,7 @@
     <button type="button" id="btn-new">新單位</button>
     <button type="button" id="btn-list">已存單位</button>
     <button type="button" id="btn-weapons">武器庫</button>
+    <button type="button" id="btn-keywords">關鍵字</button>
     <button type="button" id="btn-settings">GitHub 設定</button>
     <a class="navlink" href="player/">單位圖鑑</a>
   </nav>
@@ -155,8 +156,41 @@
     <p id="wl-status" class="dlg-status" role="status"></p>
     <ul id="wl-list" class="wlib-list w-page-list"></ul>
   </section>
+
+  <!-- 關鍵字資料庫 -->
+  <section id="view-keywords" class="view" hidden>
+    <h2>關鍵字資料庫</h2>
+    <div class="kw-layout">
+      <div class="kw-side">
+        <input id="kw-q" type="search" placeholder="搜尋名稱、英文、說明…" autocomplete="off" aria-label="搜尋關鍵字">
+        <div class="kw-side-actions">
+          <button type="button" id="kw-new">＋ 新增關鍵字</button>
+          <button type="button" id="kw-reload" title="讀 repo 上最新的">重新讀取</button>
+        </div>
+        <p id="kw-count" class="hint" role="status"></p>
+        <ul id="kw-list" class="kw-list"></ul>
+      </div>
+      <form id="kw-form" class="kw-form" autocomplete="off">
+        <h3 id="kw-form-title">從左邊選一個關鍵字來編輯</h3>
+        <div class="kw-row">
+          <label>分組 <input id="kw-group" list="dl-kw-group" placeholder="例：通用關鍵字"></label>
+          <label>名稱 <input id="kw-name" placeholder="例：精準"></label>
+          <label>英文 <input id="kw-en" placeholder="例：Accurate"></label>
+        </div>
+        <datalist id="dl-kw-group"></datalist>
+        <label>別名（用「、」分開；資料卡上寫成這些也會對到這個關鍵字）<input id="kw-aliases" placeholder="例：能量力場、能量劍刃"></label>
+        <label>說明（一行一段；「・」開頭是條列；[ ] 裡的字在玩家端會變成連結）<textarea id="kw-text" rows="12"></textarea></label>
+        <div class="actions kw-actions">
+          <button type="button" id="kw-delete">刪除</button>
+          <button type="submit" class="primary" id="kw-save">保存</button>
+          <span id="kw-msg" class="save-msg" role="status"></span>
+        </div>
+      </form>
+    </div>
+  </section>
 </main>
 
+<script src="keywords.js?v=__BUILD__"></script>
 <script src="calc.js?v=__BUILD__"></script>
 <script src="repo.js?v=__BUILD__"></script>
 <script src="cardview.js?v=__BUILD__"></script>

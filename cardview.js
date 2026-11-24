@@ -55,6 +55,18 @@
     }
     return s;
   }
+  // 特規文字（「手槍、速射、爆彈」）：有傳關鍵字查詢（玩家端）時，查得到的變成可點的連結（藍字虛線）
+  let KW = null; // render() 時設定：{ lookup(term) → 關鍵字 }
+  function kwText(s) {
+    s = strip(s);
+    if (!KW || !global.TaktikKW) return s;
+    const span = el('span');
+    global.TaktikKW.split(s).forEach((part) => {
+      const it = global.TaktikKW.isSep(part) ? null : KW.lookup(part);
+      span.append(it ? el('button', { type: 'button', class: 'kwlink', 'data-kw': it.id, title: `看「${it.name}」的說明` }, part) : part);
+    });
+    return span;
+  }
   // 單位構成：[ ] 裡的特規用 7.5pt 藍字、括號拿掉；多種模型時模型名稱粗體
   function blueTags(s, boldNames) {
     const span = el('span');
@@ -62,7 +74,7 @@
     const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const nameRe = names.length ? new RegExp('(' + names.map(esc).join('|') + ')') : null;
     String(s).split(/(\[[^\]]*\])/).forEach((part) => {
-      if (/^\[.*\]$/.test(part)) span.append(el('span', { class: 'kwtag' }, part.slice(1, -1)));
+      if (/^\[.*\]$/.test(part)) span.append(el('span', { class: 'kwtag' }, kwText(part.slice(1, -1))));
       else if (part && nameRe) part.split(nameRe).forEach((q) => { if (q) span.append(names.includes(q) ? el('b', null, q) : q); });
       else if (part) span.append(part);
     });
@@ -89,6 +101,7 @@
    */
   function render(card, result, opts = {}) {
     card = normalize(card);
+    KW = opts.keywords || null;
     const iconBase = opts.iconBase || 'icons/';
     const total = result ? result.total : (opts.total != null ? opts.total : null);
     const strValue = result && !isNaN(result.strValue) ? result.strValue
@@ -100,8 +113,8 @@
 
     const multi = card.profiles.length > 1;
     card.profiles.forEach((p) => {
-      if (!multi) root.append(el('div', { class: 'kw' }, strip(p.keywords)));
-      else root.append(el('div', { class: 'prof-name' }, el('span', { class: 'pname' }, text(p.name)), ' ', el('span', { class: 'kwtag' }, strip(p.keywords))));
+      if (!multi) root.append(el('div', { class: 'kw' }, kwText(p.keywords)));
+      else root.append(el('div', { class: 'prof-name' }, el('span', { class: 'pname' }, text(p.name)), ' ', el('span', { class: 'kwtag' }, kwText(p.keywords))));
       const shieldOn = /能量護盾/.test(p.keywords || '');
       root.append(el('table', { class: 'stats' },
         el('tr', { class: 'h' }, STAT_KEYS.map((k) => el('td', null, k))),
@@ -133,7 +146,7 @@
           tbl.append(el('tr', { class: 'mode' },
             el('td', null, WTYPES[m.icon] ? el('img', { class: 'icon', src: iconBase + WTYPES[m.icon].icon, alt: WTYPES[m.icon].label })
                 : el('img', { class: 'icon mode-icon', src: iconBase + 'mode.png', alt: '▶' }),
-              el('span', { class: 'wname' }, text(m.name)), ' ', el('span', { class: 'wrules' }, strip(m.rules))),
+              el('span', { class: 'wname' }, text(m.name)), ' ', el('span', { class: 'wrules' }, kwText(m.rules))),
             n('RNG'), n('STR'), n('D'), n('AS'), n('RL')));
         });
         return;
@@ -144,7 +157,7 @@
       const n = (k) => el('td', { class: 'n' }, el('span', null, k === 'STR' && melee ? meleeStr(w.STR, multi ? NaN : strValue) : text(w[k])));
       tbl.append(el('tr', null,
         el('td', null, el('img', { class: 'icon', src: iconBase + WTYPES[type].icon, alt: WTYPES[type].label }),
-          el('span', { class: 'wname' }, text(w.name)), ' ', el('span', { class: 'wrules' }, strip(w.rules))),
+          el('span', { class: 'wname' }, text(w.name)), ' ', el('span', { class: 'wrules' }, kwText(w.rules))),
         n('RNG'), n('STR'), n('D'), n('AS'), n('RL')));
     });
     root.append(tbl);
@@ -157,6 +170,7 @@
         return li;
       })));
     }
+    KW = null;
     return root;
   }
 

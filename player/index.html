@@ -94,8 +94,40 @@
       <p class="unit-meta" id="unit-meta"></p>
     </div>
   </section>
+
+  <!-- 關鍵字：只能搜尋、看說明 -->
+  <section id="screen-keywords" class="screen" hidden aria-labelledby="kw-title">
+    <div class="pagehead">
+      <h2 id="kw-title">關鍵字</h2>
+    </div>
+    <div class="toolbar">
+      <form class="search" id="kw-search" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="kw-q" type="search" placeholder="搜尋關鍵字名稱、英文、說明…" autocomplete="off" enterkeyhint="search" aria-label="搜尋關鍵字">
+      </form>
+      <div class="listhead"><span id="kw-count" role="status"></span></div>
+    </div>
+    <div class="list" id="kw-list"></div>
+  </section>
 </main>
 
+<!-- 關鍵字說明（點資料卡上的藍色虛線字跳出來；按返回回上一個） -->
+<div class="kw-sheet-wrap" id="kw-sheet-wrap" hidden>
+  <div class="kw-scrim" id="kw-scrim"></div>
+  <section class="kw-sheet" id="kw-sheet" role="dialog" aria-modal="true" aria-labelledby="kws-name" tabindex="-1">
+    <div class="kws-head">
+      <button type="button" class="kws-back" id="kws-back">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span id="kws-back-label">返回</span>
+      </button>
+    </div>
+    <h3 class="kws-name" id="kws-name"></h3>
+    <p class="kws-en" id="kws-en"></p>
+    <div class="kws-body" id="kws-body"></div>
+    <p class="kws-group" id="kws-group"></p>
+  </section>
+</div>
+
+<script src="../keywords.js?v=__BUILD__"></script>
 <script src="../calc.js?v=__BUILD__"></script>
 <script src="../repo.js?v=__BUILD__"></script>
 <script src="../cardview.js?v=__BUILD__"></script>
