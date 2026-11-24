@@ -1684,6 +1684,20 @@
         "自動滅火"
       ],
       "text": ""
+    },
+    {
+      "id": "kwmwudgzul",
+      "group": "複合關鍵字",
+      "name": "戰鬥服",
+      "en": "Combat Suit",
+      "includes": [
+        "先進視覺(24\")"
+      ],
+      "aliases": [
+        "戰鬥服",
+        "Combat Suit"
+      ],
+      "text": ""
     }
   ]
 }
