@@ -85,7 +85,50 @@
       "RL": "-"
     }
   ],
-  "optionWeapons": [],
+  "optionWeapons": [
+    {
+      "type": "ranged",
+      "name": "新式爆燃手槍Neo-Volkite Pistol",
+      "rules": "能量、爆燃、手槍",
+      "RNG": "12",
+      "STR": "9",
+      "D": "2",
+      "AS": "2",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "電漿手槍Plasma Pistol",
+      "rules": "能量彈、手槍",
+      "RNG": "",
+      "STR": "",
+      "D": "",
+      "AS": "",
+      "RL": "",
+      "modes": [
+        {
+          "icon": "mode",
+          "name": "標準Standard",
+          "rules": "",
+          "RNG": "12",
+          "STR": "14",
+          "D": "1",
+          "AS": "1",
+          "RL": "-"
+        },
+        {
+          "icon": "mode",
+          "name": "充能Supercharge",
+          "rules": "AOE 2”、過熱2",
+          "RNG": "12",
+          "STR": "16",
+          "D": "2",
+          "AS": "1",
+          "RL": "1"
+        }
+      ]
+    }
+  ],
   "options": [
     {
       "text": "此單位可以最多增加5個[劍衛老兵]",

@@ -74,6 +74,16 @@
       "D": "1",
       "AS": "D6",
       "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "悲憫匕首Misericordia",
+      "rules": "能量力場、額外攻擊、即死",
+      "RNG": "CC1",
+      "STR": "+4",
+      "D": "1",
+      "AS": "1",
+      "RL": "-"
     }
   ],
   "options": [

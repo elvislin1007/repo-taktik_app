@@ -298,6 +298,16 @@
       "RL": "-"
     },
     {
+      "type": "shield",
+      "name": "衛士之盾Guardian Shield",
+      "rules": "能量力場、盾牆",
+      "RNG": "CC1",
+      "STR": "+8",
+      "D": "2",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
       "type": "equipment",
       "name": "帝國聖旗Vexilla Imperius",
       "rules": "",
@@ -329,16 +339,6 @@
       "AS": "-",
       "RL": "-",
       "text": "裝備者6”內視為一個DEF15/HP6的[能量屏障]。 「200」"
-    },
-    {
-      "type": "shield",
-      "name": "衛士之盾Guardian Shield",
-      "rules": "能量力場、盾牆",
-      "RNG": "CC1",
-      "STR": "+8",
-      "D": "2",
-      "AS": "+0",
-      "RL": "-"
     }
   ],
   "options": [

@@ -75,7 +75,90 @@
       "RL": "-"
     }
   ],
-  "optionWeapons": [],
+  "optionWeapons": [
+    {
+      "type": "ranged",
+      "name": "手持火焰槍Hand Flamer",
+      "rules": "手槍、噴射、燃燒1",
+      "RNG": "6",
+      "STR": "7",
+      "D": "1",
+      "AS": "D6",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "電漿手槍Plasma Pistol",
+      "rules": "能量彈、手槍",
+      "RNG": "",
+      "STR": "",
+      "D": "",
+      "AS": "",
+      "RL": "",
+      "modes": [
+        {
+          "icon": "mode",
+          "name": "標準Standard",
+          "rules": "",
+          "RNG": "12",
+          "STR": "14",
+          "D": "1",
+          "AS": "1",
+          "RL": "-"
+        },
+        {
+          "icon": "mode",
+          "name": "充能Supercharge",
+          "rules": "AOE 2”、過熱2",
+          "RNG": "12",
+          "STR": "16",
+          "D": "2",
+          "AS": "1",
+          "RL": "1"
+        }
+      ]
+    },
+    {
+      "type": "ranged",
+      "name": "重力手槍Grav-pistol",
+      "rules": "能量、重力、手槍",
+      "RNG": "12",
+      "STR": "12",
+      "D": "1",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "閃電爪Lightning Claw",
+      "rules": "能量力場、撕碎",
+      "RNG": "CC1",
+      "STR": "+6",
+      "D": "1",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "動力拳套Power Fist",
+      "rules": "能量力場、後攻1",
+      "RNG": "CC1",
+      "STR": "+9",
+      "D": "2",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "grenade",
+      "name": "熱熔炸彈",
+      "rules": "能量、破甲、一次性",
+      "RNG": "CC1",
+      "STR": "17",
+      "D": "4",
+      "AS": "1",
+      "RL": "-"
+    }
+  ],
   "options": [
     {
       "text": "此單位可以最多增加5個[突擊仲裁者]",

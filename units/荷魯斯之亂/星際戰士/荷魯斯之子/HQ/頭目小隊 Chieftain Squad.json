@@ -109,7 +109,28 @@
       "text": "持有者6”內友方[軍團]單位進行[士氣]測試時WP視為7。衝鋒持有者所在單位不會獲得[衝鋒]帶來的任何優勢和能力加成。 「80」"
     }
   ],
-  "optionWeapons": [],
+  "optionWeapons": [
+    {
+      "type": "melee",
+      "name": "鏈鋸斧Chainaxe",
+      "rules": "撕碎",
+      "RNG": "CC1",
+      "STR": "+4",
+      "D": "1",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "動力拳套Power Fist",
+      "rules": "能量力場、後攻1",
+      "RNG": "CC1",
+      "STR": "+9",
+      "D": "2",
+      "AS": "+0",
+      "RL": "-"
+    }
+  ],
   "options": [
     {
       "text": "此單位可以最多增加5個[頭目]",

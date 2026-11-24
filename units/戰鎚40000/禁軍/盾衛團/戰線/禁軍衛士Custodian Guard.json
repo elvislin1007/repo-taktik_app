@@ -236,31 +236,11 @@
       ]
     },
     {
-      "type": "melee",
-      "name": "烈陽動力拳套Solerite Power Gauntlet",
-      "rules": "能量力場、沉重",
+      "type": "shield",
+      "name": "衛士之盾Guardian Shield",
+      "rules": "能量力場、盾牆",
       "RNG": "CC1",
-      "STR": "+11",
-      "D": "3",
-      "AS": "+0",
-      "RL": "-"
-    },
-    {
-      "type": "melee",
-      "name": "烈陽動力爪*2Solerite Power Talon*2",
-      "rules": "能量力場、撕碎、雙持",
-      "RNG": "CC1",
-      "STR": "+6",
-      "D": "2",
-      "AS": "+1",
-      "RL": "-"
-    },
-    {
-      "type": "melee",
-      "name": "烈陽動力爪Solerite Power Talon",
-      "rules": "能量力場、撕碎",
-      "RNG": "CC1",
-      "STR": "+6",
+      "STR": "+8",
       "D": "2",
       "AS": "+0",
       "RL": "-"
@@ -297,16 +277,6 @@
       "AS": "-",
       "RL": "-",
       "text": "裝備者6”內視為一個DEF15/HP6的[能量屏障]。 「200」"
-    },
-    {
-      "type": "shield",
-      "name": "衛士之盾Guardian Shield",
-      "rules": "能量力場、盾牆",
-      "RNG": "CC1",
-      "STR": "+8",
-      "D": "2",
-      "AS": "+0",
-      "RL": "-"
     }
   ],
   "options": [
@@ -358,31 +328,6 @@
     {
       "text": "哨戒戰刃",
       "pts": "每個-50pts",
-      "sub": true
-    },
-    {
-      "text": "任意模型可以將[衛士之矛]替換成以下選項：",
-      "pts": "",
-      "sub": false
-    },
-    {
-      "text": "烈陽動力拳套",
-      "pts": "免費",
-      "sub": true
-    },
-    {
-      "text": "烈陽動力爪*2",
-      "pts": "免費",
-      "sub": true
-    },
-    {
-      "text": "烈陽動力爪",
-      "pts": "每個-50pts",
-      "sub": true
-    },
-    {
-      "text": "精工動力武器",
-      "pts": "每個-100pts",
       "sub": true
     },
     {

@@ -114,6 +114,109 @@
       "AS": "+0",
       "RL": "-",
       "text": "此裝備抵擋[射擊]時STR視為+8；至少2個使用此裝備的模型可以放棄[主動動作]讓此單位獲得一個DEF13/HP3X(X=使用此裝備模型的數量)的[能量屏障]，此屏障承受[射擊]時DEF視為14，當使用此裝備的模型進行[主動動作]或是數量不足2時屏障都立刻解除。"
+    },
+    {
+      "type": "melee",
+      "name": "刺刀Bayonet",
+      "rules": "雙手",
+      "RNG": "CC1",
+      "STR": "+3",
+      "D": "1",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "鏈鋸刺刀Chains Bayonet",
+      "rules": "雙手、撕碎",
+      "RNG": "CC1",
+      "STR": "+4",
+      "D": "1",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "grenade",
+      "name": "熱熔炸彈",
+      "rules": "能量、破甲、一次性",
+      "RNG": "CC1",
+      "STR": "17",
+      "D": "4",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "手持火焰槍Hand Flamer",
+      "rules": "手槍、噴射、燃燒1",
+      "RNG": "6",
+      "STR": "7",
+      "D": "1",
+      "AS": "D6",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "電漿手槍Plasma Pistol",
+      "rules": "能量彈、手槍",
+      "RNG": "",
+      "STR": "",
+      "D": "",
+      "AS": "",
+      "RL": "",
+      "modes": [
+        {
+          "icon": "mode",
+          "name": "標準Standard",
+          "rules": "",
+          "RNG": "12",
+          "STR": "14",
+          "D": "1",
+          "AS": "1",
+          "RL": "-"
+        },
+        {
+          "icon": "mode",
+          "name": "充能Supercharge",
+          "rules": "AOE 2”、過熱2",
+          "RNG": "12",
+          "STR": "16",
+          "D": "2",
+          "AS": "1",
+          "RL": "1"
+        }
+      ]
+    },
+    {
+      "type": "melee",
+      "name": "鏈鋸劍Chainsword",
+      "rules": "撕碎",
+      "RNG": "CC1",
+      "STR": "+3",
+      "D": "1",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "閃電爪Lightning Claw",
+      "rules": "能量力場、撕碎",
+      "RNG": "CC1",
+      "STR": "+6",
+      "D": "1",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "equipment",
+      "name": "軍團戰旗(Legion Vexilla)",
+      "text": "每次啟動自動移除1PIN、近戰結算時得pts+1。 「50」",
+      "RNG": "-",
+      "STR": "-",
+      "D": "-",
+      "AS": "-",
+      "RL": "-",
+      "rules": ""
     }
   ],
   "options": [

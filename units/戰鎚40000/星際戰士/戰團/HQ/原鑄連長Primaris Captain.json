@@ -117,6 +117,78 @@
       "D": "1",
       "AS": "+0",
       "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "重爆彈手槍Heavy Bolt Pistol",
+      "rules": "爆彈、手槍、半自動",
+      "RNG": "18",
+      "STR": "9",
+      "D": "1",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "電漿手槍Plasma Pistol",
+      "rules": "能量彈、手槍",
+      "RNG": "",
+      "STR": "",
+      "D": "",
+      "AS": "",
+      "RL": "",
+      "modes": [
+        {
+          "icon": "mode",
+          "name": "標準Standard",
+          "rules": "",
+          "RNG": "12",
+          "STR": "14",
+          "D": "1",
+          "AS": "1",
+          "RL": "-"
+        },
+        {
+          "icon": "mode",
+          "name": "充能Supercharge",
+          "rules": "AOE 2”、過熱2",
+          "RNG": "12",
+          "STR": "16",
+          "D": "2",
+          "AS": "1",
+          "RL": "1"
+        }
+      ]
+    },
+    {
+      "type": "melee",
+      "name": "閃電爪Lightning Claw",
+      "rules": "能量力場、撕碎",
+      "RNG": "CC1",
+      "STR": "+6",
+      "D": "1",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "動力拳套Power Fist",
+      "rules": "能量力場、後攻1",
+      "RNG": "CC1",
+      "STR": "+9",
+      "D": "2",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "雷霆槌Thunder Hammer",
+      "rules": "能量力場、沉重",
+      "RNG": "CC1",
+      "STR": "+8",
+      "D": "3",
+      "AS": "+0",
+      "RL": "-"
     }
   ],
   "options": [

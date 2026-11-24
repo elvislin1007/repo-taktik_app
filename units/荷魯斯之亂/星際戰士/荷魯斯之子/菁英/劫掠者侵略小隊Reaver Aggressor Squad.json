@@ -75,7 +75,154 @@
       "RL": "-"
     }
   ],
-  "optionWeapons": [],
+  "optionWeapons": [
+    {
+      "type": "melee",
+      "name": "動力拳套Power Fist",
+      "rules": "能量力場、後攻1",
+      "RNG": "CC1",
+      "STR": "+9",
+      "D": "2",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "手持火焰槍Hand Flamer",
+      "rules": "手槍、噴射、燃燒1",
+      "RNG": "6",
+      "STR": "7",
+      "D": "1",
+      "AS": "D6",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "火焰槍Flamer",
+      "rules": "突擊、噴射、燃燒1",
+      "RNG": "12",
+      "STR": "8",
+      "D": "1",
+      "AS": "D6",
+      "RL": "-"
+    },
+    {
+      "type": "ranged",
+      "name": "電漿手槍Plasma Pistol",
+      "rules": "能量彈、手槍",
+      "RNG": "",
+      "STR": "",
+      "D": "",
+      "AS": "",
+      "RL": "",
+      "modes": [
+        {
+          "icon": "mode",
+          "name": "標準Standard",
+          "rules": "",
+          "RNG": "12",
+          "STR": "14",
+          "D": "1",
+          "AS": "1",
+          "RL": "-"
+        },
+        {
+          "icon": "mode",
+          "name": "充能Supercharge",
+          "rules": "AOE 2”、過熱2",
+          "RNG": "12",
+          "STR": "16",
+          "D": "2",
+          "AS": "1",
+          "RL": "1"
+        }
+      ]
+    },
+    {
+      "type": "ranged",
+      "name": "電漿槍Plasma Gun",
+      "rules": "能量彈",
+      "RNG": "",
+      "STR": "",
+      "D": "",
+      "AS": "",
+      "RL": "",
+      "modes": [
+        {
+          "icon": "mode",
+          "name": "標準Standard",
+          "rules": "速射",
+          "RNG": "24",
+          "STR": "14",
+          "D": "1",
+          "AS": "1/2",
+          "RL": "-"
+        },
+        {
+          "icon": "mode",
+          "name": "充能Supercharge",
+          "rules": "AOE 2”、過熱2",
+          "RNG": "24",
+          "STR": "16",
+          "D": "2",
+          "AS": "1",
+          "RL": "1"
+        }
+      ]
+    },
+    {
+      "type": "ranged",
+      "name": "熱熔槍Meltagun",
+      "rules": "能量、熱熔、突擊",
+      "RNG": "12",
+      "STR": "17",
+      "D": "3",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "grenade",
+      "name": "熱熔炸彈",
+      "rules": "能量、破甲、一次性",
+      "RNG": "CC1",
+      "STR": "17",
+      "D": "4",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "equipment",
+      "name": "信使音陣(Nuncio-Vox)",
+      "text": "友方單位在裝備者24”內進行曲射、轟炸、空降或是傳送時，可以重擲任何偏誤骰。 「50」",
+      "RNG": "-",
+      "STR": "-",
+      "D": "-",
+      "AS": "-",
+      "RL": "-",
+      "rules": ""
+    },
+    {
+      "type": "equipment",
+      "name": "軍團戰旗(Legion Vexilla)",
+      "text": "每次啟動自動移除1PIN、近戰結算時得pts+1。 「50」",
+      "RNG": "-",
+      "STR": "-",
+      "D": "-",
+      "AS": "-",
+      "RL": "-",
+      "rules": ""
+    },
+    {
+      "type": "melee",
+      "name": "閃電爪*2 Lightning Claw*2",
+      "rules": "能量力場、撕碎、雙持",
+      "RNG": "CC1",
+      "STR": "+6",
+      "D": "1",
+      "AS": "+0",
+      "RL": "-"
+    }
+  ],
   "options": [
     {
       "text": "此單位可以最多增加15個[劫掠者]",
