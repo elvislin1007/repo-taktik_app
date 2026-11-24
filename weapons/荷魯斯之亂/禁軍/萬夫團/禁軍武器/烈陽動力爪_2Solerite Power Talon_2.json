@@ -1,0 +1,15 @@
+{
+  "type": "melee",
+  "name": "烈陽動力爪*2Solerite Power Talon*2",
+  "rules": "能量力場、撕碎、雙持",
+  "RNG": "CC1",
+  "STR": "+6",
+  "D": "2",
+  "AS": "+1",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "禁軍",
+  "subfaction": "萬夫團",
+  "category": "禁軍武器",
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}

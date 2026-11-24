@@ -1,0 +1,15 @@
+{
+  "type": "melee",
+  "name": "攔截騎槍Interceptor lance",
+  "rules": "能量力場、破襲1",
+  "RNG": "CC2",
+  "STR": "+7",
+  "D": "2",
+  "AS": "+0",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "禁軍",
+  "subfaction": "盾衛團",
+  "category": "禁軍武器",
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}

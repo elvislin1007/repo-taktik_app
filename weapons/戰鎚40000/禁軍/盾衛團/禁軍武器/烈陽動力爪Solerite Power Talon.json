@@ -1,0 +1,15 @@
+{
+  "type": "melee",
+  "name": "烈陽動力爪Solerite Power Talon",
+  "rules": "能量力場、撕碎",
+  "RNG": "CC1",
+  "STR": "+6",
+  "D": "2",
+  "AS": "+0",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "禁軍",
+  "subfaction": "盾衛團",
+  "category": "禁軍武器",
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}

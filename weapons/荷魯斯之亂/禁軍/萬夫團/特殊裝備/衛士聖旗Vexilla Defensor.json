@@ -1,0 +1,16 @@
+{
+  "type": "equipment",
+  "name": "衛士聖旗Vexilla Defensor",
+  "rules": "",
+  "RNG": "-",
+  "STR": "-",
+  "D": "-",
+  "AS": "-",
+  "RL": "-",
+  "text": "裝備者6”內視為一個DEF15/HP6的[能量屏障]。 「200」",
+  "series": "荷魯斯之亂",
+  "faction": "禁軍",
+  "subfaction": "萬夫團",
+  "category": "特殊裝備",
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}

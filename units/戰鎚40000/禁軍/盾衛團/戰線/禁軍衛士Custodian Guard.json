@@ -1,0 +1,503 @@
+{
+  "series": "戰鎚40000",
+  "faction": "禁軍",
+  "subfaction": "盾衛團",
+  "category": "戰線",
+  "name": "禁軍衛士Custodian Guard",
+  "profiles": [
+    {
+      "name": "",
+      "keywords": "人類帝國(40K)、禁軍、盾衛團、步兵、生物、人物、戰線、能量護盾",
+      "stats": {
+        "M": "8",
+        "STR": "8",
+        "FS": "5",
+        "BS": "5",
+        "CON": "5",
+        "AGI": "6",
+        "PER": "5",
+        "INT": "5",
+        "WP": "7",
+        "DEF": "14/13",
+        "HP": "3/2",
+        "WT": "5"
+      }
+    }
+  ],
+  "composition": [
+    "3個禁軍衛士配備：衛士之矛、破片手榴彈"
+  ],
+  "abilities": [
+    {
+      "text": "禁軍武藝"
+    }
+  ],
+  "weapons": [
+    {
+      "type": "multi",
+      "name": "衛士之矛Guardian Spear",
+      "rules": "",
+      "RNG": "",
+      "STR": "",
+      "D": "",
+      "AS": "",
+      "RL": "",
+      "modes": [
+        {
+          "icon": "mode",
+          "name": "射擊Range",
+          "rules": "爆彈、突擊、撕碎",
+          "RNG": "18",
+          "STR": "9",
+          "D": "2",
+          "AS": "2",
+          "RL": "-"
+        },
+        {
+          "icon": "mode",
+          "name": "近戰Melee",
+          "rules": "能量力場、收割1、雙手",
+          "RNG": "CC2",
+          "STR": "+7",
+          "D": "2",
+          "AS": "+0",
+          "RL": "-"
+        }
+      ]
+    },
+    {
+      "type": "grenade",
+      "name": "破片手榴彈Frag grenade",
+      "rules": "HE3”",
+      "RNG": "8",
+      "STR": "7/7",
+      "D": "2/1",
+      "AS": "1",
+      "RL": "-"
+    }
+  ],
+  "optionWeapons": [
+    {
+      "type": "melee",
+      "name": "悲憫匕首Misericordia",
+      "rules": "能量力場、額外攻擊、即死",
+      "RNG": "CC1",
+      "STR": "+4",
+      "D": "1",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "grenade",
+      "name": "熱熔炸彈",
+      "rules": "能量、破甲、一次性",
+      "RNG": "CC1",
+      "STR": "17",
+      "D": "4",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "grenade",
+      "name": "纏足手榴彈Tanglefoot Grenade",
+      "rules": "AOE 3”、減速",
+      "RNG": "STR+3",
+      "STR": "-",
+      "D": "-",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "type": "multi",
+      "name": "火神之矛Pyrihite Spear",
+      "rules": "",
+      "RNG": "",
+      "STR": "",
+      "D": "",
+      "AS": "",
+      "RL": "",
+      "modes": [
+        {
+          "icon": "mode",
+          "name": "射擊Range",
+          "rules": "突擊、能量、熱熔",
+          "RNG": "18",
+          "STR": "17",
+          "D": "3",
+          "AS": "1",
+          "RL": "-"
+        },
+        {
+          "icon": "mode",
+          "name": "近戰Melee",
+          "rules": "能量力場、收割1、雙手",
+          "RNG": "CC2",
+          "STR": "+7",
+          "D": "2",
+          "AS": "+0",
+          "RL": "-"
+        }
+      ]
+    },
+    {
+      "type": "multi",
+      "name": "亞德拉賽特矛Adrasite Spear",
+      "rules": "",
+      "RNG": "",
+      "STR": "",
+      "D": "",
+      "AS": "",
+      "RL": "",
+      "modes": [
+        {
+          "icon": "ranged",
+          "name": "射擊Shooting",
+          "rules": "突擊、能量、致命、過熱1",
+          "RNG": "18",
+          "STR": "12",
+          "D": "3",
+          "AS": "1",
+          "RL": "-"
+        },
+        {
+          "icon": "melee",
+          "name": "近戰Melee",
+          "rules": "能量力場、雙手、收割1",
+          "RNG": "CC2",
+          "STR": "+7",
+          "D": "2",
+          "AS": "+0",
+          "RL": "-"
+        }
+      ]
+    },
+    {
+      "type": "multi",
+      "name": "堡主戰斧Castellan Axe",
+      "rules": "",
+      "RNG": "",
+      "STR": "",
+      "D": "",
+      "AS": "",
+      "RL": "",
+      "modes": [
+        {
+          "icon": "ranged",
+          "name": "射擊Shooting",
+          "rules": "突擊、爆彈、撕碎",
+          "RNG": "18",
+          "STR": "9",
+          "D": "2",
+          "AS": "2",
+          "RL": "-"
+        },
+        {
+          "icon": "melee",
+          "name": "近戰Melee",
+          "rules": "能量力場、雙手、後攻1",
+          "RNG": "CC2",
+          "STR": "+9",
+          "D": "2",
+          "AS": "+0",
+          "RL": "-"
+        }
+      ]
+    },
+    {
+      "type": "multi",
+      "name": "哨戒戰刃Sentinel Warblade",
+      "rules": "",
+      "RNG": "",
+      "STR": "",
+      "D": "",
+      "AS": "",
+      "RL": "",
+      "modes": [
+        {
+          "icon": "mode",
+          "name": "射擊Range",
+          "rules": "手槍、爆彈、撕碎",
+          "RNG": "18",
+          "STR": "9",
+          "D": "2",
+          "AS": "2",
+          "RL": "-"
+        },
+        {
+          "icon": "mode",
+          "name": "近戰Melee",
+          "rules": "能量力場",
+          "RNG": "CC1",
+          "STR": "+6",
+          "D": "2",
+          "AS": "+0",
+          "RL": "-"
+        }
+      ]
+    },
+    {
+      "type": "melee",
+      "name": "烈陽動力拳套Solerite Power Gauntlet",
+      "rules": "能量力場、沉重",
+      "RNG": "CC1",
+      "STR": "+11",
+      "D": "3",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "烈陽動力爪*2Solerite Power Talon*2",
+      "rules": "能量力場、撕碎、雙持",
+      "RNG": "CC1",
+      "STR": "+6",
+      "D": "2",
+      "AS": "+1",
+      "RL": "-"
+    },
+    {
+      "type": "melee",
+      "name": "烈陽動力爪Solerite Power Talon",
+      "rules": "能量力場、撕碎",
+      "RNG": "CC1",
+      "STR": "+6",
+      "D": "2",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "type": "equipment",
+      "name": "帝國聖旗Vexilla Imperius",
+      "rules": "",
+      "RNG": "-",
+      "STR": "-",
+      "D": "-",
+      "AS": "-",
+      "RL": "-",
+      "text": "裝備者6”內[禁軍][步兵]、[禁軍][人物]單位近戰AS+1。 「200」"
+    },
+    {
+      "type": "equipment",
+      "name": "華麗聖旗Vexilla Magnifica",
+      "rules": "",
+      "RNG": "-",
+      "STR": "-",
+      "D": "-",
+      "AS": "-",
+      "RL": "-",
+      "text": "裝備者24”內的敵方單位將裝備者所在單位指定為[射擊]、[施法]或[近戰]目標時立刻受到一個[至盲1]的效果，不需要視線的能力或攻擊無視此效果。 「200」"
+    },
+    {
+      "type": "equipment",
+      "name": "衛士聖旗Vexilla Defensor",
+      "rules": "",
+      "RNG": "-",
+      "STR": "-",
+      "D": "-",
+      "AS": "-",
+      "RL": "-",
+      "text": "裝備者6”內視為一個DEF15/HP6的[能量屏障]。 「200」"
+    },
+    {
+      "type": "shield",
+      "name": "衛士之盾Guardian Shield",
+      "rules": "能量力場、盾牆",
+      "RNG": "CC1",
+      "STR": "+8",
+      "D": "2",
+      "AS": "+0",
+      "RL": "-"
+    }
+  ],
+  "options": [
+    {
+      "text": "此單位可以最多增加7個[禁軍衛士]",
+      "pts": "每個500pts",
+      "sub": false
+    },
+    {
+      "text": "任意模型可以選擇以下選項：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "悲憫匕首",
+      "pts": "每個50pts",
+      "sub": true
+    },
+    {
+      "text": "熱熔炸彈",
+      "pts": "每個50pts",
+      "sub": true
+    },
+    {
+      "text": "纏足手榴彈",
+      "pts": "每個50pts",
+      "sub": true
+    },
+    {
+      "text": "任意模型可以將[衛士之矛]替換成一個以下選項：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "火神之矛",
+      "pts": "每個100pts",
+      "sub": true
+    },
+    {
+      "text": "亞德拉賽特矛",
+      "pts": "免費",
+      "sub": true
+    },
+    {
+      "text": "堡主戰斧",
+      "pts": "免費",
+      "sub": true
+    },
+    {
+      "text": "哨戒戰刃",
+      "pts": "每個-50pts",
+      "sub": true
+    },
+    {
+      "text": "任意模型可以將[衛士之矛]替換成以下選項：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "烈陽動力拳套",
+      "pts": "免費",
+      "sub": true
+    },
+    {
+      "text": "烈陽動力爪*2",
+      "pts": "免費",
+      "sub": true
+    },
+    {
+      "text": "烈陽動力爪",
+      "pts": "每個-50pts",
+      "sub": true
+    },
+    {
+      "text": "精工動力武器",
+      "pts": "每個-100pts",
+      "sub": true
+    },
+    {
+      "text": "任意未裝備[雙手]和[雙持]武器的模型可以裝備[衛士之盾]",
+      "pts": "每個100pts",
+      "sub": false
+    },
+    {
+      "text": "1個未裝備[雙手]和[雙持]武器的模型可以選擇以下選項：",
+      "pts": "",
+      "sub": false
+    },
+    {
+      "text": "帝國聖旗",
+      "pts": "200pts",
+      "sub": true
+    },
+    {
+      "text": "華麗聖旗",
+      "pts": "200pts",
+      "sub": true
+    },
+    {
+      "text": "衛士聖旗",
+      "pts": "200pts",
+      "sub": true
+    }
+  ],
+  "result": {
+    "total": 1020,
+    "steps": [
+      {
+        "label": "武器：衛士之矛Guardian Spear ▶射擊Range",
+        "calc": "RNG 18、STR 9、D 2、AS ×2、無須裝填 ×1；規則 爆彈 +0.1、突擊 +0.1、撕碎 +0.3",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(14.8 + 0) × 1.3 × 0.9 × 1.5 × 2 × 1 × 1 = 51.95 → 取整",
+        "value": 50
+      },
+      {
+        "label": "武器：衛士之矛Guardian Spear ▶近戰Melee（近戰）",
+        "calc": "CC2、STR +7（查 STR 13）、D 2、AS 一般 ×1；規則 能量力場 +0.2、雙手 −0.1",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(31.6 + 0) × 2 × 1.3 × 1.1 × 1.1 × 1 × 1 = 99.41 → 取整",
+        "value": 100
+      },
+      {
+        "label": "　衛士之矛Guardian Spear 合計",
+        "calc": "射擊取最高 50 ＋ 近戰取最高 100",
+        "value": 150
+      },
+      {
+        "label": "武器：破片手榴彈Frag grenade（手榴彈）",
+        "calc": "RNG 8、STR 7/7、D 2/1、AS ×1、無須裝填 ×1；規則 無；修正 手榴彈（類型） ×0.2",
+        "value": ""
+      },
+      {
+        "label": "　算式",
+        "calc": "(8.8 + 0) × 1.3 × 0.4 × 1 × 1 × 1 × 0.2；爆炸 (8.8 + 0) × 1 × 0.4 × 1 × 3\" × 1 × 1 × 0.2 = 2.11，×0.5 = 1.97 → 取整",
+        "value": 0
+      },
+      {
+        "label": "本體基數總和",
+        "calc": "STR8=11.6 + FS5=3.2 + BS5=3.2 + CON5=3.2 + AGI6=6.4 + PER5=3.2 + INT5=3.2 + WP7=12.8 + DEF14=22.4",
+        "value": 69.2
+      },
+      {
+        "label": "血量加乘",
+        "calc": "1 + (3 − 1) × 0.3",
+        "value": 1.6
+      },
+      {
+        "label": "速度加乘",
+        "calc": "1 + 8 × 0.05",
+        "value": 1.4
+      },
+      {
+        "label": "本體特規加成",
+        "calc": "無",
+        "value": 1
+      },
+      {
+        "label": "本體分數",
+        "calc": "69.2 × 1.6 × 1.4 × 1",
+        "value": 155.01
+      },
+      {
+        "label": "額外加成：能量護盾",
+        "calc": "A = 護盾DEF13 基數 18.4，B = 護盾HP 2；A × B（獨立）",
+        "value": 36.8
+      },
+      {
+        "label": "每個模型",
+        "calc": "本體 155.01 + 額外 36.8 + 武器 150",
+        "value": "341.81 → 340"
+      },
+      {
+        "label": "模型數",
+        "calc": "依單位構成：3 個；340 × 3",
+        "value": 1020
+      },
+      {
+        "label": "總分",
+        "calc": "1020",
+        "value": 1020
+      }
+    ],
+    "warnings": [
+      "衛士之矛Guardian Spear ▶近戰Melee：武器特規「收割1」資料庫查不到，這次沒算"
+    ]
+  },
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}

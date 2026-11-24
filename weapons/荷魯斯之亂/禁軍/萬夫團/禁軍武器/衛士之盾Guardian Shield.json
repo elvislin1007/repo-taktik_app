@@ -1,0 +1,15 @@
+{
+  "type": "shield",
+  "name": "衛士之盾Guardian Shield",
+  "rules": "能量力場、盾牆",
+  "RNG": "CC1",
+  "STR": "+8",
+  "D": "2",
+  "AS": "+0",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "禁軍",
+  "subfaction": "萬夫團",
+  "category": "禁軍武器",
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}

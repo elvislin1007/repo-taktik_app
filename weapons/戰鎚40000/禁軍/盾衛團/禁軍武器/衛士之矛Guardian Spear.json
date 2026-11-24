@@ -1,0 +1,37 @@
+{
+  "type": "multi",
+  "name": "衛士之矛Guardian Spear",
+  "rules": "",
+  "RNG": "",
+  "STR": "",
+  "D": "",
+  "AS": "",
+  "RL": "",
+  "modes": [
+    {
+      "icon": "mode",
+      "name": "射擊Range",
+      "rules": "爆彈、速射",
+      "RNG": "18",
+      "STR": "9",
+      "D": "2",
+      "AS": "2",
+      "RL": "-"
+    },
+    {
+      "icon": "mode",
+      "name": "近戰Melee",
+      "rules": "能量力場、收割1、雙手",
+      "RNG": "CC2",
+      "STR": "+7",
+      "D": "2",
+      "AS": "+0",
+      "RL": "-"
+    }
+  ],
+  "series": "戰鎚40000",
+  "faction": "禁軍",
+  "subfaction": "盾衛團",
+  "category": "禁軍武器",
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}

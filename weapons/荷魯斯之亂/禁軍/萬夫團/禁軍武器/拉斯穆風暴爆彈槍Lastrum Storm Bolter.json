@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "拉斯穆風暴爆彈槍Lastrum Storm Bolter",
+  "rules": "爆彈、速射、撕碎",
+  "RNG": "24",
+  "STR": "10",
+  "D": "2",
+  "AS": "2/4",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "禁軍",
+  "subfaction": "萬夫團",
+  "category": "禁軍武器",
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}

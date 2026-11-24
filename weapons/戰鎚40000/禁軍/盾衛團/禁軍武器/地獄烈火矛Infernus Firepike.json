@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "地獄烈火矛Infernus Firepike",
+  "rules": "噴射、重型、無視掩體、燃燒1",
+  "RNG": "12",
+  "STR": "12",
+  "D": "1",
+  "AS": "D6",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "禁軍",
+  "subfaction": "盾衛團",
+  "category": "禁軍武器",
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}

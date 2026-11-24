@@ -1,0 +1,16 @@
+{
+  "type": "equipment",
+  "name": "帝國聖旗Vexilla Imperius",
+  "rules": "",
+  "RNG": "-",
+  "STR": "-",
+  "D": "-",
+  "AS": "-",
+  "RL": "-",
+  "text": "裝備者6”內[禁軍][步兵]、[禁軍][人物]單位近戰AS+1。 「200」",
+  "series": "戰鎚40000",
+  "faction": "禁軍",
+  "subfaction": "盾衛團",
+  "category": "特殊裝備",
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}

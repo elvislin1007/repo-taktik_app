@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "集束導彈Salvo Launcher",
+  "rules": "HEAT3”、智能導彈1、破甲",
+  "RNG": "24",
+  "STR": "17/6",
+  "D": "3/1",
+  "AS": "1",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "禁軍",
+  "subfaction": "盾衛團",
+  "category": "禁軍武器",
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}

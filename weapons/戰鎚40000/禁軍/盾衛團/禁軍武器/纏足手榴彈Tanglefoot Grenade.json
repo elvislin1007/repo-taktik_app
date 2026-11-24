@@ -1,0 +1,15 @@
+{
+  "type": "grenade",
+  "name": "纏足手榴彈Tanglefoot Grenade",
+  "rules": "AOE 3”、減速",
+  "RNG": "STR+3",
+  "STR": "-",
+  "D": "-",
+  "AS": "1",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "禁軍",
+  "subfaction": "盾衛團",
+  "category": "禁軍武器",
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}

@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "颶風爆彈槍Hurricane Bolter",
+  "rules": "爆彈、速射",
+  "RNG": "24",
+  "STR": "8",
+  "D": "1",
+  "AS": "6/12",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "禁軍",
+  "subfaction": "盾衛團",
+  "category": "禁軍武器",
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}

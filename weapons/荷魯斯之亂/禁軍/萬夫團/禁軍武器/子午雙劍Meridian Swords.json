@@ -1,0 +1,47 @@
+{
+  "type": "melee",
+  "name": "子午雙劍Meridian Swords",
+  "rules": "能量力場、雙持",
+  "RNG": "",
+  "STR": "",
+  "D": "",
+  "AS": "",
+  "RL": "",
+  "modes": [
+    {
+      "icon": "mode",
+      "name": "展鷹翼Raptor Spreads its wings",
+      "rules": "速攻2",
+      "RNG": "CC1",
+      "STR": "+6",
+      "D": "2",
+      "AS": "+0",
+      "RL": "-"
+    },
+    {
+      "icon": "mode",
+      "name": "擒虹蛇Grasp the Rainbow Serpent",
+      "rules": "致命",
+      "RNG": "CC1",
+      "STR": "+11",
+      "D": "3",
+      "AS": "-2",
+      "RL": "-"
+    },
+    {
+      "icon": "mode",
+      "name": "斷雲手Hands Cut the Clouds",
+      "rules": "✶致命",
+      "RNG": "CC1",
+      "STR": "+7",
+      "D": "2",
+      "AS": "+0",
+      "RL": "-"
+    }
+  ],
+  "series": "荷魯斯之亂",
+  "faction": "禁軍",
+  "subfaction": "萬夫團",
+  "category": "禁軍武器",
+  "savedAt": "2026-11-24T18:00:00.000Z"
+}
