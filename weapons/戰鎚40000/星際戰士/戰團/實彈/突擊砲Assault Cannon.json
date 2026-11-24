@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "突擊砲Assault Cannon",
+  "rules": "重型、✶穿甲2",
+  "RNG": "24",
+  "STR": "11",
+  "D": "1",
+  "AS": "6",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "星際戰士",
+  "subfaction": "戰團",
+  "category": "實彈",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

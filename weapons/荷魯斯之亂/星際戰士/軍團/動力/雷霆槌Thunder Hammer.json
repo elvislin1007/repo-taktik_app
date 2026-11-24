@@ -1,0 +1,15 @@
+{
+  "type": "melee",
+  "name": "雷霆槌Thunder Hammer",
+  "rules": "能量力場、沉重",
+  "RNG": "CC1",
+  "STR": "+8",
+  "D": "3",
+  "AS": "+0",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "軍團",
+  "category": "動力",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

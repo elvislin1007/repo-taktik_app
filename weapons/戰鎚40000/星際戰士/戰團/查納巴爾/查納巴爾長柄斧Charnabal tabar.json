@@ -1,0 +1,15 @@
+{
+  "type": "melee",
+  "name": "查納巴爾長柄斧Charnabal tabar",
+  "rules": "✶穿甲3、先攻1",
+  "RNG": "CC2",
+  "STR": "+5",
+  "D": "1",
+  "AS": "+0",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "星際戰士",
+  "subfaction": "戰團",
+  "category": "查納巴爾",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

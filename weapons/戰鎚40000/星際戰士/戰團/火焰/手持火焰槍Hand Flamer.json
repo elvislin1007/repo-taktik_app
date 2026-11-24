@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "手持火焰槍Hand Flamer",
+  "rules": "手槍、噴射、燃燒1",
+  "RNG": "6",
+  "STR": "7",
+  "D": "1",
+  "AS": "D6",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "星際戰士",
+  "subfaction": "戰團",
+  "category": "火焰",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

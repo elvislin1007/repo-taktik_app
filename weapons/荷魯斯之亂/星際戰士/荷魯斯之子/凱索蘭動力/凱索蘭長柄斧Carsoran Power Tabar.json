@@ -1,0 +1,15 @@
+{
+  "type": "melee",
+  "name": "凱索蘭長柄斧Carsoran Power Tabar",
+  "rules": "能量力場、雙手、✶穿甲2",
+  "RNG": "2",
+  "STR": "+7",
+  "D": "1",
+  "AS": "+0",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "荷魯斯之子",
+  "category": "凱索蘭動力",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

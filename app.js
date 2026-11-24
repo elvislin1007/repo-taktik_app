@@ -757,7 +757,8 @@
     st.textContent = '讀取武器庫…'; st.className = 'dlg-status';
     try {
       const raw = await R.loadBundle('weapons', 'weapons.json', includeRepo);
-      libItems = raw.filter((x) => x && x.path && x.data).map((x) => {
+      // 特殊裝備（type: equipment）先只存在 repo，等有格式和圖示再在前端顯示
+      libItems = raw.filter((x) => x && x.path && x.data && x.data.type !== 'equipment').map((x) => {
         const segs = x.path.replace(/^weapons\//, '').replace(/\.json$/, '').split('/');
         segs.pop(); // 檔名
         return { path: x.path, series: x.data.series || segs[0] || '', faction: x.data.faction || segs[1] || '', subfaction: x.data.subfaction || segs[2] || '', category: x.data.category || (segs.length > 3 ? segs[3] : ''), w: x.data };

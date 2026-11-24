@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "爆燃鳥銃Volkite Caliver",
+  "rules": "能量、爆燃、重型",
+  "RNG": "30",
+  "STR": "10",
+  "D": "2",
+  "AS": "3",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "星際戰士",
+  "subfaction": "戰團",
+  "category": "爆燃",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

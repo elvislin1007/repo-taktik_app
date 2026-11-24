@@ -1,0 +1,11 @@
+{
+  "type": "equipment",
+  "name": "軍團戰旗(Legion Vexilla)",
+  "text": "每次啟動自動移除1PIN、近戰結算時得pts+1。",
+  "pts": "50",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "軍團",
+  "category": "特殊裝備",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

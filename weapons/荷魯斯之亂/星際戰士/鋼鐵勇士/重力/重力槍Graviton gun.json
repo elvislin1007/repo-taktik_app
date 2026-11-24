@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "重力槍Graviton gun",
+  "rules": "能量、重力、擊暈1、AOE 3”、重型",
+  "RNG": "12",
+  "STR": "12",
+  "D": "2",
+  "AS": "1",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "鋼鐵勇士",
+  "category": "重力",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

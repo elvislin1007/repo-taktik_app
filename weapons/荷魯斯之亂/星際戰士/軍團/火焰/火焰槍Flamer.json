@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "火焰槍Flamer",
+  "rules": "突擊、噴射、燃燒1",
+  "RNG": "12",
+  "STR": "8",
+  "D": "1",
+  "AS": "D6",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "軍團",
+  "category": "火焰",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

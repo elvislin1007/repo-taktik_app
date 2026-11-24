@@ -1,0 +1,37 @@
+{
+  "type": "ranged",
+  "name": "靈火爆裂槍Warpfire Blaster",
+  "rules": "突擊、能量彈、壓制",
+  "RNG": "",
+  "STR": "",
+  "D": "",
+  "AS": "",
+  "RL": "",
+  "modes": [
+    {
+      "icon": "mode",
+      "name": "標準Standard",
+      "rules": "",
+      "RNG": "18",
+      "STR": "14",
+      "D": "1",
+      "AS": "2",
+      "RL": "-"
+    },
+    {
+      "icon": "mode",
+      "name": "充能Supercharge",
+      "rules": "AOE 1”、過熱2",
+      "RNG": "18",
+      "STR": "16",
+      "D": "2",
+      "AS": "2",
+      "RL": "1"
+    }
+  ],
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "懷言者",
+  "category": "靈火",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

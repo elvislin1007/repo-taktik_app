@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "爆彈槍Boltgun",
+  "rules": "爆彈、速射",
+  "RNG": "24",
+  "STR": "8",
+  "D": "1",
+  "AS": "1/2",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "軍團",
+  "category": "爆彈",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

@@ -1,0 +1,15 @@
+{
+  "type": "shield",
+  "name": "跳幫盾Boarding Shield",
+  "rules": "能量力場、重裝、盾牆",
+  "RNG": "1",
+  "STR": "+7",
+  "D": "1",
+  "AS": "+0",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "軍團",
+  "category": "盾牌",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

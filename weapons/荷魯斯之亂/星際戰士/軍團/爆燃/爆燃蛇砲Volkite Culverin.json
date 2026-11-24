@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "爆燃蛇砲Volkite Culverin",
+  "rules": "能量、爆燃、重型",
+  "RNG": "45",
+  "STR": "10",
+  "D": "2",
+  "AS": "4",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "軍團",
+  "category": "爆燃",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

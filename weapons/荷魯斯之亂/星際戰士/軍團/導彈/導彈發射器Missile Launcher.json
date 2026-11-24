@@ -1,0 +1,47 @@
+{
+  "type": "ranged",
+  "name": "導彈發射器Missile Launcher",
+  "rules": "重型、智能導彈1",
+  "RNG": "",
+  "STR": "",
+  "D": "",
+  "AS": "",
+  "RL": "",
+  "modes": [
+    {
+      "icon": "mode",
+      "name": "破片彈Frag Missile",
+      "rules": "HE 4”",
+      "RNG": "48",
+      "STR": "8/7",
+      "D": "4/2",
+      "AS": "1",
+      "RL": "1"
+    },
+    {
+      "icon": "mode",
+      "name": "穿甲彈Krak Missile",
+      "rules": "HEAT 3”",
+      "RNG": "48",
+      "STR": "15/6",
+      "D": "3/1",
+      "AS": "1",
+      "RL": "1"
+    },
+    {
+      "icon": "mode",
+      "name": "對空彈Flak Missile",
+      "rules": "HEAT 3”、防空",
+      "RNG": "48",
+      "STR": "14/5",
+      "D": "3/1",
+      "AS": "1",
+      "RL": "1"
+    }
+  ],
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "軍團",
+  "category": "導彈",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "重力槍Grav-gun",
+  "rules": "能量、重力、速射",
+  "RNG": "12",
+  "STR": "18",
+  "D": "1",
+  "AS": "1/2",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "軍團",
+  "category": "重力",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

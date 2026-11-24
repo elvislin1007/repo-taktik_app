@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "災星組合爆彈槍Banestrike Combi-bolter",
+  "rules": "速射、✶穿甲2",
+  "RNG": "18",
+  "STR": "10",
+  "D": "1",
+  "AS": "2/4",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "荷魯斯之子",
+  "category": "災星爆彈",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "重爆彈手槍Heavy Bolt Pistol",
+  "rules": "爆彈、手槍、半自動",
+  "RNG": "18",
+  "STR": "9",
+  "D": "1",
+  "AS": "1",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "星際戰士",
+  "subfaction": "戰團",
+  "category": "爆彈",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

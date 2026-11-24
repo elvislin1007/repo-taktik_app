@@ -1,0 +1,15 @@
+{
+  "type": "melee",
+  "name": "腐化戰斧Tainted Axe",
+  "rules": "後攻1、✶致命",
+  "RNG": "1",
+  "STR": "+7",
+  "D": "1",
+  "AS": "+0",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "懷言者",
+  "category": "腐化",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

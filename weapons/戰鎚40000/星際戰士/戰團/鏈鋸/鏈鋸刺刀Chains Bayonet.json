@@ -1,0 +1,15 @@
+{
+  "type": "melee",
+  "name": "鏈鋸刺刀Chains Bayonet",
+  "rules": "雙手、撕碎",
+  "RNG": "CC1",
+  "STR": "+4",
+  "D": "1",
+  "AS": "+0",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "星際戰士",
+  "subfaction": "戰團",
+  "category": "鏈鋸",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

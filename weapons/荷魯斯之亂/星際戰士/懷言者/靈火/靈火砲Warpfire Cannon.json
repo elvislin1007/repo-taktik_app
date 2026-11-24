@@ -1,0 +1,37 @@
+{
+  "type": "ranged",
+  "name": "靈火砲Warpfire Cannon",
+  "rules": "重型、AOE3”、能量彈、壓制",
+  "RNG": "",
+  "STR": "",
+  "D": "",
+  "AS": "",
+  "RL": "",
+  "modes": [
+    {
+      "icon": "mode",
+      "name": "標準Standard",
+      "rules": "",
+      "RNG": "36",
+      "STR": "13",
+      "D": "1",
+      "AS": "1",
+      "RL": "-"
+    },
+    {
+      "icon": "mode",
+      "name": "充能Supercharge",
+      "rules": "",
+      "RNG": "36",
+      "STR": "15",
+      "D": "2",
+      "AS": "1",
+      "RL": "1"
+    }
+  ],
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "懷言者",
+  "category": "靈火",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

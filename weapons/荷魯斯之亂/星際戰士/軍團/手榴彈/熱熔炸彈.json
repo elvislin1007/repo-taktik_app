@@ -1,0 +1,15 @@
+{
+  "type": "grenade",
+  "name": "熱熔炸彈",
+  "rules": "能量、破甲、一次性",
+  "RNG": "CC1",
+  "STR": "17",
+  "D": "4",
+  "AS": "1",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "軍團",
+  "category": "手榴彈",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

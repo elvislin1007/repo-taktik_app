@@ -1,0 +1,15 @@
+{
+  "type": "melee",
+  "name": "動力拳套Power Fist",
+  "rules": "能量力場、後攻1",
+  "RNG": "CC1",
+  "STR": "+9",
+  "D": "2",
+  "AS": "+0",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "星際戰士",
+  "subfaction": "戰團",
+  "category": "動力",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

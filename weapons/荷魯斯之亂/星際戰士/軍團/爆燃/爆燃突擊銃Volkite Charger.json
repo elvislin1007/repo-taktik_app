@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "爆燃突擊銃Volkite Charger",
+  "rules": "能量、爆燃、突擊",
+  "RNG": "16",
+  "STR": "9",
+  "D": "2",
+  "AS": "2",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "軍團",
+  "category": "爆燃",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

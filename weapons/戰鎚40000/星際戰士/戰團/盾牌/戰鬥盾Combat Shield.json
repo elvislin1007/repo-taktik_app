@@ -1,0 +1,15 @@
+{
+  "type": "shield",
+  "name": "戰鬥盾Combat Shield",
+  "rules": "能量力場",
+  "RNG": "1",
+  "STR": "+6",
+  "D": "1",
+  "AS": "+0",
+  "RL": "-",
+  "series": "戰鎚40000",
+  "faction": "星際戰士",
+  "subfaction": "戰團",
+  "category": "盾牌",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

@@ -1,15 +1,15 @@
 {
   "type": "ranged",
-  "name": "爆彈槍",
-  "rules": "[爆彈、速射]",
+  "name": "雷射槍Lasgun",
+  "rules": "速射",
   "RNG": "24",
-  "STR": "8",
+  "STR": "6",
   "D": "1",
   "AS": "1/2",
   "RL": "-",
   "series": "戰鎚40000",
   "faction": "星際戰士",
   "subfaction": "戰團",
-  "savedAt": "2026-11-23T10:17:32.404Z",
-  "category": "爆彈"
+  "category": "雷射",
+  "savedAt": "2026-11-24T12:00:00.000Z"
 }

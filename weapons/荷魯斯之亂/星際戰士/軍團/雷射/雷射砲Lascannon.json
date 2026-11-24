@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "雷射砲Lascannon",
+  "rules": "能量、重型",
+  "RNG": "48",
+  "STR": "17",
+  "D": "4",
+  "AS": "1",
+  "RL": "1",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "軍團",
+  "category": "雷射",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

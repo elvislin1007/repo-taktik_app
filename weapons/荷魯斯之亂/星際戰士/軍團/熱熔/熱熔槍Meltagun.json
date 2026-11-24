@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "熱熔槍Meltagun",
+  "rules": "能量、熱熔、突擊",
+  "RNG": "12",
+  "STR": "17",
+  "D": "3",
+  "AS": "1",
+  "RL": "-",
+  "series": "荷魯斯之亂",
+  "faction": "星際戰士",
+  "subfaction": "軍團",
+  "category": "熱熔",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}

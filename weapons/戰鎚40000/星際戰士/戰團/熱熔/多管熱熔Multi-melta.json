@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "多管熱熔Multi-melta",
+  "rules": "能量、熱熔、重型",
+  "RNG": "18",
+  "STR": "17",
+  "D": "3",
+  "AS": "2",
+  "RL": "1",
+  "series": "戰鎚40000",
+  "faction": "星際戰士",
+  "subfaction": "戰團",
+  "category": "熱熔",
+  "savedAt": "2026-11-24T12:00:00.000Z"
+}
