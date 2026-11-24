@@ -9,7 +9,7 @@
     melee: { label: '近戰', icon: 'melee.png' },
     shield: { label: '盾牌', icon: 'shield.png' },
     grenade: { label: '手榴彈', icon: 'grenade.png' },
-    multi: { label: '複合武器', icon: 'multi.png' },
+    multi: { label: '近戰＋射擊', icon: 'multi.png' },
   };
   const isShootType = (t) => !t || t === 'ranged' || t === 'grenade';
   const text = (s) => String(s == null ? '' : s).trim();
@@ -122,9 +122,10 @@
       el('tr', { class: 'h' }, el('td', null, 'WARGEARS'), ['RNG(”)', 'STR', 'D', 'AS', 'RL'].map((h) => el('td', { class: 'n' }, h))));
     card.weapons.forEach((w) => {
       // 複合武器：名稱一列（數值空白）＋每個模式一列（▶ 開頭）
-      if (w.type === 'multi') {
+      if (Array.isArray(w.modes) && w.modes.length) {
+        const ht = WTYPES[w.type] ? w.type : 'ranged';
         tbl.append(el('tr', null,
-          el('td', null, el('img', { class: 'icon', src: iconBase + WTYPES.multi.icon, alt: WTYPES.multi.label }), el('span', { class: 'wname' }, text(w.name))),
+          el('td', null, el('img', { class: 'icon', src: iconBase + WTYPES[ht].icon, alt: WTYPES[ht].label }), el('span', { class: 'wname' }, text(w.name))),
           ...['RNG', 'STR', 'D', 'AS', 'RL'].map(() => el('td', { class: 'n' }))));
         (w.modes || []).forEach((m) => {
           const melee = C.modeType(m) === 'melee';
@@ -138,7 +139,7 @@
       }
       if (!text(w.name) && !text(w.STR) && !text(w.RNG)) return;
       const type = WTYPES[w.type] ? w.type : 'ranged';
-      const melee = !isShootType(type);
+      const melee = type === 'multi' ? C.modeType(w) === 'melee' : !isShootType(type); // 近戰＋射擊圖示的單一武器看 RNG
       const n = (k) => el('td', { class: 'n' }, el('span', null, k === 'STR' && melee ? meleeStr(w.STR, multi ? NaN : strValue) : text(w[k])));
       tbl.append(el('tr', null,
         el('td', null, el('img', { class: 'icon', src: iconBase + WTYPES[type].icon, alt: WTYPES[type].label }),

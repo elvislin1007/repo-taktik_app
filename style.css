@@ -125,6 +125,8 @@ dialog h2 { margin: 0 0 8px; font-size: 17px; }
 .icon-menu button { display: flex; width: 100%; gap: 8px; align-items: center; border: none; background: none; color: #000; padding: 4px 6px; text-align: left; }
 .icon-menu button:hover, .icon-menu button[aria-selected="true"] { background: #e6f0fa; }
 .icon-menu .icon { height: 16px; }
+.icon-menu-sep { height: 1px; margin: 4px 2px; background: #ccc; }
+.icon-menu .icon-menu-extra { display: block; font-size: 13px; color: #1f5f99; white-space: nowrap; }
 
 /* 共用武器庫 */
 .wlib-msg { font-size: 13px; align-self: center; }

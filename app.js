@@ -20,9 +20,11 @@
     melee: { label: '近戰', icon: 'icons/melee.png' },
     shield: { label: '盾牌', icon: 'icons/shield.png' },
     grenade: { label: '手榴彈', icon: 'icons/grenade.png' },
-    multi: { label: '複合武器', icon: 'icons/multi.png' },
+    multi: { label: '近戰＋射擊', icon: 'icons/multi.png' },
   };
   const isShootType = (t) => !t || t === 'ranged' || t === 'grenade';
+  // 複合武器＝有「功能列」的武器（圖示照樣自己選）；名稱一列＋每個功能一列
+  const isComposite = (w) => Array.isArray(w.modes) && w.modes.length > 0;
   const DRAFT_KEY = 'taktik-draft-v1';
 
   const blankWeapon = (type) => (isShootType(type)
@@ -293,8 +295,7 @@
       if (after) td.append(after);
       return td;
     };
-    if (type === 'multi') {
-      if (!Array.isArray(w.modes) || !w.modes.length) w.modes = [blankMode(), blankMode()];
+    if (isComposite(w)) {
       const nameRow = el('tr', { class: 'multi-head' },
         el('td', { class: 'row-ctrl-anchor' }, iconPicker(w, opts.rerender), ' ',
           editable(w.name, (v) => { w.name = v; }, { class: 'wname ed-wname', ph: '複合武器名稱 English（例：極限雙拳 Gauntlets of Ultramar）' })),
@@ -314,7 +315,7 @@
       });
       return [nameRow, ...rows];
     }
-    const melee = !isShootType(type);
+    const melee = type === 'multi' ? C.modeType(w) === 'melee' : !isShootType(type);
     const nameCell = el('td', { class: 'row-ctrl-anchor' }, iconPicker(w, opts.rerender), ' ',
       editable(w.name, (v) => { w.name = v; }, { class: 'wname ed-wname', ph: '武器名稱 English' }), ' ',
       editable(w.rules, (v) => { w.rules = v; }, { class: 'wrules', ph: '武器特規（例：能量彈、突擊）' }));
@@ -343,29 +344,51 @@
       if (menu) return close();
       menu = el('div', { class: 'icon-menu', role: 'listbox' }, Object.entries(WTYPES).map(([k, t]) =>
         el('button', { type: 'button', role: 'option', 'aria-selected': String(k === w.type), onclick: () => { close(); if (switchType(w, k)) onPick(); } },
-          el('img', { class: 'icon', src: t.icon, alt: '' }), t.label)));
+          el('img', { class: 'icon', src: t.icon, alt: '' }), t.label)),
+        el('div', { class: 'icon-menu-sep', role: 'separator' }),
+        el('button', { type: 'button', class: 'icon-menu-extra', onclick: () => { close(); if (setModeCount(w)) onPick(); } },
+          isComposite(w) ? `複合武器：改功能數（目前 ${w.modes.length}）…` : '複合武器：設定幾種功能…'),
+        isComposite(w) ? el('button', { type: 'button', class: 'icon-menu-extra', onclick: () => { close(); if (makeSingle(w)) onPick(); } }, '改回單一武器') : null);
       box.append(menu);
       document.addEventListener('mousedown', outside);
     });
     box.append(btn);
     return box;
   }
-  function switchType(w, type) {
-    if (w.type === type) return false;
-    if (type === 'multi') {
-      // 複合武器：先問有幾種模式，照這個數字生成（名稱一列＋每個模式一列）
-      const ans = prompt('這把複合武器有幾種模式？\n（例：卡爾加的極限雙拳＝射擊＋近戰，填 2；畫面上會是名稱一列＋2 列模式）', '2');
-      if (ans == null) return false;
-      const n = parseInt(String(ans).trim(), 10);
-      if (!(n >= 1 && n <= 8)) { alert('請填 1 到 8 的數字'); return false; }
-      w.type = 'multi';
+  // 複合武器：問有幾種功能，照數字生成（名稱一列＋每個功能一列；2 種功能＝共 3 列）。已經是複合武器就是改列數
+  function setModeCount(w) {
+    const cur = isComposite(w) ? w.modes.length : 2;
+    const ans = prompt('這把武器有幾種功能（攻擊模式）？\n（例：卡爾加的極限雙拳＝射擊＋近戰，填 2；畫面上會是名稱一列＋2 列功能，共 3 列）', String(cur));
+    if (ans == null) return false;
+    const n = parseInt(String(ans).trim(), 10);
+    if (!(n >= 1 && n <= 8)) { alert('請填 1 到 8 的數字'); return false; }
+    if (!isComposite(w)) {
       w.modes = Array.from({ length: n }, blankMode);
       ['rules', 'RNG', 'STR', 'D', 'AS'].forEach((k) => { w[k] = ''; });
       w.RL = '-';
-      saveDraft();
-      return true;
-    }
-    if (w.type === 'multi') { delete w.modes; Object.assign(w, blankWeapon(type), { name: w.name }); saveDraft(); return true; }
+    } else if (n > w.modes.length) {
+      while (w.modes.length < n) w.modes.push(blankMode());
+    } else if (n < w.modes.length) {
+      const drop = w.modes.slice(n);
+      const filled = drop.some((m) => text(m.name) || text(m.STR) || text(m.RNG));
+      if (filled && !confirm(`會刪掉最後 ${drop.length} 列已經填過的功能，確定嗎？`)) return false;
+      w.modes = w.modes.slice(0, n);
+    } else return false;
+    saveDraft();
+    return true;
+  }
+  function makeSingle(w) {
+    const filled = (w.modes || []).some((m) => text(m.name) || text(m.STR) || text(m.RNG));
+    if (filled && !confirm('改回單一武器會刪掉所有功能列，確定嗎？')) return false;
+    delete w.modes;
+    Object.assign(w, blankWeapon(w.type === 'multi' ? 'ranged' : w.type), { name: w.name });
+    saveDraft();
+    return true;
+  }
+  function switchType(w, type) {
+    if (w.type === type) return false;
+    // 複合武器：圖示自己選，只換圖示，功能列不動
+    if (isComposite(w)) { w.type = type; saveDraft(); return true; }
     const wasRanged = isShootType(w.type);
     w.type = type;
     if (isShootType(type)) {
@@ -526,7 +549,7 @@
     WEAPON_FIELDS.forEach((k) => { w[k] = src[k] == null ? '' : String(src[k]); });
     if (!WTYPES[w.type]) w.type = 'ranged';
     const plusX = (o, melee) => { if (forSave && melee) { const x = C.meleeX(o.STR); if (!isNaN(x)) o.STR = `+${x}`; } };
-    if (w.type === 'multi') {
+    if (isComposite(src)) {
       w.modes = (src.modes || []).map((m) => {
         const o = {};
         ['name', 'rules', 'RNG', 'STR', 'D', 'AS', 'RL'].forEach((k) => { o[k] = m[k] == null ? '' : String(m[k]); });
@@ -538,7 +561,7 @@
   }
   // 武器庫清單上的數值摘要
   function weaponSummary(w) {
-    if (w.type === 'multi') return `複合武器・${(w.modes || []).length} 種模式：${(w.modes || []).map((m) => text(m.name) || '（未命名）').join('、')}`;
+    if (isComposite(w)) return `複合武器・${w.modes.length} 種功能：${(w.modes || []).map((m) => text(m.name) || '（未命名）').join('、')}`;
     return `RNG ${text(w.RNG) || '-'}　STR ${text(w.STR) || '-'}　D ${text(w.D) || '-'}　AS ${text(w.AS) || '-'}　RL ${text(w.RL) || '-'}`;
   }
   const libMsg = (t, cls) => { const m = document.getElementById('wlib-msg'); if (m) { m.textContent = t; m.className = 'wlib-msg ' + (cls || ''); } };
