@@ -1,0 +1,15 @@
+{
+  "type": "ranged",
+  "name": "C-14步槍C-14 Rifle",
+  "rules": "[速射]",
+  "RNG": "24",
+  "STR": "7",
+  "D": "1",
+  "AS": "2/4",
+  "RL": "-",
+  "series": "星海爭霸",
+  "faction": "人族",
+  "subfaction": "勢力",
+  "category": "勢力",
+  "savedAt": "2026-11-24T09:33:42.835Z"
+}
