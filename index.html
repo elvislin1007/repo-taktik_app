@@ -178,8 +178,15 @@
           <label>英文 <input id="kw-en" placeholder="例：Accurate"></label>
         </div>
         <datalist id="dl-kw-group"></datalist>
+        <label>種類
+          <select id="kw-kind">
+            <option value="rule">一般關鍵字（填說明）</option>
+            <option value="compound">複合關鍵字（填包含的特規，算分時展開）</option>
+          </select>
+        </label>
+        <label id="kw-inc-wrap" hidden>包含的特規（用「、」分開；算分時照這些特規算，名稱本身不算分）<input id="kw-includes" placeholder="例：英勇、先進視覺(24”)"></label>
         <label>別名（用「、」分開；資料卡上寫成這些也會對到這個關鍵字）<input id="kw-aliases" placeholder="例：能量力場、能量劍刃"></label>
-        <label>說明（一行一段；「・」開頭是條列；[ ] 裡的字在玩家端會變成連結）<textarea id="kw-text" rows="12"></textarea></label>
+        <label><span id="kw-text-label">說明（一行一段；「・」開頭是條列；[ ] 裡的字在玩家端會變成連結）</span><textarea id="kw-text" rows="12"></textarea></label>
         <div class="actions kw-actions">
           <button type="button" id="kw-delete">刪除</button>
           <button type="submit" class="primary" id="kw-save">保存</button>

@@ -42,8 +42,8 @@
   const INDEPENDENT_KEYS = ['人物', '載具', '機甲', '巨獸'];
   // 12 單位類型：不計分
   const TYPE_KEYS = ['生物', '步兵', '戰線', '組員', '人物', '載具', '機甲', '巨獸'];
-  // 12 複合關鍵字
-  const COMPOUND = {
+  // 12 複合關鍵字：預設值；編輯器讀到關鍵字資料庫後用 setCompound() 換成資料庫裡的（includes 有填的那些）
+  let COMPOUND = {
     '阿斯塔特': ['英勇', '先進視覺(24”)'],
     '風暴兵': ['先進視覺(24”)'],
     '機魂': ['自動操作', '自動滅火'],
@@ -484,5 +484,15 @@
     return out;
   }
 
-  global.TaktikCalc = { scoreUnit, parseAbility, meleeX, modeType, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
+  function setCompound(items) {
+    const map = {};
+    (items || []).forEach((it) => {
+      const inc = (it.includes || []).map(clean).filter(Boolean);
+      if (!inc.length) return;
+      [it.name, ...(it.aliases || [])].forEach((n) => { n = clean(n); if (n && !map[n]) map[n] = inc; });
+    });
+    COMPOUND = map;
+  }
+  const getCompound = () => COMPOUND;
+  global.TaktikCalc = { setCompound, getCompound, scoreUnit, parseAbility, meleeX, modeType, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
 })(typeof window !== 'undefined' ? window : globalThis);

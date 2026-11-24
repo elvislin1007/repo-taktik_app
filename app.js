@@ -581,7 +581,8 @@
     saveDraft();
   }
 
-  function confirmScore() {
+  async function confirmScore() {
+    await ensureKwdb();
     const kw = C.splitList(state.profiles[0] && state.profiles[0].keywords);
     if (!text(state.faction) && kw[0]) state.faction = kw[0];
     if (!text(state.subfaction) && kw[1]) state.subfaction = kw[1];
@@ -1029,6 +1030,7 @@
   async function loadKwdb() {
     document.getElementById('kw-count').textContent = '讀取中…';
     kwdb = await fetchKwdb();
+    applyCompound();
     renderKwList();
   }
   function renderKwList() {
@@ -1049,9 +1051,27 @@
     kwIn('en').value = it.en || '';
     kwIn('aliases').value = (it.aliases || []).filter((a) => a !== it.name && a !== it.en && a !== String(it.en || '').replace(/\s*\(X\)\s*$/i, '')).join('、');
     kwIn('text').value = it.text || '';
+    kwIn('kind').value = (it.includes && it.includes.length) || it.group === '複合關鍵字' ? 'compound' : 'rule';
+    kwIn('includes').value = (it.includes || []).join('、');
+    syncKwKind();
     kwIn('form-title').textContent = kwSel === 'new' ? '新增關鍵字' : `編輯：${KWX.title(it)}`;
     kwIn('delete').disabled = kwSel === 'new';
     kwIn('msg').textContent = ''; kwIn('msg').className = 'save-msg';
+  }
+  function syncKwKind() {
+    const comp = kwIn('kind').value === 'compound';
+    kwIn('inc-wrap').hidden = !comp;
+    kwIn('text-label').textContent = comp
+      ? '說明（可留白；玩家端會先列出「包含」的特規，可以點開）'
+      : '說明（一行一段；「・」開頭是條列；[ ] 裡的字在玩家端會變成連結）';
+  }
+  // 算分用的複合關鍵字跟著資料庫走
+  function applyCompound() { if (kwdb) C.setCompound(kwdb.items); }
+  let kwReady = null;
+  function ensureKwdb() {
+    if (kwdb) return Promise.resolve();
+    if (!kwReady) kwReady = fetchKwdb().then((d) => { if (!kwdb) kwdb = d; applyCompound(); }).catch(() => {});
+    return kwReady;
   }
   function editKw(id) {
     const it = kwdb.items.find((x) => x.id === id);
@@ -1063,8 +1083,10 @@
   function readKwForm() {
     const name = text(kwIn('name').value), en = text(kwIn('en').value);
     const extra = String(kwIn('aliases').value).split(/[、，,;；\n]/).map(text).filter(Boolean);
+    const comp = kwIn('kind').value === 'compound';
+    const includes = comp ? String(kwIn('includes').value).split(/[、，,;；\n]/).map(text).filter(Boolean) : [];
     return {
-      group: text(kwIn('group').value) || '通用關鍵字', name, en,
+      group: comp ? '複合關鍵字' : (text(kwIn('group').value) || '通用關鍵字'), name, en, ...(comp ? { includes } : {}),
       aliases: [...new Set([name, ...extra, en.replace(/\s*\(X\)\s*$/i, '')].filter(Boolean))],
       text: String(kwIn('text').value).replace(/\r/g, '').trim(),
     };
@@ -1075,6 +1097,7 @@
     if (!kwSel) return fail('先從左邊選一個關鍵字，或按「＋ 新增關鍵字」。');
     const form = readKwForm();
     if (!remove && !form.name) return fail('名稱是空的。');
+    if (!remove && kwIn('kind').value === 'compound' && !(form.includes || []).length) return fail('複合關鍵字要填「包含的特規」。');
     if (remove && !confirm(`刪除關鍵字「${form.name}」？\n（檔案歷史裡還找得到）`)) return;
     if (!(await pageIsCurrent())) return fail(STALE_MSG.replace('；你填的內容已存成草稿，重新整理後按上方「繼續上次草稿」就會回來', ''));
     msg.textContent = '保存中…'; msg.className = 'save-msg';
@@ -1093,6 +1116,7 @@
       const label = remove ? '刪除' : (kwSel === 'new' ? '新增' : '更新');
       const res = await R.saveFile(KW_PATH, latest, `關鍵字${label}：${form.name}`);
       kwdb = latest;
+      applyCompound();
       kwSel = remove ? null : id;
       renderKwList();
       if (remove) { kwIn('form-title').textContent = '已刪除，從左邊再選一個'; ['group', 'name', 'en', 'aliases', 'text'].forEach((k) => { kwIn(k).value = ''; }); }
@@ -1109,6 +1133,8 @@
   document.getElementById('btn-keywords').addEventListener('click', async () => { show('keywords'); if (!kwdb) await loadKwdb(); });
   document.getElementById('kw-q').addEventListener('input', () => kwdb && renderKwList());
   document.getElementById('kw-reload').addEventListener('click', loadKwdb);
+  kwIn('kind').addEventListener('change', () => { syncKwKind(); if (kwIn('kind').value === 'compound') kwIn('group').value = '複合關鍵字'; });
+  ensureKwdb();
   document.getElementById('kw-new').addEventListener('click', () => {
     kwSel = 'new';
     fillKwForm({ group: (kwdb && kwdb.groups[0]) || '通用關鍵字' });

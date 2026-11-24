@@ -74,7 +74,17 @@
     $('kws-name').textContent = it.name;
     $('kws-en').textContent = it.en || '';
     $('kws-en').hidden = !it.en;
-    $('kws-body').replaceChildren(kwRich(it.text));
+    const body = [];
+    if (it.includes && it.includes.length) {
+      body.push(el('p', { class: 'kws-inc' }, el('b', null, '包含：'),
+        ...it.includes.flatMap((x, i) => {
+          const hit = KW.lookup(kwIndex, x);
+          const node = hit ? el('button', { type: 'button', class: 'kwlink', 'data-kw': hit.id }, x) : el('span', { class: 'kwref' }, x);
+          return i ? ['、', node] : [node];
+        })));
+      if (!String(it.text || '').trim()) body.push(el('p', { class: 'kws-note' }, '此單位適用以上關鍵字（算分時照這些特規算）。'));
+    }
+    $('kws-body').replaceChildren(...body, kwRich(it.text));
     $('kws-group').textContent = it.group || '';
     const prev = kwStack.length > 1 ? kwById(kwStack[kwStack.length - 2]) : null;
     $('kws-back-label').textContent = prev ? `返回「${prev.name}」` : '返回';
