@@ -21,6 +21,7 @@
     shield: { label: '盾牌', icon: 'icons/shield.png' },
     grenade: { label: '手榴彈', icon: 'icons/grenade.png' },
     multi: { label: '近戰＋射擊', icon: 'icons/multi.png' },
+    equipment: { label: '特殊裝備', icon: 'icons/equipment.png' },
   };
   const isShootType = (t) => !t || t === 'ranged' || t === 'grenade';
   // 複合武器＝有「功能列」的武器（圖示照樣自己選）；名稱一列＋每個功能一列
@@ -352,6 +353,17 @@
       });
       return [nameRow, ...rows];
     }
+    if (type === 'equipment') {
+      const nameRow = el('tr', null,
+        el('td', { class: 'row-ctrl-anchor' }, iconPicker(w, opts.rerender), ' ',
+          editable(w.name, (v) => { w.name = v; }, { class: 'wname ed-wname', ph: '裝備名稱 English' }), ' ',
+          editable(w.rules, (v) => { w.rules = v; }, { class: 'wrules', ph: '特規' })),
+        ...['RNG', 'STR', 'D', 'AS'].map(() => el('td', { class: 'n' }, '-')),
+        el('td', { class: 'n' }, '-', ctrl()));
+      const descRow = el('tr', { class: 'eq-desc' }, el('td', { colspan: '6' },
+        editable(w.text, (v) => { w.text = v; }, { tag: 'div', class: 'eq-text', ph: '裝備說明；分數寫在最後的「」裡（輸出時隱藏）' })));
+      return [nameRow, descRow];
+    }
     const melee = type === 'multi' ? C.modeType(w) === 'melee' : !isShootType(type);
     const nameCell = el('td', { class: 'row-ctrl-anchor' }, iconPicker(w, opts.rerender), ' ',
       editable(w.name, (v) => { w.name = v; }, { class: 'wname ed-wname', ph: '武器名稱 English' }), ' ',
@@ -379,7 +391,7 @@
     const outside = (e) => { if (!box.contains(e.target)) close(); };
     btn.addEventListener('click', () => {
       if (menu) return close();
-      menu = el('div', { class: 'icon-menu', role: 'listbox' }, Object.entries(WTYPES).map(([k, t]) =>
+      menu = el('div', { class: 'icon-menu', role: 'listbox' }, Object.entries(WTYPES).filter(([k]) => !(k === 'equipment' && isComposite(w))).map(([k, t]) =>
         el('button', { type: 'button', role: 'option', 'aria-selected': String(k === w.type), onclick: () => { close(); if (switchType(w, k)) onPick(); } },
           el('img', { class: 'icon', src: t.icon, alt: '' }), t.label)),
         el('div', { class: 'icon-menu-sep', role: 'separator' }),
@@ -395,6 +407,7 @@
   }
   // 複合武器：問有幾種功能，照數字生成（名稱一列＋每個功能一列；2 種功能＝共 3 列）。已經是複合武器就是改列數
   function setModeCount(w) {
+    if (w.type === 'equipment') { alert('特殊裝備不能設成複合武器，先把圖示換成射擊或近戰。'); return false; }
     const cur = isComposite(w) ? w.modes.length : 2;
     const ans = prompt('這把武器有幾種功能（攻擊模式）？', String(cur));
     if (ans == null) return false;
@@ -427,6 +440,18 @@
     if (w.type === type) return false;
     // 複合武器：圖示自己選，只換圖示，功能列不動
     if (isComposite(w)) { w.type = type; saveDraft(); return true; }
+    // 特殊裝備：數值都是 -，下面一列寫說明（分數寫在說明最後的「」裡）
+    if (type === 'equipment') {
+      ['RNG', 'STR', 'D', 'AS', 'RL'].forEach((k) => { w[k] = '-'; });
+      if (w.text == null) w.text = '';
+      w.type = type; saveDraft(); return true;
+    }
+    if (w.type === 'equipment') {
+      const keep = { name: w.name, rules: w.rules };
+      delete w.text;
+      Object.assign(w, blankWeapon(type), keep);
+      saveDraft(); return true;
+    }
     const wasRanged = isShootType(w.type);
     w.type = type;
     if (isShootType(type)) {
@@ -715,6 +740,7 @@
     const w = {};
     WEAPON_FIELDS.forEach((k) => { w[k] = src[k] == null ? '' : String(src[k]); });
     if (!WTYPES[w.type]) w.type = 'ranged';
+    if (w.type === 'equipment') { w.text = String(src.text || ''); return w; }
     const plusX = (o, melee) => { if (forSave && melee) { const x = C.meleeX(o.STR); if (!isNaN(x)) o.STR = `+${x}`; } };
     if (isComposite(src)) {
       w.modes = (src.modes || []).map((m) => {
@@ -728,7 +754,16 @@
     return w;
   }
   // 武器庫清單上的數值摘要
+  // 武器庫清單上顯示這把武器（裝備）的分數
+  function weaponPts(w) {
+    let r;
+    try { r = C.weaponScore(w); } catch (e) { r = { score: NaN, warnings: [String(e.message)] }; }
+    const ok = r && !isNaN(r.score);
+    return el('span', { class: 'wl-pts' + (r.warnings.length ? ' warn' : ''), title: r.warnings.join('\n') || '' },
+      ok ? `${r.score}pts` : '—pts', r.warnings.length ? ' ⚠' : '');
+  }
   function weaponSummary(w) {
+    if (w.type === 'equipment') return `特殊裝備：${C.parseAbility({ text: w.text }).text || '（沒有說明）'}`;
     if (isComposite(w)) return `複合武器・${w.modes.length} 種功能：${(w.modes || []).map((m) => text(m.name) || '（未命名）').join('、')}`;
     return `RNG ${text(w.RNG) || '-'}　STR ${text(w.STR) || '-'}　D ${text(w.D) || '-'}　AS ${text(w.AS) || '-'}　RL ${text(w.RL) || '-'}`;
   }
@@ -775,8 +810,7 @@
     st.textContent = '讀取武器庫…'; st.className = 'dlg-status';
     try {
       const raw = await R.loadBundle('weapons', 'weapons.json', includeRepo);
-      // 特殊裝備（type: equipment）先只存在 repo，等有格式和圖示再在前端顯示
-      libItems = raw.filter((x) => x && x.path && x.data && x.data.type !== 'equipment').map((x) => {
+      libItems = raw.filter((x) => x && x.path && x.data).map((x) => {
         const segs = x.path.replace(/^weapons\//, '').replace(/\.json$/, '').split('/');
         segs.pop(); // 檔名
         return { path: x.path, series: x.data.series || segs[0] || '', faction: x.data.faction || segs[1] || '', subfaction: x.data.subfaction || segs[2] || '', category: x.data.category || (segs.length > 3 ? segs[3] : ''), w: x.data };
@@ -824,7 +858,7 @@
         el('img', { class: 'icon', src: WTYPES[t].icon, alt: WTYPES[t].label }),
         el('div', { class: 'wl-main' },
           el('div', { class: 'wl-name' }, text(x.w.name), ' ', el('span', { class: 'wl-rules' }, C.clean(x.w.rules))),
-          el('div', { class: 'wl-stats' }, weaponSummary(x.w)),
+          el('div', { class: 'wl-stats' }, weaponSummary(x.w), ' ', weaponPts(x.w)),
           el('div', { class: 'wl-where' }, [x.series, x.faction, x.subfaction, x.category].filter(Boolean).join(' › '))),
         el('div', { class: 'wl-btns' },
           el('button', { type: 'button', onclick: () => { wdlg.close(); openWeaponEditor(x); } }, '編輯'),
@@ -956,7 +990,7 @@
         el('img', { class: 'icon', src: WTYPES[t].icon, alt: WTYPES[t].label }),
         el('div', { class: 'wl-main' },
           el('div', { class: 'wl-name' }, text(x.w.name), ' ', el('span', { class: 'wl-rules' }, C.clean(x.w.rules))),
-          el('div', { class: 'wl-stats' }, weaponSummary(x.w)),
+          el('div', { class: 'wl-stats' }, weaponSummary(x.w), ' ', weaponPts(x.w)),
           el('div', { class: 'wl-where' }, [x.series, x.faction, x.subfaction, x.category].filter(Boolean).join(' › '))),
         el('button', { type: 'button', onclick: () => { openWeaponEditor(x); window.scrollTo(0, 0); } }, '編輯')));
     });

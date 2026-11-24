@@ -56,3 +56,6 @@
 .card .kwlink { all: unset; display: inline; color: #1F6FC5; border-bottom: 1.5px dashed #1F6FC5; padding-bottom: 0; line-height: inherit; cursor: pointer; -webkit-tap-highlight-color: rgba(31,111,197,.2); }
 .card .kwlink:hover { border-bottom-style: solid; background: rgba(31,111,197,.12); }
 .card .kwlink:focus-visible { outline: 2px solid var(--c-blue); outline-offset: 1px; border-radius: 2px; }
+
+/* 特殊裝備的說明列 */
+.card .wg tr.eq-desc td { font-size: calc(7pt * var(--s)); font-weight: 400; padding: 1px 4px 2px; text-align: left; }

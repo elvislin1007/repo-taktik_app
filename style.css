@@ -223,3 +223,9 @@ button.mini { padding: 1px 10px; font-size: 12.5px; }
 #kw-inc-add { align-self: flex-start; }
 .kw-comp-btn { border-color: #C77C1E; }
 .linkish { background: none; border: none; color: var(--muted); text-decoration: underline; cursor: pointer; padding: 4px; }
+
+/* 武器庫清單的分數；特殊裝備說明列 */
+.wl-pts { display: inline-block; margin-left: 8px; font-weight: 700; color: #1f5f99; white-space: nowrap; }
+.wl-pts.warn { color: #b35c00; cursor: help; }
+.card .wg tr.eq-desc td { text-align: left; }
+.card .wg .eq-text { min-height: 1.2em; }

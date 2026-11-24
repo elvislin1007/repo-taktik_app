@@ -1,11 +1,16 @@
 {
   "type": "equipment",
   "name": "軍團戰旗(Legion Vexilla)",
-  "text": "每次啟動自動移除1PIN、近戰結算時得pts+1。",
-  "pts": "50",
+  "text": "每次啟動自動移除1PIN、近戰結算時得pts+1。 「50」",
   "series": "戰鎚40000",
   "faction": "星際戰士",
   "subfaction": "戰團",
   "category": "特殊裝備",
-  "savedAt": "2026-11-24T12:00:00.000Z"
+  "savedAt": "2026-11-24T12:00:00.000Z",
+  "RNG": "-",
+  "STR": "-",
+  "D": "-",
+  "AS": "-",
+  "RL": "-",
+  "rules": ""
 }

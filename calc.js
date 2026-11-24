@@ -394,6 +394,23 @@
   // 數字前面要有空格，或用「」／[ ] 包起來（不用小括號，因為「戰術家(2)」這種是特規寫法），
   // 避免把「WP+1」這種內文當成分數。輸出資料卡時隱藏。
   const ABIL_SCORE = /(?:[\s　]+[「\[［]?\s*|[「\[［]\s*)(\d+(?:\.\d+)?)\s*(?:分|pts?)?\s*[」\]］]?\s*$/i;
+  // 特殊裝備：沒有數值，分數像能力一樣寫在說明最後（「50」），使用者自訂
+  function scoreEquipment(w, out) {
+    const name = clean(w.name) || '（未命名裝備）';
+    const pa = parseAbility({ text: w.text });
+    if (isNaN(pa.score)) { out.warnings.push(`特殊裝備「${name}」說明最後沒有寫分數（例如「50」），這次算 0`); return 0; }
+    out.steps.push({ label: `特殊裝備：${name}`, calc: '自訂分數', value: pa.score });
+    return pa.score;
+  }
+  // 武器庫清單用：單獨一把武器的分數
+  function weaponScore(w) {
+    const out = { steps: [], warnings: [], notes: [] };
+    let v;
+    if (w.type === 'equipment') v = scoreEquipment(w, out);
+    else if (Array.isArray(w.modes) && w.modes.length) v = scoreMulti(w, out);
+    else v = scoreWeapon(w.type === 'multi' ? Object.assign({}, w, { type: modeType(w) }) : w, null, out);
+    return { score: v, warnings: out.warnings };
+  }
   function parseAbility(a) {
     const raw = String((a && a.text) || '');
     const m = raw.match(ABIL_SCORE);
@@ -430,6 +447,7 @@
     // 武器：每個模型都帶單位的全部武器，分數只算一次
     let wSum = 0;
     (card.weapons || []).forEach((w) => {
+      if (w.type === 'equipment') { wSum += scoreEquipment(w, out); return; }
       if (Array.isArray(w.modes) && w.modes.length) { wSum += scoreMulti(w, out); return; }
       if (w.type === 'multi') w = Object.assign({}, w, { type: modeType(w) }); // 只是用了「近戰＋射擊」圖示的單一武器：看 RNG
       if (!clean(w.name) && !w.STR && !w.RNG) return;
@@ -494,5 +512,5 @@
     COMPOUND = map;
   }
   const getCompound = () => COMPOUND;
-  global.TaktikCalc = { setCompound, getCompound, scoreUnit, parseAbility, meleeX, modeType, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
+  global.TaktikCalc = { weaponScore, scoreEquipment, setCompound, getCompound, scoreUnit, parseAbility, meleeX, modeType, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
 })(typeof window !== 'undefined' ? window : globalThis);

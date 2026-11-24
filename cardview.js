@@ -10,6 +10,7 @@
     shield: { label: '盾牌', icon: 'shield.png' },
     grenade: { label: '手榴彈', icon: 'grenade.png' },
     multi: { label: '近戰＋射擊', icon: 'multi.png' },
+    equipment: { label: '特殊裝備', icon: 'equipment.png' },
   };
   const isShootType = (t) => !t || t === 'ranged' || t === 'grenade';
   const text = (s) => String(s == null ? '' : s).trim();
@@ -149,6 +150,17 @@
               el('span', { class: 'wname' }, text(m.name)), ' ', el('span', { class: 'wrules' }, kwText(m.rules))),
             n('RNG'), n('STR'), n('D'), n('AS'), n('RL')));
         });
+        return;
+      }
+      // 特殊裝備：名稱列（數值都是 -）＋一整列說明（最後的分數不顯示）
+      if (w.type === 'equipment') {
+        if (!text(w.name)) return;
+        tbl.append(el('tr', null,
+          el('td', null, el('img', { class: 'icon', src: iconBase + WTYPES.equipment.icon, alt: WTYPES.equipment.label }),
+            el('span', { class: 'wname' }, text(w.name)), ' ', el('span', { class: 'wrules' }, kwText(w.rules))),
+          ...['RNG', 'STR', 'D', 'AS', 'RL'].map(() => el('td', { class: 'n' }, el('span', null, '-')))));
+        const desc = C.parseAbility({ text: w.text }).text;
+        if (text(desc)) tbl.append(el('tr', { class: 'eq-desc' }, el('td', { colspan: '6' }, abilityView(desc))));
         return;
       }
       if (!text(w.name) && !text(w.STR) && !text(w.RNG)) return;
