@@ -306,3 +306,12 @@ body.kw-open { overflow: hidden; }
   max-width: calc(var(--maxw) - 32px); margin-left: max(16px, env(safe-area-inset-left)); margin-right: max(16px, env(safe-area-inset-right)); }
 @media (min-width: 852px) { #screen-army > .army-bar, #screen-army > .army-rules, #screen-army > .army-warn, #screen-army > #army-body { margin-left: auto; margin-right: auto; } }
 #screen-army > #army-body { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+
+/* 加入單位：一層層點 */
+.pick-crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 4px; margin: 2px 0 4px; }
+.crumb { border: 0; background: none; color: var(--accent); padding: 6px 4px; font-size: 14.5px; min-height: 36px; }
+.crumb.on { color: var(--fg); font-weight: 700; }
+.crumb-sep { color: var(--muted); }
+.pick-level { margin: 6px 2px 2px; font-size: 12.5px; font-weight: 700; color: var(--muted); }
+.pick-go { font-size: 22px; color: var(--muted); width: 24px; text-align: center; }
+.pick-folder .pick-name { font-weight: 700; }

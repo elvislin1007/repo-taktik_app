@@ -220,45 +220,67 @@
   $('army-limits-reset').addEventListener('click', () => { if (!cur) return; cur.limits = {}; touch(cur); renderLimits(); drawArmy(); });
 
   // ---------- 加入單位（從資料庫挑） ----------
+  // 一層層點：系列 › 陣營 › 子陣營（跟單位圖鑑的選單一樣），到子陣營才列出單位；有輸入搜尋時直接列出目前範圍內符合的單位
+  let pickPath = [];
   function openPicker() {
     $('pick-wrap').hidden = false;
     document.body.classList.add('kw-open');
-    const f = $('pick-scope');
-    const scopes = [...new Set(P.units.map((u) => u.segs.slice(0, 3).join(' › ')))].sort((x, y) => x.localeCompare(y, 'zh-Hant'));
-    const keep = f.value;
-    f.replaceChildren(el('option', { value: '' }, '全部系列／陣營'), ...scopes.map((s) => el('option', { value: s }, s)));
-    if (scopes.includes(keep)) f.value = keep;
+    $('pick-msg').textContent = '';
     drawPicker();
-    setTimeout(() => $('pick-q').focus({ preventScroll: true }), 50);
   }
   function closePicker() { $('pick-wrap').hidden = true; document.body.classList.remove('kw-open'); drawArmy(); }
+  const inPath = (u, path) => path.every((g, i) => u.segs[i] === g);
+  function unitRow(u) {
+    const n = cur.entries.filter((e) => e.path === u.path).length;
+    return el('li', null, el('button', { type: 'button', class: 'pick-row', onclick: () => {
+      cur.entries.push({ uid: newId(), path: u.path, name: u.name, sel: {} }); touch(cur); drawPicker();
+      $('pick-msg').textContent = `已加入：${u.name}`;
+    } },
+    el('span', { class: 'pick-name' }, u.name, n ? el('span', { class: 'pick-n' }, ` ×${n}`) : null),
+    el('span', { class: 'pick-pts' }, u.total != null ? `${u.total}pts` : '—'),
+    el('span', { class: 'pick-add', 'aria-hidden': 'true' }, '＋')));
+  }
   function drawPicker() {
+    // 範圍若已經沒有單位（例如資料變了）就退回上一層
+    while (pickPath.length && !P.units.some((u) => inPath(u, pickPath))) pickPath = pickPath.slice(0, -1);
     const q = $('pick-q').value.toLowerCase().split(/\s+/).filter(Boolean);
-    const scope = $('pick-scope').value;
-    const hits = P.units.filter((u) => (!scope || u.segs.slice(0, 3).join(' › ') === scope) && q.every((w) => u.hay.includes(w)))
-      .sort((x, y) => x.segs.slice(0, 3).join('/').localeCompare(y.segs.slice(0, 3).join('/'), 'zh-Hant') || P.catIndex(x.category) - P.catIndex(y.category) || x.name.localeCompare(y.name, 'zh-Hant'));
-    const ul = el('ul', { class: 'pick-list' });
-    let lastHead = null;
-    hits.forEach((u) => {
-      const head = `${u.segs.slice(0, 3).join(' › ')}　${u.category || '未分類'}`;
-      if (head !== lastHead) { lastHead = head; ul.append(el('li', { class: 'cat-head' }, head)); }
-      const n = cur.entries.filter((e) => e.path === u.path).length;
-      ul.append(el('li', null, el('button', { type: 'button', class: 'pick-row', onclick: () => {
-        cur.entries.push({ uid: newId(), path: u.path, name: u.name, sel: {} }); touch(cur); drawPicker();
-        $('pick-msg').textContent = `已加入：${u.name}`;
-      } },
-      el('span', { class: 'pick-name' }, u.name, n ? el('span', { class: 'pick-n' }, ` ×${n}`) : null),
-      el('span', { class: 'pick-pts' }, u.total != null ? `${u.total}pts` : '—'),
-      el('span', { class: 'pick-add', 'aria-hidden': 'true' }, '＋'))));
-    });
-    $('pick-body').replaceChildren(hits.length ? ul : el('p', { class: 'empty' }, '找不到符合的單位'));
+    // 麵包屑：全部 › 系列 › 陣營 › 子陣營（點哪一層就回到哪一層）
+    const crumbs = $('pick-crumbs');
+    crumbs.replaceChildren(el('button', { type: 'button', class: 'crumb' + (pickPath.length ? '' : ' on'), onclick: () => { pickPath = []; drawPicker(); } }, '全部'),
+      ...pickPath.flatMap((g, i) => [el('span', { class: 'crumb-sep', 'aria-hidden': 'true' }, '›'),
+        el('button', { type: 'button', class: 'crumb' + (i === pickPath.length - 1 ? ' on' : ''), onclick: () => { pickPath = pickPath.slice(0, i + 1); drawPicker(); } }, g)]));
+    const body = $('pick-body');
+    const inScope = P.units.filter((u) => inPath(u, pickPath));
+    const LEVEL = ['系列', '陣營', '子陣營'];
+    if (!q.length && pickPath.length < 3) {
+      // 還沒到子陣營：列出下一層的資料夾
+      const next = [...new Set(inScope.map((u) => u.segs[pickPath.length]).filter(Boolean))].sort((x, y) => x.localeCompare(y, 'zh-Hant'));
+      body.replaceChildren(el('p', { class: 'pick-level' }, `選擇${LEVEL[pickPath.length]}`),
+        el('ul', { class: 'pick-list' }, next.map((g) => {
+          const cnt = inScope.filter((u) => u.segs[pickPath.length] === g).length;
+          return el('li', null, el('button', { type: 'button', class: 'pick-row pick-folder', onclick: () => { pickPath = [...pickPath, g]; drawPicker(); } },
+            el('span', { class: 'pick-name' }, g), el('span', { class: 'pick-pts' }, `${cnt} 個單位`), el('span', { class: 'pick-go', 'aria-hidden': 'true' }, '›')));
+        })));
+    } else {
+      // 子陣營（或有搜尋）：列出單位，照類別分組
+      const hits = inScope.filter((u) => q.every((w) => u.hay.includes(w)))
+        .sort((x, y) => x.segs.slice(0, 3).join('/').localeCompare(y.segs.slice(0, 3).join('/'), 'zh-Hant') || P.catIndex(x.category) - P.catIndex(y.category) || x.name.localeCompare(y.name, 'zh-Hant'));
+      const ul = el('ul', { class: 'pick-list' });
+      let lastHead = null;
+      hits.forEach((u) => {
+        const where = pickPath.length >= 3 ? '' : u.segs.slice(pickPath.length, 3).join(' › ') + '　';
+        const head = `${where}${u.category || '未分類'}`;
+        if (head !== lastHead) { lastHead = head; ul.append(el('li', { class: 'cat-head' }, head)); }
+        ul.append(unitRow(u));
+      });
+      body.replaceChildren(hits.length ? ul : el('p', { class: 'empty' }, '找不到符合的單位'));
+    }
     $('pick-total').textContent = `目前 ${fmt(armyPts(cur))}${cur.cap ? ` / ${cur.cap}` : ''} pts`;
   }
   $('army-add').addEventListener('click', openPicker);
   $('pick-done').addEventListener('click', closePicker);
   $('pick-scrim').addEventListener('click', closePicker);
   $('pick-q').addEventListener('input', drawPicker);
-  $('pick-scope').addEventListener('change', drawPicker);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('pick-wrap').hidden) closePicker(); });
 
   // ---------- 匯出 PDF（列印） ----------
