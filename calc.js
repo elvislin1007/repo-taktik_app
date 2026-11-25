@@ -132,7 +132,8 @@
   const getScoreTables = () => JSON.parse(JSON.stringify({ ...TABLE_DEF, EXTRA: EXTRA_DEF }));
 
   // ---------- 工具 ----------
-  const round5 = (x) => Math.floor(x / 5 + 0.5) * 5;
+  // 取整：10 分以上四捨五入到 5；未滿 10 分取到個位（二戰、中古戰鎚等低分武器才看得出差異）
+  const round5 = (x) => (Math.abs(x) < 10 ? Math.floor(x + 0.5) : Math.floor(x / 5 + 0.5) * 5);
   const r2 = (x) => Math.round(x * 100) / 100;
   const clean = (s) => (s || '').replace(/[\[\]［］]/g, '').replace(/\s+/g, ' ').trim();
   const splitList = (s) => clean(s).split(/[、,，;；]/).map((t) => t.trim()).filter(Boolean);

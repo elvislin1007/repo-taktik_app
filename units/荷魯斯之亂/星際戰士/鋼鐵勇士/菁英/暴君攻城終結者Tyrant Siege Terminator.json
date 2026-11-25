@@ -194,8 +194,8 @@
     "warnings": [
       "暴君火箭巢Tyrant Rocket Launcher ▶破片Frag：武器特規「壓制」資料庫查不到，這次沒算",
       "暴君火箭巢Tyrant Rocket Launcher ▶破片Frag：STR 有兩個值但沒有 HE／HEAT 半徑",
-      "暴君火箭巢Tyrant Rocket Launcher ▶穿甲Krak：STR 有兩個值但沒有 HE／HEAT 半徑",
-      "暴君火箭巢Tyrant Rocket Launcher ▶防空Flak：STR 有兩個值但沒有 HE／HEAT 半徑"
+      "暴君火箭巢Tyrant Rocket Launcher ▶穿甲Krak：有 HEAT 3\" 但 D 只寫一個值（要寫成 直擊/爆炸，例 2/1），爆炸部分沒算",
+      "暴君火箭巢Tyrant Rocket Launcher ▶防空Flak：有 HEAT 3\" 但 D 只寫一個值（要寫成 直擊/爆炸，例 2/1），爆炸部分沒算"
     ]
   },
   "savedAt": "2026-11-24T16:00:00.000Z"
