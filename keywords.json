@@ -2173,12 +2173,13 @@
       "id": "kw115",
       "group": "通用關鍵字",
       "name": "匿踪",
-      "en": "Stealth(X)",
+      "en": "Stealth",
       "aliases": [
         "匿踪",
         "Stealth"
       ],
-      "text": "此單位在掩體中額外獲得X點遮擋。"
+      "text": "此單位在掩體中額外獲得X點遮擋。",
+      "scores": []
     },
     {
       "id": "kw116",
