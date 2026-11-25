@@ -2082,12 +2082,21 @@
       "id": "kw110",
       "group": "通用關鍵字",
       "name": "衝擊",
-      "en": "Shock (X)",
+      "en": "Shock",
       "aliases": [
         "衝擊",
         "Shock"
       ],
-      "text": "被命中單位額外受到X點PIN。"
+      "text": "被命中單位額外受到X點PIN。",
+      "scores": [
+        {
+          "key": "衝擊",
+          "weapon": {
+            "v": 0.1,
+            "x": "n"
+          }
+        }
+      ]
     },
     {
       "id": "kw111",
