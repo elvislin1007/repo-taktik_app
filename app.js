@@ -1105,7 +1105,7 @@
   // 階層式特規：分數 × X。X＝資料卡上寫的數字；「7−X」類（免傷5+）X＝7−5＝2
   const X_BODY = [['', '固定'], ['n', '×X（先攻2）'], ['7-', '×(7−X)（免傷5+）']];
   const X_WEAPON = [['', '固定'], ['n', '×X（穿甲2）'], ['7-', '×(7−X)（腐蝕5+）'], ['2-', '×(2−X)（曲射-1）']];
-  const X_BASE = [['n', '×X'], ['7-', '×(7−X)']];
+  const X_BASE = [['n', '×X'], ['7-', '×(7−X)'], ['1', '×1（固定，不看 X）']];
   const X_MOD = [['', '固定'], ['n', '×(值×X)（角度9 → ×0.9）'], ['1+n', '×(1＋值×X)'], ['7-', '×(值×(7−X))']];
   // 每一列下方的例子：「免傷6+ → +0.2、5+ → +0.4、4+ → +0.6」
   function tierExample(key, v, x) {
@@ -1115,6 +1115,7 @@
     const f = (q) => (q >= 0 ? '+' : '') + r(q);
     if (x === 'n') return `${key}1 → ${f(n)}、${key}2 → ${f(2 * n)}、${key}3 → ${f(3 * n)}`;
     if (x === '7-') return `${key}6+ → ${f(n)}、5+ → ${f(2 * n)}、4+ → ${f(3 * n)}、3+ → ${f(4 * n)}`;
+    if (x === '1') return `${key} → ${f(n)}（固定，寫幾都一樣）`;
     if (x === '2-') return `${key}1 → ${f(n)}、${key}0 → ${f(2 * n)}、${key}-1 → ${f(3 * n)}`;
     return '';
   }
@@ -1149,7 +1150,7 @@
       if (s.body) p.push(`本體${sgn(s.body.v)}${fmtX(s.body.x)}`);
       if (s.bodyNoun != null) p.push(`本體(名詞)${sgn(s.bodyNoun)}`);
       if (s.weapon) p.push(`武器${sgn(s.weapon.v)}${fmtX(s.weapon.x)}`);
-      if (s.wbase) p.push(`基數+${s.wbase.v}${fmtX(s.wbase.x)}`);
+      if (s.wbase) p.push(`基數+${s.wbase.v}${s.wbase.x === '1' ? '' : fmtX(s.wbase.x)}`);
       if (s.wmod != null) p.push(typeof s.wmod === 'object' ? `倍率 ${s.wmod.v}${s.wmod.x === '1+n' ? '：1＋值×X' : fmtX(s.wmod.x)}` : `×${s.wmod}`);
       if (s.extra) p.push('公式 ' + Object.values(s.extra).join('／'));
       if (p.length) parts.push(((it.scores.length > 1 || s.key !== it.name) ? s.key + ' ' : '') + p.join(' '));

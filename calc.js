@@ -87,6 +87,8 @@
   };
   // 武器倍率依 X：'n' ＝ 值×X（角度9 → ×0.9）、'1+n' ＝ 1＋值×X、'7-' ＝ 值×(7−X)
   const W_MOD_TIER = { '角度': [0.1, 'n'] };
+  // 武器基數加 ×1：不看 X，寫了就固定加
+  const W_BASEFIX = {};
   const DIRECT_ONLY = ['能量', 'HEAT', 'APHE'];
 
   // 04 額外加成的係數（公式形狀寫在程式裡，係數可以從關鍵字資料庫改）
@@ -104,7 +106,7 @@
   const ex = (name, f) => (EXTRA[name] && EXTRA[name][f] != null ? EXTRA[name][f] : EXTRA_DEF[name][f]);
 
   // 預設表（程式內建）；編輯器讀到關鍵字資料庫後用 setScores() 換成資料庫的分數
-  const TABLES = { BODY_FIXED, BODY_NOUN, BODY_TIER, W_RULE, W_TIER, W_BASEADD, W_MOD, W_MOD_TIER };
+  const TABLES = { BODY_FIXED, BODY_NOUN, BODY_TIER, W_RULE, W_TIER, W_BASEADD, W_MOD, W_MOD_TIER, W_BASEFIX };
   const TABLE_DEF = JSON.parse(JSON.stringify(TABLES));
   // items[].scores = [{ key, body:{v,x}, bodyNoun, weapon:{v,x}, wbase:{v,x}, wmod, extra:{...} }]
   //   x：'' 固定、'n' ×X、'7-' ×(7−X)、'2-' ×(2−X)；資料庫有寫到的 key 以資料庫為準（沒填的部分＝不算分）
@@ -127,7 +129,7 @@
       if (sc.body && !isNaN(num0(sc.body.v))) { if (sc.body.x) BODY_TIER[k] = [num0(sc.body.v), sc.body.x]; else BODY_FIXED[k] = num0(sc.body.v); }
       if (!isNaN(num0(sc.bodyNoun))) BODY_NOUN[k] = num0(sc.bodyNoun);
       if (sc.weapon && !isNaN(num0(sc.weapon.v))) { if (sc.weapon.x) W_TIER[k] = [num0(sc.weapon.v), sc.weapon.x]; else W_RULE[k] = num0(sc.weapon.v); }
-      if (sc.wbase && !isNaN(num0(sc.wbase.v))) W_BASEADD[k] = [num0(sc.wbase.v), sc.wbase.x || 'n'];
+      if (sc.wbase && !isNaN(num0(sc.wbase.v))) { if (sc.wbase.x === '1') W_BASEFIX[k] = num0(sc.wbase.v); else W_BASEADD[k] = [num0(sc.wbase.v), sc.wbase.x || 'n']; }
       if (sc.wmod != null && typeof sc.wmod === 'object') {
         if (!isNaN(num0(sc.wmod.v))) { if (sc.wmod.x) W_MOD_TIER[k] = [num0(sc.wmod.v), sc.wmod.x]; else W_MOD[k] = num0(sc.wmod.v); }
       } else if (!isNaN(num0(sc.wmod))) W_MOD[k] = num0(sc.wmod);
@@ -347,6 +349,7 @@
         return;
       }
       if (t in W_MOD) { mod *= W_MOD[t]; modP.push(`${tok} ×${W_MOD[t]}`); return; }
+      if (t in W_BASEFIX) { baseAdd += W_BASEFIX[t]; baseP.push(`${tok} +${W_BASEFIX[t]}`); return; }
       const r = parseRule(t);
       if (r.arg != null && r.name in W_TIER) {
         const [k, kind] = W_TIER[r.name]; const x = solveX(r.arg, kind);
@@ -356,6 +359,7 @@
         const [k, kind] = W_BASEADD[r.name]; const x = solveX(r.arg, kind);
         baseAdd += k * x; baseP.push(`${tok} +${k}×${x}`); return;
       }
+      if (r.arg != null && r.name in W_BASEFIX) { baseAdd += W_BASEFIX[r.name]; baseP.push(`${tok} +${W_BASEFIX[r.name]}`); return; }
       if (r.arg != null && r.name in W_MOD_TIER) {
         const [k, kind] = W_MOD_TIER[r.name];
         const x = solveX(r.arg, kind === '1+n' ? 'n' : kind);
