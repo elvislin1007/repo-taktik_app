@@ -1102,9 +1102,21 @@
     renderKwList();
   }
   // ---------- 關鍵字的分數（scores）：本體加乘、武器加乘、武器基數加、武器倍率、額外加成係數 ----------
-  const X_BODY = [['', '固定'], ['n', '×X'], ['7-', '×(7−X)']];
-  const X_WEAPON = [['', '固定'], ['n', '×X'], ['7-', '×(7−X)'], ['2-', '×(2−X)']];
+  // 階層式特規：分數 × X。X＝資料卡上寫的數字；「7−X」類（免傷5+）X＝7−5＝2
+  const X_BODY = [['', '固定'], ['n', '×X（先攻2）'], ['7-', '×(7−X)（免傷5+）']];
+  const X_WEAPON = [['', '固定'], ['n', '×X（穿甲2）'], ['7-', '×(7−X)（腐蝕5+）'], ['2-', '×(2−X)（曲射-1）']];
   const X_BASE = [['n', '×X'], ['7-', '×(7−X)']];
+  // 每一列下方的例子：「免傷6+ → +0.2、5+ → +0.4、4+ → +0.6」
+  function tierExample(key, v, x) {
+    const n = Number(v);
+    if (v === '' || v == null || isNaN(n) || !x) return '';
+    const r = (q) => Math.round(q * 1000) / 1000;
+    const f = (q) => (q >= 0 ? '+' : '') + r(q);
+    if (x === 'n') return `${key}1 → ${f(n)}、${key}2 → ${f(2 * n)}、${key}3 → ${f(3 * n)}`;
+    if (x === '7-') return `${key}6+ → ${f(n)}、5+ → ${f(2 * n)}、4+ → ${f(3 * n)}、3+ → ${f(4 * n)}`;
+    if (x === '2-') return `${key}1 → ${f(n)}、${key}0 → ${f(2 * n)}、${key}-1 → ${f(3 * n)}`;
+    return '';
+  }
   const EXTRA_INFO = {
     '熱視線': ['額外加成 ＝ 係數 × (距離 − 6)', { k: '係數' }], '夜視': ['額外加成 ＝ 係數 × (距離 − 6)（有寫距離時）', { k: '係數' }],
     '先進視覺': ['額外加成 ＝ 係數 × (距離 − 6)', { k: '係數' }],
@@ -1115,6 +1127,8 @@
     '法術': ['額外加成 ＝ 每級 × X', { ind: '獨立每級', troop: '部隊每級' }],
     '抗性': ['本體加乘 ＝ 每級 × X（小抗性：火、電、冰、精神、毒；大抗性：法術、能量）', { small: '小抗性每級', big: '大抗性每級' }],
     '反-': ['武器基數 ＋ 係數 × (7 − X)', { k: '係數' }],
+    'HE': ['HE 武器分數 ＝ 直擊 ＋ 爆炸 × 權重；爆炸 ＝ 爆炸STR基數 × 爆炸D加乘 × 射程 × (1＋規則) × HE半徑 × 攻速 × 裝填 × 修正（STR、D 要寫成 直擊/爆炸，例 8/7、2/1）', { k: '爆炸權重' }],
+    'HEAT': ['HEAT 武器分數 ＝ 直擊 ＋ 爆炸 × 權重（算法同 HE；STR、D 要寫成 直擊/爆炸）', { k: '爆炸權重' }],
   };
   const fmtX = (x) => ({ '': '', n: '×X', '7-': '×(7−X)', '2-': '×(2−X)' }[x || ''] || '');
   const sgn = (v) => (Number(v) >= 0 ? '+' : '') + v;
@@ -1152,23 +1166,36 @@
       row.append(grid);
       return row;
     }
+    const ex = el('div', { class: 'sc-example' });
+    const showEx = () => {
+      const k = C.normKey(key.value) || '…';
+      const lines = [['body', '本體'], ['weapon', '武器'], ['wbase', '武器基數']].map(([f, lbl]) => {
+        const i = row.querySelector(`input[data-f="${f}"]`); const s = row.querySelector(`select[data-f="${f}X"]`);
+        const t = i && s ? tierExample(k, i.value, s.value) : '';
+        return t ? `${lbl}：${t}` : '';
+      }).filter(Boolean);
+      ex.textContent = lines.length ? '例：' + lines.join('；') : '';
+    };
     const cell = (lbl, field, opts, v) => {
       const n = numIn(v && v.v, lbl); n.dataset.f = field;
+      n.addEventListener('input', showEx);
       const c = el('label', { class: 'sc-cell' }, lbl, n);
-      if (opts) { const s = xSel(opts, v && v.x, lbl + ' X'); s.dataset.f = field + 'X'; c.append(s); }
+      if (opts) { const s = xSel(opts, v && v.x, lbl + ' X'); s.dataset.f = field + 'X'; s.addEventListener('change', showEx); c.append(s); }
       return c;
     };
+    key.addEventListener('input', showEx);
     const grid = el('div', { class: 'sc-grid' },
       cell('本體加乘', 'body', X_BODY, sc.body), cell('武器加乘', 'weapon', X_WEAPON, sc.weapon),
       cell('武器基數加', 'wbase', X_BASE, sc.wbase), cell('武器倍率 ×', 'wmod', null, sc.wmod != null ? { v: sc.wmod } : null));
     if (sc.bodyNoun != null) grid.append(cell('本體（寫名詞時）', 'bodyNoun', null, { v: sc.bodyNoun }));
-    row.append(grid);
+    row.append(grid, ex);
+    showEx();
     return row;
   }
   function readScores() {
     const out = [];
     kwIn('sc-list').querySelectorAll('.sc-row').forEach((row) => {
-      const key = text(row.querySelector('.sc-key').value);
+      const key = row.dataset.extra ? text(row.querySelector('.sc-key').value) : C.normKey(row.querySelector('.sc-key').value);
       if (!key) return;
       const val = (f) => { const i = row.querySelector(`input[data-f="${f}"]`); return i && i.value !== '' && !isNaN(Number(i.value)) ? Number(i.value) : null; };
       const xv = (f) => { const s = row.querySelector(`select[data-f="${f}X"]`); return s ? s.value : ''; };

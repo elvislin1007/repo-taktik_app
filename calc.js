@@ -96,6 +96,7 @@
     '維修': { ind: 15, troop: 3 }, '醫療': { ind: 15, troop: 3 }, '法術': { ind: 15, troop: 3 },
     '抗性': { small: 0.1, big: 0.2 },                                      // 小抗性／大抗性 每級（本體加乘）
     '反-': { k: 5 },                                                       // 武器基數 + k × (7 − X)
+    'HE': { k: 0.5 }, 'HEAT': { k: 0.5 },                                  // 爆炸分數的權重：直擊 ＋ 爆炸 × k
   };
   let EXTRA = JSON.parse(JSON.stringify(EXTRA_DEF));
   const ex = (name, f) => (EXTRA[name] && EXTRA[name][f] != null ? EXTRA[name][f] : EXTRA_DEF[name][f]);
@@ -105,12 +106,16 @@
   const TABLE_DEF = JSON.parse(JSON.stringify(TABLES));
   // items[].scores = [{ key, body:{v,x}, bodyNoun, weapon:{v,x}, wbase:{v,x}, wmod, extra:{...} }]
   //   x：'' 固定、'n' ×X、'7-' ×(7−X)、'2-' ×(2−X)；資料庫有寫到的 key 以資料庫為準（沒填的部分＝不算分）
+  // 寫法：「免傷6+」「先攻(X)」「免傷(5+)」→「免傷」「先攻」（數字是資料卡上的值，不是寫法的一部分）
+  function normKey(s) {
+    return String(s || '').trim().replace(/\s*[（(]\s*X\s*[)）]\s*$/i, '').replace(/\s*[（(]?\s*\d+(?:\.\d+)?\s*\+?\s*[)）]?\s*$/, '').trim();
+  }
   function setScores(items) {
     Object.entries(TABLES).forEach(([n, t]) => { Object.keys(t).forEach((k) => delete t[k]); Object.assign(t, JSON.parse(JSON.stringify(TABLE_DEF[n]))); });
     EXTRA = JSON.parse(JSON.stringify(EXTRA_DEF));
     const num0 = (v) => (v === '' || v == null ? NaN : Number(v));
     (items || []).forEach((it) => (it.scores || []).forEach((sc) => {
-      const k = String(sc.key || '').trim();
+      const k = normKey(sc.key);
       if (!k) return;
       if (sc.extra && EXTRA_DEF[k]) {
         Object.entries(sc.extra).forEach(([f, v]) => { if (!isNaN(num0(v))) EXTRA[k][f] = num0(v); });
@@ -322,15 +327,15 @@
     // 規則分類
     let add = 0, baseAdd = 0, mod = 1;
     const addP = [], baseP = [], modP = [];
-    let heRadius = null;
+    let heRadius = null, heKind = 'HE';
     const directAdd = { v: 0 };
     rules.forEach((tok) => {
       const t = W_ALIAS[tok] || tok;
       if (type === 'grenade' && (t === '手榴彈' || t === '一次性')) { modP.push(`${tok}（手榴彈類型已乘 ×0.2，不重複）`); return; }
       const he = t.match(/^HE\s*(\d+(?:\.\d+)?)\s*[”"]?$/i) || t.match(/^HE\((\d+)/i);
-      if (he) { heRadius = parseFloat(he[1]); return; }
+      if (he) { heRadius = parseFloat(he[1]); heKind = 'HE'; return; }
       const heat = t.match(/^HEAT\s*(\d+)/i);
-      if (heat) { heRadius = parseFloat(heat[1]); return; }
+      if (heat) { heRadius = parseFloat(heat[1]); heKind = 'HEAT'; return; }
       if (t in W_RULE) {
         add += W_RULE[t]; addP.push(`${tok} ${fmtSigned(W_RULE[t])}`);
         if (DIRECT_ONLY.includes(t)) directAdd.v += W_RULE[t];
@@ -375,9 +380,12 @@
         const bBase = STR_BASE[strPair[1]];
         const bAdd = add - directAdd.v;
         const blast = ((bBase || 0) + baseAdd) * dmg(dPair[1]) * rngM * (1 + bAdd) * heRadius * asM * rlM * mod;
-        lines.push(`爆炸 (${bBase} + ${baseAdd}) × ${r2(dmg(dPair[1]))} × ${r2(rngM)} × ${r2(1 + bAdd)} × ${heRadius}" × ${r2(asM)} × ${rlM} × ${r2(mod)} = ${r2(blast)}，×0.5`);
-        total = direct + blast * 0.5;
-      } else if (strPair.length > 1) warn.push(`${name}：STR 有兩個值但沒有 HE／HEAT 半徑`);
+        const kb = ex(heKind, 'k');
+        lines.push(`爆炸 (${bBase} + ${baseAdd}) × ${r2(dmg(dPair[1]))} × ${r2(rngM)} × ${r2(1 + bAdd)} × ${heRadius}" × ${r2(asM)} × ${rlM} × ${r2(mod)} = ${r2(blast)}，×${kb}`);
+        total = direct + blast * kb;
+      } else if (heRadius && strPair.length < 2) warn.push(`${name}：有 ${heKind} ${heRadius}" 但 STR 只寫一個值（要寫成 直擊/爆炸，例 8/7），爆炸部分沒算`);
+      else if (heRadius && dPair.length < 2) warn.push(`${name}：有 ${heKind} ${heRadius}" 但 D 只寫一個值（要寫成 直擊/爆炸，例 2/1），爆炸部分沒算`);
+      else if (strPair.length > 1) warn.push(`${name}：STR 有兩個值但沒有 HE／HEAT 半徑`);
       out.steps.push({ label: `武器：${name}${type === 'grenade' ? '（手榴彈）' : ''}`, calc: `RNG ${rngV}、STR ${w.STR}、D ${w.D}、AS ${asTxt}、${rlTxt}；規則 ${addP.join('、') || '無'}${baseP.length ? '；基數加值 ' + baseP.join('、') : ''}${modP.length ? '；修正 ' + modP.join('、') : ''}`, value: '' });
     } else {
       const x = meleeX(w.STR);
@@ -552,5 +560,5 @@
     COMPOUND = map;
   }
   const getCompound = () => COMPOUND;
-  global.TaktikCalc = { setScores, getScoreTables, weaponScore, scoreEquipment, setCompound, getCompound, scoreUnit, parseAbility, meleeX, modeType, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
+  global.TaktikCalc = { normKey, setScores, getScoreTables, weaponScore, scoreEquipment, setCompound, getCompound, scoreUnit, parseAbility, meleeX, modeType, round5, STR_BASE, ATTR_BASE, clean, splitList, parseRule, num, firstNum };
 })(typeof window !== 'undefined' ? window : globalThis);
