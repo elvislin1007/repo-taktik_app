@@ -3256,15 +3256,16 @@
     {
       "id": "ks037",
       "group": "算分特規",
-      "name": "輔助動作",
-      "en": "",
+      "name": "輔助",
+      "en": "Assist",
       "aliases": [
-        "輔助動作"
+        "輔助",
+        "Assist"
       ],
       "text": "",
       "scores": [
         {
-          "key": "輔助動作",
+          "key": "輔助-",
           "wbase": {
             "v": 5,
             "x": "n"
