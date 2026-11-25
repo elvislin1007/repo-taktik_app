@@ -73,17 +73,17 @@
   "optionWeapons": [],
   "options": [],
   "result": {
-    "total": 835,
+    "total": 930,
     "steps": [
       {
         "label": "武器：仇敵殲滅者Enmitic Annihilator",
-        "calc": "RNG 18、STR 12、D 1、AS ×2、無須裝填 ×1；規則 無",
+        "calc": "RNG 18、STR 12、D 1、AS ×2、無須裝填 ×1；規則 AOE 2” +1×2",
         "value": ""
       },
       {
         "label": "　算式",
-        "calc": "(26.8 + 0) × 1 × 0.9 × 1 × 2 × 1 × 1 = 48.24 → 取整",
-        "value": 50
+        "calc": "(26.8 + 0) × 1 × 0.9 × 3 × 2 × 1 × 1 = 144.72 → 取整",
+        "value": 145
       },
       {
         "label": "武器：削骨爪Flensing claw（近戰）",
@@ -147,23 +147,22 @@
       },
       {
         "label": "每個模型",
-        "calc": "本體 391.37 + 額外 90 + 能力 100 + 武器 255",
-        "value": "836.37 → 835"
+        "calc": "本體 391.37 + 額外 90 + 能力 100 + 武器 350",
+        "value": "931.37 → 930"
       },
       {
         "label": "模型數",
-        "calc": "依單位構成：1 個；835 × 1",
-        "value": 835
+        "calc": "依單位構成：1 個；930 × 1",
+        "value": 930
       },
       {
         "label": "總分",
-        "calc": "835",
-        "value": 835
+        "calc": "930",
+        "value": 930
       }
     ],
     "warnings": [
       "仇敵殲滅者Enmitic Annihilator：武器特規「高斯」資料庫查不到，這次沒算",
-      "仇敵殲滅者Enmitic Annihilator：武器特規「AOE 2”」資料庫查不到，這次沒算",
       "仇敵殲滅者Enmitic Annihilator：武器特規「突儀」資料庫查不到，這次沒算",
       "相位收割者Hyperphase harvester：武器特規「沉重」資料庫查不到，這次沒算",
       "有「能量護盾」，但 DEF、HP 沒有寫斜線後的護盾值（例：14/14、7/4）"
