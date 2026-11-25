@@ -337,7 +337,16 @@
         "破襲",
         "Breaching"
       ],
-      "text": "發動衝鋒時STR+X。"
+      "text": "發動衝鋒時STR+X。",
+      "scores": [
+        {
+          "key": "破襲",
+          "wbase": {
+            "v": 0.1,
+            "x": "n"
+          }
+        }
+      ]
     },
     {
       "id": "kw019",
