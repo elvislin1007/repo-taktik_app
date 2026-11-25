@@ -42,7 +42,7 @@
     {
       "type": "ranged",
       "name": "仇敵殲滅者Enmitic Annihilator",
-      "rules": "高斯、AOE 2”、突儀",
+      "rules": "高斯、AOE 2”、突擊",
       "RNG": "18",
       "STR": "12",
       "D": "1",
@@ -62,7 +62,7 @@
     {
       "type": "melee",
       "name": "相位收割者Hyperphase harvester",
-      "rules": "能量力場、沉重",
+      "rules": "能量力場、沉重1",
       "RNG": "CC2",
       "STR": "+8",
       "D": "3",
@@ -70,20 +70,20 @@
       "RL": "-"
     }
   ],
-  "optionWeapons": [],
   "options": [],
+  "optionWeapons": [],
   "result": {
-    "total": 930,
+    "total": 935,
     "steps": [
       {
         "label": "武器：仇敵殲滅者Enmitic Annihilator",
-        "calc": "RNG 18、STR 12、D 1、AS ×2、無須裝填 ×1；規則 AOE 2” +1×2",
+        "calc": "RNG 18、STR 12、D 1、AS ×2、無須裝填 ×1；規則 AOE 2” +1×2、突擊 +0.1",
         "value": ""
       },
       {
         "label": "　算式",
-        "calc": "(26.8 + 0) × 1 × 0.9 × 3 × 2 × 1 × 1 = 144.72 → 取整",
-        "value": 145
+        "calc": "(26.8 + 0) × 1 × 0.9 × 3.1 × 2 × 1 × 1 = 149.54 → 取整",
+        "value": 150
       },
       {
         "label": "武器：削骨爪Flensing claw（近戰）",
@@ -147,26 +147,25 @@
       },
       {
         "label": "每個模型",
-        "calc": "本體 391.37 + 額外 90 + 能力 100 + 武器 350",
-        "value": "931.37 → 930"
+        "calc": "本體 391.37 + 額外 90 + 能力 100 + 武器 355",
+        "value": "936.37 → 935"
       },
       {
         "label": "模型數",
-        "calc": "依單位構成：1 個；930 × 1",
-        "value": 930
+        "calc": "依單位構成：1 個；935 × 1",
+        "value": 935
       },
       {
         "label": "總分",
-        "calc": "930",
-        "value": 930
+        "calc": "935",
+        "value": 935
       }
     ],
     "warnings": [
       "仇敵殲滅者Enmitic Annihilator：武器特規「高斯」資料庫查不到，這次沒算",
-      "仇敵殲滅者Enmitic Annihilator：武器特規「突儀」資料庫查不到，這次沒算",
-      "相位收割者Hyperphase harvester：武器特規「沉重」資料庫查不到，這次沒算",
+      "相位收割者Hyperphase harvester：武器特規「沉重1」資料庫查不到，這次沒算",
       "有「能量護盾」，但 DEF、HP 沒有寫斜線後的護盾值（例：14/14、7/4）"
     ]
   },
-  "savedAt": "2026-11-24T17:00:00.000Z"
+  "savedAt": "2026-11-25T03:43:54.081Z"
 }
