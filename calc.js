@@ -85,6 +85,8 @@
     '角度(180°)': 0.9, '角度(90°)': 0.8, '角度(30°)': 0.7, '固定': 0.6,
     '垂直穩定器': 1.1, '雙向穩定器': 1.2, '防空': 1.2, '額外': 1.2,
   };
+  // 武器倍率依 X：'n' ＝ 值×X（角度9 → ×0.9）、'1+n' ＝ 1＋值×X、'7-' ＝ 值×(7−X)
+  const W_MOD_TIER = { '角度': [0.1, 'n'] };
   const DIRECT_ONLY = ['能量', 'HEAT', 'APHE'];
 
   // 04 額外加成的係數（公式形狀寫在程式裡，係數可以從關鍵字資料庫改）
@@ -102,7 +104,7 @@
   const ex = (name, f) => (EXTRA[name] && EXTRA[name][f] != null ? EXTRA[name][f] : EXTRA_DEF[name][f]);
 
   // 預設表（程式內建）；編輯器讀到關鍵字資料庫後用 setScores() 換成資料庫的分數
-  const TABLES = { BODY_FIXED, BODY_NOUN, BODY_TIER, W_RULE, W_TIER, W_BASEADD, W_MOD };
+  const TABLES = { BODY_FIXED, BODY_NOUN, BODY_TIER, W_RULE, W_TIER, W_BASEADD, W_MOD, W_MOD_TIER };
   const TABLE_DEF = JSON.parse(JSON.stringify(TABLES));
   // items[].scores = [{ key, body:{v,x}, bodyNoun, weapon:{v,x}, wbase:{v,x}, wmod, extra:{...} }]
   //   x：'' 固定、'n' ×X、'7-' ×(7−X)、'2-' ×(2−X)；資料庫有寫到的 key 以資料庫為準（沒填的部分＝不算分）
@@ -126,7 +128,9 @@
       if (!isNaN(num0(sc.bodyNoun))) BODY_NOUN[k] = num0(sc.bodyNoun);
       if (sc.weapon && !isNaN(num0(sc.weapon.v))) { if (sc.weapon.x) W_TIER[k] = [num0(sc.weapon.v), sc.weapon.x]; else W_RULE[k] = num0(sc.weapon.v); }
       if (sc.wbase && !isNaN(num0(sc.wbase.v))) W_BASEADD[k] = [num0(sc.wbase.v), sc.wbase.x || 'n'];
-      if (!isNaN(num0(sc.wmod))) W_MOD[k] = num0(sc.wmod);
+      if (sc.wmod != null && typeof sc.wmod === 'object') {
+        if (!isNaN(num0(sc.wmod.v))) { if (sc.wmod.x) W_MOD_TIER[k] = [num0(sc.wmod.v), sc.wmod.x]; else W_MOD[k] = num0(sc.wmod.v); }
+      } else if (!isNaN(num0(sc.wmod))) W_MOD[k] = num0(sc.wmod);
     }));
   }
   const getScoreTables = () => JSON.parse(JSON.stringify({ ...TABLE_DEF, EXTRA: EXTRA_DEF }));
@@ -351,6 +355,13 @@
       if (r.arg != null && r.name in W_BASEADD) {
         const [k, kind] = W_BASEADD[r.name]; const x = solveX(r.arg, kind);
         baseAdd += k * x; baseP.push(`${tok} +${k}×${x}`); return;
+      }
+      if (r.arg != null && r.name in W_MOD_TIER) {
+        const [k, kind] = W_MOD_TIER[r.name];
+        const x = solveX(r.arg, kind === '1+n' ? 'n' : kind);
+        if (isNaN(x)) { warn.push(`${name}：「${tok}」的數值看不懂`); return; }
+        const m = kind === '1+n' ? 1 + k * x : k * x;
+        mod *= m; modP.push(`${tok} ×${r2(m)}`); return;
       }
       const anti = r.name.match(/^反-/);
       if (anti && r.arg != null) { const x = solveX(r.arg, '7-'); const ka = ex('反-', 'k'); baseAdd += ka * x; baseP.push(`${tok} +${ka}×${x}`); return; }

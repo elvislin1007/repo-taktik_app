@@ -1106,6 +1106,7 @@
   const X_BODY = [['', '固定'], ['n', '×X（先攻2）'], ['7-', '×(7−X)（免傷5+）']];
   const X_WEAPON = [['', '固定'], ['n', '×X（穿甲2）'], ['7-', '×(7−X)（腐蝕5+）'], ['2-', '×(2−X)（曲射-1）']];
   const X_BASE = [['n', '×X'], ['7-', '×(7−X)']];
+  const X_MOD = [['', '固定'], ['n', '×(值×X)（角度9 → ×0.9）'], ['1+n', '×(1＋值×X)'], ['7-', '×(值×(7−X))']];
   // 每一列下方的例子：「免傷6+ → +0.2、5+ → +0.4、4+ → +0.6」
   function tierExample(key, v, x) {
     const n = Number(v);
@@ -1115,6 +1116,15 @@
     if (x === 'n') return `${key}1 → ${f(n)}、${key}2 → ${f(2 * n)}、${key}3 → ${f(3 * n)}`;
     if (x === '7-') return `${key}6+ → ${f(n)}、5+ → ${f(2 * n)}、4+ → ${f(3 * n)}、3+ → ${f(4 * n)}`;
     if (x === '2-') return `${key}1 → ${f(n)}、${key}0 → ${f(2 * n)}、${key}-1 → ${f(3 * n)}`;
+    return '';
+  }
+  function modExample(key, v, x) {
+    const n = Number(v);
+    if (v === '' || v == null || isNaN(n) || !x) return '';
+    const r = (q) => Math.round(q * 1000) / 1000;
+    if (x === 'n') return [9, 8, 7, 6].map((q, i) => `${i ? '' : key}${q} → ×${r(n * q)}`).join('、');
+    if (x === '1+n') return [1, 2, 3].map((q, i) => `${i ? '' : key}${q} → ×${r(1 + n * q)}`).join('、');
+    if (x === '7-') return ['6+', '5+', '4+'].map((q, i) => `${i ? '' : key}${q} → ×${r(n * (i + 1))}`).join('、');
     return '';
   }
   const EXTRA_INFO = {
@@ -1140,7 +1150,7 @@
       if (s.bodyNoun != null) p.push(`本體(名詞)${sgn(s.bodyNoun)}`);
       if (s.weapon) p.push(`武器${sgn(s.weapon.v)}${fmtX(s.weapon.x)}`);
       if (s.wbase) p.push(`基數+${s.wbase.v}${fmtX(s.wbase.x)}`);
-      if (s.wmod != null) p.push(`×${s.wmod}`);
+      if (s.wmod != null) p.push(typeof s.wmod === 'object' ? `倍率 ${s.wmod.v}${s.wmod.x === '1+n' ? '：1＋值×X' : fmtX(s.wmod.x)}` : `×${s.wmod}`);
       if (s.extra) p.push('公式 ' + Object.values(s.extra).join('／'));
       if (p.length) parts.push(((it.scores.length > 1 || s.key !== it.name) ? s.key + ' ' : '') + p.join(' '));
     });
@@ -1174,6 +1184,9 @@
         const t = i && s ? tierExample(k, i.value, s.value) : '';
         return t ? `${lbl}：${t}` : '';
       }).filter(Boolean);
+      const mi = row.querySelector('input[data-f="wmod"]'); const ms = row.querySelector('select[data-f="wmodX"]');
+      const mt = mi && ms ? modExample(k, mi.value, ms.value) : '';
+      if (mt) lines.push(`武器倍率：${mt}`);
       ex.textContent = lines.length ? '例：' + lines.join('；') : '';
     };
     const cell = (lbl, field, opts, v) => {
@@ -1186,7 +1199,7 @@
     key.addEventListener('input', showEx);
     const grid = el('div', { class: 'sc-grid' },
       cell('本體加乘', 'body', X_BODY, sc.body), cell('武器加乘', 'weapon', X_WEAPON, sc.weapon),
-      cell('武器基數加', 'wbase', X_BASE, sc.wbase), cell('武器倍率 ×', 'wmod', null, sc.wmod != null ? { v: sc.wmod } : null));
+      cell('武器基數加', 'wbase', X_BASE, sc.wbase), cell('武器倍率 ×', 'wmod', X_MOD, sc.wmod != null ? (typeof sc.wmod === 'object' ? sc.wmod : { v: sc.wmod, x: '' }) : null));
     if (sc.bodyNoun != null) grid.append(cell('本體（寫名詞時）', 'bodyNoun', null, { v: sc.bodyNoun }));
     row.append(grid, ex);
     showEx();
@@ -1209,7 +1222,7 @@
       if (val('bodyNoun') != null) sc.bodyNoun = val('bodyNoun');
       if (val('weapon') != null) sc.weapon = { v: val('weapon'), x: xv('weapon') };
       if (val('wbase') != null) sc.wbase = { v: val('wbase'), x: xv('wbase') || 'n' };
-      if (val('wmod') != null) sc.wmod = val('wmod');
+      if (val('wmod') != null) sc.wmod = xv('wmod') ? { v: val('wmod'), x: xv('wmod') } : val('wmod');
       out.push(sc);
     });
     return out;
