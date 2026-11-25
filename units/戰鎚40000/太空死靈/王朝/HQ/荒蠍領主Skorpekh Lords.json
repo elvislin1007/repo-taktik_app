@@ -35,7 +35,7 @@
       "text": "聯合摧毀United in Destruction：此模型指揮距離內的友方[王朝][毀滅者教派]單位可以重擲果1的[造傷]。「50」"
     },
     {
-      "text": "毀滅天性Hardwired for Destruction：此模型可以重擲結果1的[命中]。"
+      "text": "毀滅天性Hardwired for Destruction：此模型可以重擲結果1的[命中]。「50」"
     }
   ],
   "weapons": [
@@ -73,7 +73,7 @@
   "optionWeapons": [],
   "options": [],
   "result": {
-    "total": 785,
+    "total": 835,
     "steps": [
       {
         "label": "武器：仇敵殲滅者Enmitic Annihilator",
@@ -141,19 +141,24 @@
         "value": 50
       },
       {
+        "label": "能力：毀滅天性Hardwired for Destru",
+        "calc": "能力後面寫的 50（獨立）",
+        "value": 50
+      },
+      {
         "label": "每個模型",
-        "calc": "本體 391.37 + 額外 90 + 能力 50 + 武器 255",
-        "value": "786.37 → 785"
+        "calc": "本體 391.37 + 額外 90 + 能力 100 + 武器 255",
+        "value": "836.37 → 835"
       },
       {
         "label": "模型數",
-        "calc": "依單位構成：1 個；785 × 1",
-        "value": 785
+        "calc": "依單位構成：1 個；835 × 1",
+        "value": 835
       },
       {
         "label": "總分",
-        "calc": "785",
-        "value": 785
+        "calc": "835",
+        "value": 835
       }
     ],
     "warnings": [
