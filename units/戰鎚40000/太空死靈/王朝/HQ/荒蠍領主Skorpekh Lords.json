@@ -32,7 +32,7 @@
       "text": "指揮協定"
     },
     {
-      "text": "聯合摧毀United in Destruction：此模型指揮距離內的友方[王朝][毀滅者教派]單位可以重擲果1的[造傷]。「50」"
+      "text": "聯合摧毀United in Destruction：此模型指揮距離內的友方[王朝][毀滅者教派]單位可以重擲結果1的[造傷]。「75」"
     },
     {
       "text": "毀滅天性Hardwired for Destruction：此模型可以重擲結果1的[命中]。「50」"
@@ -73,7 +73,7 @@
   "options": [],
   "optionWeapons": [],
   "result": {
-    "total": 940,
+    "total": 950,
     "steps": [
       {
         "label": "武器：仇敵殲滅者Enmitic Annihilator",
@@ -97,13 +97,13 @@
       },
       {
         "label": "武器：相位收割者Hyperphase harvester（近戰）",
-        "calc": "CC2、STR +8（查 STR 15）、D 3、AS 一般 ×1；規則 能量力場 +0.2、後攻1 −0.1×1",
+        "calc": "CC2、STR +8（查 STR 15）、D 3、AS 一般 ×1；規則 能量力場 +0.2、後攻1 −0.2×1",
         "value": ""
       },
       {
         "label": "　算式",
-        "calc": "(42.4 + 0) × 2 × 1.6 × 1.1 × 1.1 × 1 × 1 = 164.17 → 取整",
-        "value": 165
+        "calc": "(42.4 + 0) × 2 × 1.6 × 1.1 × 1 × 1 × 1 = 149.25 → 取整",
+        "value": 150
       },
       {
         "label": "本體基數總和",
@@ -142,8 +142,8 @@
       },
       {
         "label": "能力：聯合摧毀United in Destructio",
-        "calc": "能力後面寫的 50（獨立）",
-        "value": 50
+        "calc": "能力後面寫的 75（獨立）",
+        "value": 75
       },
       {
         "label": "能力：毀滅天性Hardwired for Destru",
@@ -152,21 +152,21 @@
       },
       {
         "label": "每個模型",
-        "calc": "本體 391.37 + 額外 197.2 + 能力 100 + 武器 250",
-        "value": "938.57 → 940"
+        "calc": "本體 391.37 + 額外 197.2 + 能力 125 + 武器 235",
+        "value": "948.57 → 950"
       },
       {
         "label": "模型數",
-        "calc": "依單位構成：1 個；940 × 1",
-        "value": 940
+        "calc": "依單位構成：1 個；950 × 1",
+        "value": 950
       },
       {
         "label": "總分",
-        "calc": "940",
-        "value": 940
+        "calc": "950",
+        "value": 950
       }
     ],
     "warnings": []
   },
-  "savedAt": "2026-11-25T04:08:15.350Z"
+  "savedAt": "2026-11-25T04:17:07.958Z"
 }
