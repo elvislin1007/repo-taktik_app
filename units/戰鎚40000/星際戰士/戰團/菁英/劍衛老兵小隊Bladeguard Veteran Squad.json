@@ -57,7 +57,7 @@
     {
       "type": "shield",
       "name": "暴風盾Storm Shield",
-      "rules": "能量力場、遲緩1、盾牆",
+      "rules": "能量力場、盾牆",
       "RNG": "CC1",
       "STR": "+8",
       "D": "1",
@@ -251,7 +251,6 @@
       }
     ],
     "warnings": [
-      "暴風盾Storm Shield：武器特規「遲緩1」資料庫查不到，這次沒算",
       "穿甲手榴彈Krak grenade：有 HEAT 2\" 但 D 只寫一個值（要寫成 直擊/爆炸，例 2/1），爆炸部分沒算"
     ]
   },
