@@ -33,7 +33,7 @@
       "text": "爆彈訓練、戰爭準則、破碎滅絕"
     },
     {
-      "text": "歐姆尼賽亞透鏡Omni-Scope：包含此模型的單位忽視[夜戰]；此外此單位射擊武器獲得[防空]，並且進行防空反應時視為一次免費射擊。「20」"
+      "text": "歐姆尼賽亞透鏡Omni-Scope：包含此模型的單位忽視[夜戰]；此外此單位射擊武器獲得[防空]，並且進行防空反應時視為一次免費射擊。「100」"
     }
   ],
   "weapons": [
@@ -93,17 +93,17 @@
   "optionWeapons": [],
   "options": [],
   "result": {
-    "total": 2370,
+    "total": 2460,
     "steps": [
       {
         "label": "武器：暴君火箭巢Tyrant Rocket Launcher ▶破片Frag",
-        "calc": "RNG 48、STR 8/7、D 4/2、AS ×1、正常裝填 ×0.8；規則 無",
+        "calc": "RNG 48、STR 8/7、D 4/2、AS ×1、正常裝填 ×0.8；規則 壓制 +0.1",
         "value": ""
       },
       {
         "label": "　算式",
-        "calc": "(11.6 + 0) × 1.9 × 2.4 × 1 × 1 × 0.8 × 1 = 42.32 → 取整",
-        "value": 40
+        "calc": "(11.6 + 0) × 1.9 × 2.4 × 1.1 × 1 × 0.8 × 1 = 46.55 → 取整",
+        "value": 45
       },
       {
         "label": "武器：暴君火箭巢Tyrant Rocket Launcher ▶穿甲Krak",
@@ -172,27 +172,26 @@
       },
       {
         "label": "能力：歐姆尼賽亞透鏡Omni-Scope",
-        "calc": "能力後面寫的 20 × 1/5（部隊，每個模型）",
-        "value": 4
+        "calc": "能力後面寫的 100 × 1/5（部隊，每個模型）",
+        "value": 20
       },
       {
         "label": "每個模型",
-        "calc": "本體 103.83 + 額外 10.8 + 能力 4 + 武器 275",
-        "value": "393.63 → 395"
+        "calc": "本體 103.83 + 額外 10.8 + 能力 20 + 武器 275",
+        "value": "409.63 → 410"
       },
       {
         "label": "模型數",
-        "calc": "依單位構成：6 個；395 × 6",
-        "value": 2370
+        "calc": "依單位構成：6 個；410 × 6",
+        "value": 2460
       },
       {
         "label": "總分",
-        "calc": "2370",
-        "value": 2370
+        "calc": "2460",
+        "value": 2460
       }
     ],
     "warnings": [
-      "暴君火箭巢Tyrant Rocket Launcher ▶破片Frag：武器特規「壓制」資料庫查不到，這次沒算",
       "暴君火箭巢Tyrant Rocket Launcher ▶破片Frag：STR 有兩個值但沒有 HE／HEAT 半徑",
       "暴君火箭巢Tyrant Rocket Launcher ▶穿甲Krak：有 HEAT 3\" 但 D 只寫一個值（要寫成 直擊/爆炸，例 2/1），爆炸部分沒算",
       "暴君火箭巢Tyrant Rocket Launcher ▶防空Flak：有 HEAT 3\" 但 D 只寫一個值（要寫成 直擊/爆炸，例 2/1），爆炸部分沒算"

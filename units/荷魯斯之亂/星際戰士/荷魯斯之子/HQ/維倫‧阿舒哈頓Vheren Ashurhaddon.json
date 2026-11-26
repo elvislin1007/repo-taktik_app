@@ -44,7 +44,7 @@
       "text": "虛空戰甲 Panoply of the Void：任何對此模型加入的單位射擊武器RNG-3。「50」"
     },
     {
-      "text": "鮮血與榮耀(指揮)Blood and Glory(Cmd.) : 此模型被pts配到攻擊時(決鬥和精準攻擊除外)，可以重擲失敗的[格檔]和[閃避]檢定。「50」"
+      "text": "鮮血與榮耀(指揮)Blood and Glory(Cmd.) : 此模型被pts配到攻擊時(決鬥和精準攻擊除外)，可以重擲失敗的[格檔]和[閃避]檢定。「0」"
     }
   ],
   "weapons": [
@@ -102,7 +102,7 @@
   "optionWeapons": [],
   "options": [],
   "result": {
-    "total": 940,
+    "total": 890,
     "steps": [
       {
         "label": "武器：災星齊射Banestrike Fusilade",
@@ -205,24 +205,19 @@
         "value": 50
       },
       {
-        "label": "能力：鮮血與榮耀(指揮)Blood and Glory",
-        "calc": "能力後面寫的 50（獨立）",
-        "value": 50
-      },
-      {
         "label": "每個模型",
-        "calc": "本體 325.16 + 額外 160.8 + 能力 300 + 武器 152",
-        "value": "937.96 → 940"
+        "calc": "本體 325.16 + 額外 160.8 + 能力 250 + 武器 152",
+        "value": "887.96 → 890"
       },
       {
         "label": "模型數",
-        "calc": "依單位構成：1 個；940 × 1",
-        "value": 940
+        "calc": "依單位構成：1 個；890 × 1",
+        "value": 890
       },
       {
         "label": "總分",
-        "calc": "940",
-        "value": 940
+        "calc": "890",
+        "value": 890
       }
     ],
     "warnings": [

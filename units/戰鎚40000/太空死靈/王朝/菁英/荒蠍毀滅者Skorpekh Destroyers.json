@@ -32,7 +32,7 @@
       "text": "指揮協定"
     },
     {
-      "text": "毀滅天性Hardwired for Destruction：此模型可以重擲結果1的[命中]。「10」"
+      "text": "毀滅天性Hardwired for Destruction：此模型可以重擲結果1的[命中]。「50」"
     }
   ],
   "weapons": [
@@ -72,7 +72,7 @@
     }
   ],
   "result": {
-    "total": 555,
+    "total": 570,
     "steps": [
       {
         "label": "武器：相位掠奪刃Hyperphase Thresshers（近戰）",
@@ -111,23 +111,23 @@
       },
       {
         "label": "能力：毀滅天性Hardwired for Destru",
-        "calc": "能力後面寫的 10 × 1/5（部隊，每個模型）",
-        "value": 2
+        "calc": "能力後面寫的 50 × 1/5（部隊，每個模型）",
+        "value": 10
       },
       {
         "label": "每個模型",
-        "calc": "本體 106.62 + 額外 0 + 能力 2 + 武器 75",
-        "value": "183.62 → 185"
+        "calc": "本體 106.62 + 額外 0 + 能力 10 + 武器 75",
+        "value": "191.62 → 190"
       },
       {
         "label": "模型數",
-        "calc": "依單位構成：3 個；185 × 3",
-        "value": 555
+        "calc": "依單位構成：3 個；190 × 3",
+        "value": 570
       },
       {
         "label": "總分",
-        "calc": "555",
-        "value": 555
+        "calc": "570",
+        "value": 570
       }
     ],
     "warnings": []

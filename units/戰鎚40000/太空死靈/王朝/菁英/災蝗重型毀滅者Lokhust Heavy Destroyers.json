@@ -32,7 +32,7 @@
       "text": "指揮協定"
     },
     {
-      "text": "毀滅天性Hardwired for Destruction：此模型可以重擲結果1的[命中]。「10」"
+      "text": "毀滅天性Hardwired for Destruction：此模型可以重擲結果1的[命中]。「50」"
     }
   ],
   "weapons": [
@@ -72,7 +72,7 @@
     }
   ],
   "result": {
-    "total": 390,
+    "total": 400,
     "steps": [
       {
         "label": "武器：高斯毀滅砲Gauss Destructor",
@@ -111,23 +111,23 @@
       },
       {
         "label": "能力：毀滅天性Hardwired for Destru",
-        "calc": "能力後面寫的 10 × 1/5（部隊，每個模型）",
-        "value": 2
+        "calc": "能力後面寫的 50 × 1/5（部隊，每個模型）",
+        "value": 10
       },
       {
         "label": "每個模型",
-        "calc": "本體 140.45 + 額外 0 + 能力 2 + 武器 250",
-        "value": "392.45 → 390"
+        "calc": "本體 140.45 + 額外 0 + 能力 10 + 武器 250",
+        "value": "400.45 → 400"
       },
       {
         "label": "模型數",
-        "calc": "依單位構成：1 個；390 × 1",
-        "value": 390
+        "calc": "依單位構成：1 個；400 × 1",
+        "value": 400
       },
       {
         "label": "總分",
-        "calc": "390",
-        "value": 390
+        "calc": "400",
+        "value": 400
       }
     ],
     "warnings": [
