@@ -3710,19 +3710,23 @@
     },
     {
       "id": "kwmwx1cbc0",
-      "group": "複合關鍵字",
+      "group": "通用關鍵字",
       "name": "智能導彈",
       "en": "Smart Ｍissiles",
-      "includes": [
-        "智能",
-        "飛彈/發射物",
-        "制導"
-      ],
       "aliases": [
         "智能導彈",
         "Smart Ｍissiles"
       ],
-      "text": ""
+      "text": "",
+      "scores": [
+        {
+          "key": "智能導彈",
+          "wbase": {
+            "v": 0.3,
+            "x": "n"
+          }
+        }
+      ]
     }
   ]
 }
