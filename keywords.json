@@ -3781,6 +3781,18 @@
           }
         }
       ]
+    },
+    {
+      "id": "kwmwxdxsb5",
+      "group": "通用關鍵字",
+      "name": "高斯",
+      "en": "Gauss",
+      "aliases": [
+        "高斯",
+        "Gauss"
+      ],
+      "text": "",
+      "scores": []
     }
   ]
 }
