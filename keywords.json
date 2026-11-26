@@ -1971,12 +1971,13 @@
       "id": "kw103",
       "group": "通用關鍵字",
       "name": "收割",
-      "en": "Reaping(X)",
+      "en": "Reaping",
       "aliases": [
         "收割",
         "Reaping"
       ],
-      "text": "與大於自身單位模型數量敵方近戰時，AS+X。"
+      "text": "與大於自身單位模型數量敵方近戰時，AS+X。",
+      "scores": []
     },
     {
       "id": "kw104",
