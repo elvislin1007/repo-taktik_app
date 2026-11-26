@@ -3687,6 +3687,18 @@
         "Necrons"
       ],
       "text": ""
+    },
+    {
+      "id": "kwmwx0df8c",
+      "group": "通用關鍵字",
+      "name": "連擊",
+      "en": "Combo",
+      "aliases": [
+        "連擊",
+        "Combo"
+      ],
+      "text": "",
+      "scores": []
     }
   ]
 }
