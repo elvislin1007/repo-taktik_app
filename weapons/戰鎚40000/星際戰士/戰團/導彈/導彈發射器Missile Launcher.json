@@ -13,7 +13,7 @@
       "name": "破片彈Frag Missile",
       "rules": "HE 4”",
       "RNG": "48",
-      "STR": "8/7",
+      "STR": "8/8",
       "D": "4/2",
       "AS": "1",
       "RL": "1"
@@ -43,5 +43,5 @@
   "faction": "星際戰士",
   "subfaction": "戰團",
   "category": "導彈",
-  "savedAt": "2026-11-24T12:00:00.000Z"
+  "savedAt": "2026-11-26T04:18:33.752Z"
 }
