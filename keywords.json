@@ -3801,6 +3801,18 @@
           }
         }
       ]
+    },
+    {
+      "id": "kwmwyou6lb",
+      "group": "通用關鍵字",
+      "name": "減速",
+      "en": "Retard",
+      "aliases": [
+        "減速",
+        "Retard"
+      ],
+      "text": "",
+      "scores": []
     }
   ]
 }
